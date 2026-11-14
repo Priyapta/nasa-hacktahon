@@ -1,0 +1,16 @@
+{
+  "location": {
+    "lat": -7.09,
+    "lon": 110.91
+  },
+  "rotation": {
+    "has_pattern": false,
+    "stages": []
+  },
+  "time": {
+    "start_month": "2026-11",
+    "horizon_months": 12
+  },
+  "water_source": "tadah_hujan",
+  "lang": "id"
+}

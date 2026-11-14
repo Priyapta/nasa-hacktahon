@@ -33,7 +33,7 @@ Orang 2 memiliki seluruh aturan dan perhitungan agronomi. Orang 3 memakai hasiln
 ## 3. Orang 2: backend inti, data, dan mesin rule-based
 
 - [ ] BE-01. Migrasikan backend Node.js ke FastAPI. Siapkan schema Pydantic, router `/api/v1`, pemetaan galat validasi ke 400, konfigurasi, dependensi Python, dan `/api/v1/health`.
-- [ ] BE-02. Kunci kontrak analisis/tanaman/pencarian bersama Orang 1 dan kontrak pipeline/chat bersama Orang 3. Buat fixture JSON untuk frontend sebelum perhitungan selesai; fixture tidak dipakai sebagai data produksi.
+- [x] BE-02. Kunci kontrak analisis/tanaman/pencarian bersama Orang 1 dan kontrak pipeline/chat bersama Orang 3. Buat fixture JSON untuk frontend sebelum perhitungan selesai; fixture tidak dipakai sebagai data produksi. Implementasi kontrak BE-02: `backend/contracts/README.md`, schema Pydantic, ekspor JSON Schema, fixture sintetis FE/agent, dan tes kontrak.
 - [ ] BE-03. Implementasikan service NASA POWER: periode sepuluh tahun lengkap, normalisasi nilai hilang, satuan, metadata, cache, serta fallback cache saat layanan gagal.
 - [ ] BE-04. Implementasikan service SoilGrids: konversi satuan, pembobotan kedalaman 0–30 cm, tekstur, ketidakpastian, cache, dan hasil parsial saat data gagal. Implementasikan Nominatim dengan validasi, cache, dan pembatas laju.
 - [ ] BE-05. Implementasikan profil bulanan, kelas Oldeman, validitas bulan, dan jendela tahun historis berurutan sesuai horizon. Jangan membentuk tahun buatan dari statistik tiap bulan.
