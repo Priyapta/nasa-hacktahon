@@ -7,6 +7,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     MKL_NUM_THREADS=1
 
 WORKDIR /app
+# Rasterio wheels require the Expat runtime even on the slim base image.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libexpat1 \
+    && rm -rf /var/lib/apt/lists/*
 COPY requirements.lock.txt ./requirements.lock.txt
 RUN pip install --no-cache-dir --only-binary=:all: -r requirements.lock.txt \
     && groupadd --gid 10001 atlas \
@@ -17,5 +21,6 @@ RUN pip install --no-cache-dir --only-binary=:all: -r requirements.lock.txt \
 COPY app ./app
 COPY data/catalog ./data/catalog
 USER atlas
+RUN python -c "from app.main import app; assert '/api/v1/health' in app.openapi()['paths']"
 EXPOSE 8000
 CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--proxy-headers", "--forwarded-allow-ips", "*", "--limit-concurrency", "32", "--backlog", "64", "--timeout-keep-alive", "5", "--timeout-graceful-shutdown", "30", "--no-access-log"]
