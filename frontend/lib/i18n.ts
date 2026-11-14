@@ -60,6 +60,7 @@ const id = {
     noPattern: "Belum punya pola",
     noPatternNote:
       "Hasil akan menampilkan beberapa alternatif tanpa pembanding pola biasa.",
+    patternHint: "Klik tanaman sesuai urutan tanam biasa. Bulan otomatis mengikuti slot kalender; hanya Bera yang durasinya bisa diubah.",
     emptyStages: "Pilih tanaman pertama dari daftar di bawah.",
     stage: (n: number) => `Tahap ${n}`,
     months: (n: number) => `${n} bulan`,
@@ -164,6 +165,7 @@ const en: Dictionary = {
     hasPattern: "I have a pattern",
     noPattern: "No pattern yet",
     noPatternNote: "Results will show several alternatives without a usual-pattern baseline.",
+    patternHint: "Add crops in your usual planting order. Months use fixed calendar slots; only the fallow duration can be changed.",
     emptyStages: "Pick the first crop from the list below.",
     stage: (n) => `Stage ${n}`,
     months: (n) => `${n} ${n === 1 ? "month" : "months"}`,

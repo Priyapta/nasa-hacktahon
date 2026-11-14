@@ -84,6 +84,7 @@ export default function RotationBuilder({
         <p className="m-0 text-sm leading-relaxed text-muted">{t.plan.noPatternNote}</p>
       ) : (
         <>
+          <p className="m-0 text-sm leading-relaxed text-muted">{t.plan.patternHint}</p>
           {stages.length === 0 ? (
             <p className="m-0 rounded-xl border-2 border-dashed border-control px-4 py-3 text-sm text-muted">
               {t.plan.emptyStages}
