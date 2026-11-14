@@ -1,0 +1,7 @@
+.search:focus-within {
+  border-color: var(--color-ink);
+}
+
+.search input:focus-visible {
+  outline: none;
+}

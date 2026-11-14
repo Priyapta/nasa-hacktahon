@@ -2,7 +2,10 @@
 
 **Status terkini dan panduan penerus:** [HANDOVER.md](HANDOVER.md).
 FastAPI, service POWER/SoilGrids, statistik iklim, geocode, crops, mesin rotasi
-dan `POST /api/v1/analyze` sudah tersedia. Agent belum tersedia. Bagian fondasi/rencana awal
+dan `POST /api/v1/analyze` sudah tersedia. Chat umum DeepSeek sudah terpasang
+di `/api/v1/agent/chat`; konteks analisis dan tool belum terhubung.
+Set `AI_API_KEY` dan `AI_MODEL` di environment shell sebelum menjalankan Uvicorn.
+Bagian fondasi/rencana awal
 di bawah adalah catatan historis; gunakan handover dan root tasks untuk progres kini.
 
 Acuan: PRD bagian 7 dan 12.4, serta `architecture.md`. FastAPI berjalan sebagai satu aplikasi monolit. Kode backend Node/TypeScript lama telah dihapus; integrasi frontend ke endpoint baru belum lengkap.

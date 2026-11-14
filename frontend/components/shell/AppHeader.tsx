@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
 import type { Lang } from "@/lib/types";
+import styles from "./AppHeader.module.css";
 
 export function Logo({ size = 32 }: { size?: number }) {
   return (
@@ -58,14 +59,15 @@ export default function AppHeader({ t, lang, step, onLangChange }: AppHeaderProp
 
       <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
         <span className="mr-1 text-[13px] text-muted lg:hidden">{step < 3 ? t.stepOf(step) : ""}</span>
-        <div role="group" aria-label={t.language} className="flex gap-1">
+        <div role="group" aria-label={t.language} className={styles.language}>
+          <span aria-hidden="true" className={styles.selection} data-lang={lang} />
           {(["id", "en"] as const).map((code) => (
             <button
               key={code}
               type="button"
               aria-pressed={lang === code}
               onClick={() => onLangChange(code)}
-              className="tile min-h-11 cursor-pointer px-3 text-center text-sm font-bold uppercase"
+              className={styles.option}
             >
               {code}
             </button>

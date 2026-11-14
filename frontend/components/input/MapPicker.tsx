@@ -10,25 +10,31 @@ import {
 import {
   AttributionControl,
   Map as MapLibreMap,
+  Popup,
   setWorkerUrl,
+  type GeoJSONSource,
   type RasterSourceSpecification,
 } from "maplibre-gl";
 import {
   TerraDraw,
   TerraDrawPolygonMode,
   TerraDrawSelectMode,
+  TerraDrawModeUndoRedo,
 } from "terra-draw";
 import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter";
+import type { Feature } from "geojson";
 import { clarityStyle } from "@/lib/map-style";
 import { bounds, measure } from "@/lib/geo";
 import { polygonFromRing, ringFromPolygon } from "@/lib/query";
 import type { Dictionary } from "@/lib/i18n";
 import type { OpenRing } from "@/lib/types";
-import { Layers, Minus, PenLine, Plus } from "lucide-react";
+import { Layers, Minus, PenLine, Plus, Undo2 } from "lucide-react";
+import styles from "./MapPicker.module.css";
 
 // Purwodadi, Grobogan: the PRD demo region.
 const DEMO_CENTER: [number, number] = [110.91, -7.09];
 const DEMO_ZOOM = 11;
+const GLOBE_ZOOM = 0.6;
 export const MIN_DRAW_ZOOM = 14;
 // Clarity level 18 tiles fail with CORS-blocked 404s around Central Java, so
 // the map overzooms native level 17 imagery instead.
@@ -36,11 +42,10 @@ const CLARITY_NATIVE_MAX_ZOOM = 17;
 // Terra Draw only accepts UUID v4 feature ids. One fixed id keeps a single field.
 const FIELD_ID = "6f1c2e4a-8b3d-4c5e-9f7a-1b2c3d4e5f60";
 
-// Leave room for the overlays that sit on the map, so the field lands in the
-// visible part: the step 1 panel on desktop and the search bar on phones.
-function fitPadding(m: MapLibreMap, editable: boolean) {
-  const wide = m.getContainer().clientWidth >= 900;
-  if (editable && wide) return { top: 120, bottom: 60, left: 440, right: 100 };
+// Reserve space for both desktop card sizes without moving the field between steps.
+function fitPadding(m: MapLibreMap) {
+  const wide = m.getContainer().clientWidth >= 1024;
+  if (wide) return { top: 120, bottom: 60, left: 600, right: 100 };
   return { top: 80, bottom: 40, left: 40, right: 80 };
 }
 
@@ -70,7 +75,8 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
   callbacks.current = props;
   const [ready, setReady] = useState(false);
   const [drawing, setDrawing] = useState(false);
-  const [zoom, setZoom] = useState(DEMO_ZOOM);
+  const [canUndo, setCanUndo] = useState(false);
+  const [zoom, setZoom] = useState(props.initialArea ? DEMO_ZOOM : GLOBE_ZOOM);
   const [satellite, setSatellite] = useState(true);
   const [tileError, setTileError] = useState(false);
   const [fatal, setFatal] = useState(false);
@@ -116,9 +122,9 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
       (style.sources.clarity as RasterSourceSpecification).maxzoom = CLARITY_NATIVE_MAX_ZOOM;
       m = new MapLibreMap({
         container: container.current,
-        style: { ...style, projection: { type: "mercator" } },
+        style: { ...style, projection: { type: props.editable ? "globe" : "mercator" } },
         center: DEMO_CENTER,
-        zoom: DEMO_ZOOM,
+        zoom: props.initialArea ? DEMO_ZOOM : container.current.clientWidth >= 1024 ? 2 : GLOBE_ZOOM,
         maxZoom: 20,
         dragRotate: false,
         pitchWithRotate: false,
@@ -151,17 +157,35 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
           ?.classList.remove("maplibregl-compact-show");
       d = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({ map: m, coordinatePrecision: 9 }),
+        undoRedo: { modeLevel: new TerraDrawModeUndoRedo() },
         modes: [
           new TerraDrawPolygonMode({
+            pointerDistance: 14,
+            keyEvents: { cancel: null, finish: null },
+            pointerEvents: {
+              leftClick: (event) => {
+                const draft = d?.getSnapshot().find((feature) => feature.properties.currentlyDrawing && feature.geometry.type === "Polygon");
+                if (draft?.geometry.type !== "Polygon") return true;
+                const points = draft.geometry.coordinates[0];
+                const count = Number(draft.properties.committedCoordinateCount);
+                const pointer = m.project([event.lng, event.lat]);
+                const first = m.project(points[0] as [number, number]);
+                const last = m.project(points[count - 1] as [number, number]);
+                if (pointer.dist(first) <= 14) return count >= 3;
+                return pointer.dist(last) > 14;
+              },
+              rightClick: true, contextMenu: false, onDragStart: true, onDrag: true, onDragEnd: true,
+            },
             styles: {
               fillColor: "#c3e77a",
-              fillOpacity: 0.34,
+              fillOpacity: (feature) => feature.properties.currentlyDrawing ? 0 : 0.34,
+              outlineOpacity: (feature) => feature.properties.currentlyDrawing ? 0 : 1,
               outlineColor: "#c3e77a",
               outlineWidth: 3,
               closingPointColor: "#ffffff",
               closingPointOutlineColor: "#145a37",
-              closingPointWidth: 7,
-              closingPointOutlineWidth: 3,
+              closingPointWidth: 0,
+              closingPointOutlineWidth: 0,
             },
           }),
           new TerraDrawSelectMode({
@@ -191,7 +215,53 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
         ],
       });
       draw.current = d;
+      m.addSource("field-draft", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       d.start();
+      m.addLayer({ id: "field-draft", type: "line", source: "field-draft", filter: ["==", ["geometry-type"], "LineString"], paint: { "line-color": "#c3e77a", "line-width": 3 } });
+      m.addLayer({
+        id: "field-draft-points", type: "circle", source: "field-draft", filter: ["==", ["geometry-type"], "Point"],
+        paint: {
+          "circle-radius": ["case", ["get", "first"], 8, 5],
+          "circle-color": ["case", ["get", "first"], "#145a37", "#ffffff"],
+          "circle-stroke-color": ["case", ["get", "first"], "#ffffff", "#145a37"],
+          "circle-stroke-width": 2,
+        },
+      });
+      m.addSource("field-hover", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      m.addLayer({ id: "field-hover", type: "circle", source: "field-hover", paint: {
+        "circle-radius": 12, "circle-color": "#1f7a4d", "circle-opacity": 0.2,
+        "circle-stroke-color": "#ffffff", "circle-stroke-width": 2,
+      } });
+      const hint = new Popup({ closeButton: false, closeOnClick: false, offset: 18, anchor: "bottom", className: styles.pointHint });
+      let hovered = "";
+      function clearHover() {
+        if (!hovered) return;
+        hovered = "";
+        hint.remove();
+        (m.getSource("field-hover") as GeoJSONSource).setData({ type: "FeatureCollection", features: [] });
+        m.getCanvas().style.cursor = "";
+      }
+      m.on("mousemove", (event) => {
+        if (!callbacks.current.editable || event.originalEvent.buttons) { clearHover(); return; }
+        const draft = d?.getSnapshot().find((feature) => feature.properties.currentlyDrawing && feature.geometry.type === "Polygon");
+        const points = draft?.geometry.type === "Polygon"
+          ? draft.geometry.coordinates[0].slice(0, Number(draft.properties.committedCoordinateCount))
+          : currentRing();
+        const index = points?.findIndex((point) => m.project(point as [number, number]).dist(event.point) <= 14) ?? -1;
+        if (!points || index < 0) { clearHover(); return; }
+        const coordinate = points[index] as [number, number];
+        const key = `${coordinate}:${Boolean(draft)}:${points.length}:${callbacks.current.t.land.closeBoundary}`;
+        if (hovered === key) return;
+        hovered = key;
+        const copy = callbacks.current.t.land;
+        const text = draft ? index === 0 ? points.length >= 3 ? copy.closeBoundary : copy.needPoints : copy.draftPoint : copy.editPoint;
+        (m.getSource("field-hover") as GeoJSONSource).setData({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: coordinate } });
+        hint.setLngLat(coordinate).setText(text).addTo(m);
+        m.getCanvas().style.cursor = draft ? index === 0 && points.length >= 3 ? "pointer" : "crosshair" : "grab";
+      });
+      m.on("mouseout", clearHover);
+      m.on("mousedown", clearHover);
+      d.on("history", () => setCanUndo(d?.canUndo() ?? false));
 
       const initial = callbacks.current.initialArea;
       if (initial) {
@@ -200,7 +270,7 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
           { type: "Feature", id: FIELD_ID, properties: { mode: "polygon" }, geometry },
         ]);
         if (result.valid) {
-          m.fitBounds(bounds(geometry), { padding: fitPadding(m, callbacks.current.editable), maxZoom: 17, duration: 0 });
+          m.fitBounds(bounds(geometry), { padding: fitPadding(m), maxZoom: 17, duration: 0 });
           if (callbacks.current.editable) {
             d.setMode("select");
             d.selectFeature(FIELD_ID);
@@ -228,6 +298,20 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
         callbacks.current.onAreaChange(ringFromPolygon(feature.geometry));
       });
       d.on("change", (_ids, type) => {
+        if (type !== "update") clearHover();
+        const draft = d?.getSnapshot().find((feature) => feature.properties.currentlyDrawing && feature.geometry.type === "Polygon");
+        const features: Feature[] = [];
+        if (draft?.geometry.type === "Polygon") {
+          const coordinates = draft.geometry.coordinates[0];
+          features.push({
+            type: "Feature", properties: {},
+            geometry: { type: "LineString", coordinates: coordinates.slice(0, -1) },
+          });
+          coordinates.slice(0, Number(draft.properties.committedCoordinateCount)).forEach((coordinate, index) => {
+            features.push({ type: "Feature", properties: { first: index === 0 }, geometry: { type: "Point", coordinates: coordinate } });
+          });
+        }
+        (m.getSource("field-draft") as GeoJSONSource).setData({ type: "FeatureCollection", features });
         if (type !== "update" || d?.getMode() !== "select") return;
         const ring = currentRing();
         if (!ring) return;
@@ -257,6 +341,7 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
     const d = draw.current;
     const m = map.current;
     if (!ready || !d || !m) return;
+    m.setProjection({ type: props.editable ? "globe" : "mercator" });
     const hasField = Boolean(d.getSnapshotFeature(FIELD_ID));
     if (props.editable) {
       if (hasField && d.getMode() !== "polygon") {
@@ -270,18 +355,17 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
       }
       d.setMode("static");
     }
-    const ring = currentRing();
-    if (ring) {
-      requestAnimationFrame(() => {
-        m.resize();
-        m.fitBounds(bounds(polygonFromRing(ring)), { padding: fitPadding(m, props.editable), maxZoom: 17, duration: 600 });
-      });
-    }
   }, [props.editable, ready]);
 
   useEffect(() => {
     if (!drawing) return;
     function cancel(event: KeyboardEvent) {
+      if ((event.target as HTMLElement).matches("input, textarea, select, [contenteditable=true]")) return;
+      if (event.key === "Backspace" || event.key === "Delete") {
+        event.preventDefault();
+        draw.current?.undo();
+        return;
+      }
       if (event.key !== "Escape") return;
       draw.current?.clear();
       draw.current?.setMode("static");
@@ -304,7 +388,7 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
   const canDraw = zoom >= MIN_DRAW_ZOOM;
 
   return (
-    <div className="absolute inset-0 bg-[#2e4a22]" data-panel={props.editable ? "left" : undefined}>
+    <div className={`${styles.frame} absolute inset-0 ${props.editable ? styles.cosmos : "bg-[#2e4a22]"}`} data-panel={props.editable ? "left" : undefined} aria-busy={!ready}>
       <div ref={container} className="h-full w-full" />
       {fatal && (
         <p role="alert" className="absolute inset-x-4 top-20 rounded-xl bg-white p-4 text-sm">
@@ -315,6 +399,11 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
         <p role="status" className="surface absolute left-1/2 top-24 max-w-[calc(100%-120px)] -translate-x-1/2 px-4 py-2 text-sm">
           {t.map.tileError}
         </p>
+      )}
+      {drawing && (
+        <button type="button" className="btn-secondary absolute bottom-28 right-3 gap-2 lg:right-5" disabled={!canUndo} onClick={() => draw.current?.undo()}>
+          <Undo2 size={18} aria-hidden="true" />{t.land.undoPoint}
+        </button>
       )}
       <div role="group" aria-label={t.map.tools} className="absolute right-3 top-20 flex flex-col gap-2 lg:right-5 lg:top-5">
         {props.editable && (

@@ -15,7 +15,7 @@ Acuan: [PRD Field Shift](<PRD Field Shift Alat Bantu Rotasi Tanam Berbasis Data 
 | Iklim | NASA POWER, sepuluh tahun kalender lengkap terakhir |
 | Tanah | SoilGrids, kedalaman agregat 0–30 cm |
 | Pencarian lokasi | Nominatim melalui backend |
-| Agent AI | LLM eksternal dengan tool terstruktur; provider/model dipilih sebelum implementasi |
+| Agent AI | DeepSeek melalui Chat Completions; model awal `deepseek-flash`, dapat diatur lewat `AI_MODEL`; tool analisis menyusul setelah pipeline tersedia |
 | Hosting target | Frontend di Vercel, backend di Render |
 
 Frontend mengumpulkan empat input, menampilkan hasil, dan menyediakan panel tanya AI. Seluruh perhitungan yang menentukan strategi dilakukan backend. LLM dipakai untuk percakapan dan pemilihan tool; mesin analisis tidak melatih model ML. Tidak ada login, prediksi panen, perhitungan keuntungan, atau skor gabungan.
@@ -288,7 +288,7 @@ Perintah backend target dari direktori `backend/`: `uvicorn app.main:app --reloa
 
 Database lokal dijalankan terpisah lewat `docker compose up -d --wait db` dari root repositori. `docker-compose.yml` memakai image `postgres:17`, healthcheck, port `127.0.0.1:5432`, dan named volume persisten. `.env` di root memasok `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, serta `POSTGRES_PORT`. `backend/.env` memasok `DATABASE_URL` yang sesuai. Password wajib diisi; kredensial hanya untuk backend. Lihat langkah operasional di [README](README.md#local-postgresql-with-docker).
 
-Penyediaan database sudah diimplementasikan; backend Node.js saat ini belum menggunakannya. Orang 2 menentukan tabel/migrasi dan menghubungkan FastAPI ketika kebutuhan data aplikasi diimplementasikan. Penambahan PostgreSQL tidak otomatis memigrasikan field LocalStorage, data kurasi/cache JSON, atau menyimpan chat. Aplikasi tetap tanpa akun dan riwayat chat permanen. Tidak ditambahkan tabel untuk fitur yang belum diminta.
+Penyediaan database sudah diimplementasikan; backend FastAPI saat ini belum menggunakannya. Orang 2 menentukan tabel/migrasi ketika kebutuhan data aplikasi diimplementasikan. Penambahan PostgreSQL tidak otomatis memigrasikan field LocalStorage, data kurasi/cache JSON, atau menyimpan chat. Aplikasi tetap tanpa akun dan riwayat chat permanen. Tidak ditambahkan tabel untuk fitur yang belum diminta.
 
 Compose ini untuk pengembangan lokal. Pada deployment Vercel/Render, PostgreSQL berada di layanan terpisah yang dapat diakses backend melalui `DATABASE_URL` produksi; Compose lokal tidak otomatis ikut terdeploy ke Vercel.
 
@@ -298,7 +298,7 @@ Target chat dengan konteks ter-cache di bawah 15 detik, dengan deadline total 30
 
 ## 7. Migrasi dari kode saat ini
 
-Repositori saat ini sudah memakai Next.js, tetapi backend masih Node.js HTTP dengan Photon. Dokumen ini belum mengganti implementasinya.
+Repositori memakai Next.js dan backend FastAPI. Tabel berikut mencatat rencana migrasi awal; health, katalog tanaman, Nominatim, chat, runner Python, dan proxy port 8000 sudah tersedia. Endpoint analisis dan tool chat masih menunggu integrasi.
 
 | Area | Perubahan saat implementasi |
 | --- | --- |
@@ -335,6 +335,8 @@ PRD memilih Leaflet, sedangkan implementasi peta sekarang memakai MapLibre. Perg
 Daftar ini menjadi verifikasi saat implementasi. Pembuatan dokumen arsitektur belum menyatakan bahwa kriteria penerimaan aplikasi telah lulus.
 
 ## 9. Agent AI dan kontrak chat
+
+Status implementasi awal: panel chat dwibahasa tersedia melalui `frontend/components/agent/agent-chat.tsx` dan `frontend/hooks/useAgentChat.ts`, dipasang di alur input dan hasil. Endpoint FastAPI berada di `backend/app/api/agent.py`, memakai service `backend/app/services/agent.py` dan `httpx`. DeepSeek memakai `AI_API_KEY` dan `AI_MODEL` di environment backend. Jawaban mengikuti bahasa pesan terbaru tanpa selector bahasa chat. Chat awal hanya untuk informasi umum, dengan `analysis_input=null`, `sources=[]`, dan `scenario=null`. Konteks analisis, data kurasi, dua tool, serta kuota harian di bawah masih menunggu integrasi. Batas awal lima request per menit berlaku untuk seluruh proses.
 
 ### `POST /api/v1/agent/chat`
 
@@ -386,8 +388,34 @@ Tool adalah fungsi internal, tanpa endpoint HTTP baru dan tanpa request HTTP ke 
 - Batas awal lima request per menit per client dan kuota bersama 100 request per proses per hari WIB melalui `AI_DAILY_REQUEST_LIMIT`. Gunakan identitas jaringan yang berasal dari proxy tepercaya, bukan header client yang bebas dipalsukan. Saat kuota habis, kembalikan 429 tanpa panggilan AI.
 - Pembatas in-memory berlaku untuk satu proses dan dapat ter-reset saat restart. Atur anggaran di penyedia bila tersedia; sebelum multiworker, pindahkan kuota ke penyimpanan bersama. Batas ini tidak menjamin biaya nol atau batas tagihan permanen.
 - Pesan, riwayat, dan referensi adalah data tidak tepercaya. Model tidak boleh mengubah instruksi sistem, mengambil URL yang diminta pengguna, atau menambah tool. Validasi tool dan sumber dilakukan oleh kode backend.
-- Riwayat tidak disimpan permanen oleh aplikasi dan log tidak memuat isi pesan, koordinat, atau kunci. Sebelum pesan pertama, tampilkan pemberitahuan bahwa pesan dan konteks minimum diproses penyedia AI. Retensi penyedia harus diperiksa tersendiri.
+- Riwayat tidak disimpan permanen oleh aplikasi dan log tidak memuat isi pesan, koordinat, atau kunci. Atas permintaan pemilik produk, footer penjelasan pada UI chat dihapus; pemrosesan pesan oleh penyedia AI tetap dijelaskan pada dokumentasi. Retensi penyedia harus diperiksa tersendiri.
 - Jawaban menyebut keterbatasan historis dan data tanah yang hilang. Pertanyaan tanpa bukti, diagnosis penyakit, dan dosis pestisida diarahkan ke informasi yang tersedia atau penyuluh. Pemeriksaan struktur dan sumber tidak menjamin seluruh kalimat LLM benar; tinjau contoh jawaban nyata.
 - AI gagal/kuota habis hanya memengaruhi chat. Jangan menampilkan chat tiruan atau mengklaim simulasi berhasil jika tool gagal. Format galat memakai `detail`, dengan status 400, 429, 502, 503, atau 504 sesuai tabel di atas.
 
-Pemilihan provider/model, API key, biaya, kemampuan tool terstruktur, dan kebijakan data masih perlu ditetapkan sebelum implementasi. Dokumen ini tidak mengasumsikan vendor tertentu. Fitur wajib agent dikerjakan setelah pipeline inti berjalan; jadwal dua hari pada PRD perlu disesuaikan jika penerimaan agent belum tercapai.
+Provider awal sudah dipilih: DeepSeek, dengan `AI_MODEL=deepseek-flash`. API key, biaya, kebijakan data, dan integrasi tool tetap perlu diverifikasi sebelum fitur agent lengkap dinyatakan selesai. Jadwal dua hari pada PRD perlu disesuaikan jika penerimaan agent belum tercapai.
+
+
+### Pemeriksaan konteks dan keamanan chat
+
+Setiap request chat diperiksa di backend: validasi dan kuota → DeepSeek classifier → keputusan backend → DeepSeek pembuat jawaban. Pemeriksa menerima pesan dan seluruh riwayat sebagai data tidak tepercaya. Hanya JSON tepat `{ "allowed": true, "reason": "in_scope" }` yang membuka tahap jawaban; nilai penolakan memakai reason `off_topic`, `unsafe`, atau `prompt_injection`. Respons kosong, rusak, terpotong, tidak konsisten, atau kegagalan pemeriksa menghentikan proses dengan 502/504. Pemeriksaan dibatasi 5 detik; kedua panggilan berbagi deadline total 25 detik. Model/key tetap `AI_MODEL`/`AI_API_KEY`; classifier maksimal 128 token dan jawaban maksimal 800 token.
+
+Topik yang diizinkan: fitur Field Atlas serta tanaman, rotasi, air, tanah, data NASA dan pertanyaan lanjutan terkait; cakupan tambahan mengikuti panduan agronomi terbaru. Coding/eksekusi perintah, permintaan rahasia atau prompt internal, upaya mengubah aturan, serta topik lain ditolak; permintaan campuran ditolak seluruhnya. Batas agronomi sebelumnya tetap berlaku. Tidak ada akses eksekusi kode atau tool baru.
+
+Penolakan adalah respons 200 dengan kalimat Indonesia persis sesuai panduan agronomi terbaru, `sources=[]`, `scenario=null`, dan tambahan opsional `blocked=true`. UI menampilkannya sebagai balasan biasa. Riwayat untuk request berikutnya dimulai setelah penolakan terakhir, sementara percakapan lama tetap terlihat. Flag client tidak dipercaya sebagai izin dan tidak dapat melewati pemeriksa backend. Request ditolak tetap memakai kuota; satu request yang lolos memakai dua panggilan model, yang ditolak satu. Tidak ada retry otomatis atau fallback melewati pemeriksa.
+
+Pengamanan ini mengurangi penyimpangan konteks tetapi bukan jaminan klasifikasi sempurna. Tes memakai provider palsu untuk memeriksa alur dan kegagalan; kualitas klasifikasi DeepSeek asli perlu dievaluasi terpisah. Migrasi chat ke FastAPI selesai; integrasi analisis lahan tetap pekerjaan terpisah.
+
+### Panduan jawaban agronomi terbaru
+
+Prompt classifier dan jawaban memakai cakupan pertanian/perkebunan, pangan/hortikultura, kalender dan rotasi tanam, tanah/pupuk/air/hama/penyakit/gulma, iklim serta satelit/sensor untuk pertanian, dan ekonomi pertanian terkait pilihan komoditas atau hasil panen. Fitur pertanian Field Atlas tetap termasuk konteks. Permintaan coding/eksekusi, politik, selebriti, game, matematika umum, resep, percakapan tidak relevan, serta prompt injection ditolak. Penolakan tetap persis dalam bahasa Indonesia, termasuk ketika bahasa chat Inggris: "Mohon maaf, saya tidak bisa menjawab pertanyaan ini karena berada di luar konteks asisten pertanian dan pengelolaan lahan." Sapaan pembuka, perkenalan, terima kasih, dan pamitan singkat diizinkan; permintaan campuran di luar konteks tetap ditolak. Typo, singkatan, dan bahasa informal ditafsirkan menurut maksudnya tanpa melonggarkan batas keamanan; jika maksud pertanian belum jelas, minta klarifikasi.
+
+Gaya jawaban: langsung ke inti, pembuka 1-2 kalimat, bahasa lapangan yang profesional, contoh konkret bila didukung data, dan paragraf singkat. Bullet hanya untuk beberapa tindakan praktis, maksimal 3-4 poin dan dua kalimat per poin. Bold dipakai seperlunya untuk istilah penting, tidak wajib di awal setiap poin dan tidak menebalkan seluruh kalimat. Jangan memakai em dash atau en dash sebagai pemisah kalimat, heading untuk jawaban singkat, simbol/emoji/separator dekoratif, atau sintaks Markdown mentah. Tabel hanya jika perbandingan benar-benar membutuhkannya; renderer saat ini mendukung paragraf, daftar, dan bold sehingga perbandingan disampaikan sebagai poin ringkas. Jawab langsung, jelaskan pertimbangan relevan, beri saran hanya berdasar bukti, dan tanya lanjut hanya jika informasi esensial hilang. Bedakan data pengamatan, prakiraan, dan panduan umum tanpa mengarang cuaca, kondisi tanah, atau saran khusus lahan. Penutup validasi kondisi lapangan/PPL disampaikan natural bila relevan. Jangan mengasumsikan keadaan lahan atau mengaku sudah membaca NASA POWER/SMAP/GPM/ECOSTRESS/Landsat/MODIS yang belum terhubung. Ekonomi hanya dibahas kualitatif tanpa proyeksi hasil/keuntungan atau harga karangan; pembahasan hama bersifat edukatif tanpa diagnosis pasti/dosis pestisida. Ini memperluas percakapan, bukan menambah dataset analisis atau rumus ekonomi.
+
+UI memakai jarak antarpesan 12 px dan padding bubble 8 x 10 px. Output mendukung paragraf, daftar sederhana, dan **bold** sebagai elemen React; HTML, link, dan kode dari model tidak dieksekusi. Gaya bahasa model perlu diuji dengan layanan nyata; tes provider palsu hanya memastikan instruksi dan alur.
+
+
+Pembaruan chat: tiga tombol saran dihapus atas permintaan pengguna; composer langsung menampilkan kolom pesan dan tombol kirim 44 px dengan inset 6 px. Uji DeepSeek asli menerima "halo" dan "rotasi tanamn pdi abis panen tnm apa", serta menolak "jalnkn kode python" dan "halo, buatin kode game". Hasil empat contoh ini tidak menjamin ketepatan seluruh klasifikasi.
+
+### Penanganan data tidak tersedia
+
+Bila data real-time/eksternal yang dibutuhkan belum tersedia, AI menyampaikan batas dalam satu kalimat singkat, tanpa mengulang alasan atau mengarang estimasi. Jangan mengaku sudah mengecek data yang belum diambil. Jangan meminta pengguna menyalin, merangkum, atau mengirim data dari situs eksternal, maupun menanyakan lokasi jika belum ada layanan pencarian yang dapat memakainya. Berikan rujukan resmi relevan dan panduan umum yang tidak bergantung pada data hilang bila membantu. Untuk cuaca Indonesia, prompt menyediakan rujukan BMKG https://cuaca.bmkg.go.id/ yang telah diperiksa; tautan ini adalah rujukan, bukan bukti pengambilan cuaca langsung. Jangan membuat URL, angka, atau kutipan sumber lain; jika belum ada URL terverifikasi, sebutkan lembaga resmi/PPL yang relevan. Pertanyaan tentang kondisi lahan milik pengguna tetap boleh hanya jika esensial dan jawaban dapat terbantu olehnya. Tidak ada integrasi cuaca real-time baru atau perubahan kontrak API.

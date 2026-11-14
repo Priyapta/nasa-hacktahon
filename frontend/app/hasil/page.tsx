@@ -4,7 +4,7 @@ import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AppHeader from "@/components/shell/AppHeader";
-import AskAiDock from "@/components/shell/AskAiDock";
+import AgentChat from "@/components/agent/agent-chat";
 import { dictionary } from "@/lib/i18n";
 import { parsePlan, serializePlan } from "@/lib/query";
 
@@ -34,7 +34,7 @@ function Results() {
             {t.results.back}
           </Link>
         </section>
-        <AskAiDock t={t} launcherClassName="fixed bottom-5 right-5" />
+        <AgentChat lang={plan.lang} />
       </main>
     </div>
   );

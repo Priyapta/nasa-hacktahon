@@ -16,11 +16,12 @@
     "@turf/turf": "*",
     "lucide-react": "*",
     "maplibre-gl": "^6.18.0",
-    "next": "*",
-    "react": "*",
-    "react-dom": "*",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "terra-draw": "*",
-    "terra-draw-maplibre-gl-adapter": "^1.5.0"
+    "terra-draw-maplibre-gl-adapter": "^1.5.0",
+    "animejs": "^3.2.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
@@ -28,6 +29,7 @@
     "@types/node": "*",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "tailwindcss": "*"
+    "tailwindcss": "*",
+    "@types/animejs": "^3.1.13"
   }
 }

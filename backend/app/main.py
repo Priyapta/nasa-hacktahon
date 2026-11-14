@@ -5,11 +5,13 @@ from fastapi.responses import JSONResponse
 
 from app.api.analyze import router as analyze_router
 from app.api.crops import router as crops_router
+from app.api.agent import router as agent_router
 from app.api.geocode import router as geocode_router
 from app.api.routes import router
 from app.catalog import load_catalog
 from app.config import allowed_origins
 from app.services.analysis import AnalysisService
+from app.services.agent import AgentService
 
 
 def create_app() -> FastAPI:
@@ -24,6 +26,7 @@ def create_app() -> FastAPI:
 
     app.state.catalog = load_catalog()
     app.state.analysis = AnalysisService(catalog=app.state.catalog)
+    app.state.agent = AgentService()
 
     if origins := allowed_origins():
         app.add_middleware(
@@ -53,6 +56,7 @@ def create_app() -> FastAPI:
     app.include_router(geocode_router, prefix="/api/v1")
     app.include_router(crops_router, prefix="/api/v1")
     app.include_router(analyze_router, prefix="/api/v1")
+    app.include_router(agent_router, prefix="/api/v1")
 
     default_openapi = app.openapi
 

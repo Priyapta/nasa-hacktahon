@@ -1,0 +1,105 @@
+name: Test and deploy
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.lock.txt
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: python -m pip install -r backend/requirements-dev.lock.txt
+      - run: python -m pytest -q
+        working-directory: backend
+      - name: Check backend image before merge
+        if: github.event_name == 'pull_request'
+        run: |
+          docker build --platform linux/amd64 -t field-shift-api:check backend
+          docker run --rm --network none field-shift-api:check python -c "from app.main import create_app; assert '/api/v1/health' in create_app().openapi()['paths']"
+
+  deploy-backend:
+    needs: checks
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    concurrency:
+      group: atlas-backend-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}-api" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build and publish backend
+        id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: backend
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.image.outputs.name }}:${{ github.sha }}
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Deploy exact image to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ vars.VPS_PORT || '22' }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE: ${{ steps.image.outputs.name }}@${{ steps.build.outputs.digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest=$(GH_TOKEN="$GHCR_TOKEN" gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          if [[ $latest != "$GITHUB_SHA" ]]; then
+            echo "A newer main commit exists; its workflow will deploy instead."
+            exit 0
+          fi
+          : "${VPS_HOST:?Set VPS_HOST secret}"
+          : "${VPS_USER:?Set VPS_USER secret}"
+          : "${VPS_SSH_KEY:?Set VPS_SSH_KEY secret}"
+          : "${VPS_KNOWN_HOSTS:?Set VPS_KNOWN_HOSTS secret}"
+          [[ $VPS_PORT =~ ^[0-9]+$ ]] && (( VPS_PORT >= 1 && VPS_PORT <= 65535 ))
+          umask 077
+          mkdir -p "$RUNNER_TEMP/atlas-ssh"
+          printf '%s\n' "$VPS_SSH_KEY" > "$RUNNER_TEMP/atlas-ssh/key"
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > "$RUNNER_TEMP/atlas-ssh/known_hosts"
+          ssh_options=(-i "$RUNNER_TEMP/atlas-ssh/key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/atlas-ssh/known_hosts" -o ConnectTimeout=15)
+          scp "${ssh_options[@]}" -P "$VPS_PORT" deploy/backend/compose.yaml deploy/backend/deploy.sh "$VPS_USER@$VPS_HOST:/opt/field-shift/"
+          printf '%s\n' "$GHCR_TOKEN" | ssh "${ssh_options[@]}" -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" "bash /opt/field-shift/deploy.sh '$IMAGE' '$GITHUB_ACTOR'"

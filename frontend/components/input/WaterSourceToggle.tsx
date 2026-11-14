@@ -39,7 +39,6 @@ export default function WaterSourceToggle({ t, value, onChange }: WaterSourceTog
           </button>
         ))}
       </div>
-      <p className="m-0 text-[13px] text-muted">{t.plan.waterNote}</p>
     </section>
   );
 }
