@@ -1,0 +1,355 @@
+{
+  "version": "2026-11-14.v1",
+  "rotations": [
+    {
+      "id": "grobogan-padi-padi-jagung",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "jagung"
+        }
+      ],
+      "status": "source_checked",
+      "evidence_scope": "grobogan",
+      "evidence_basis": "local_pattern_mapping",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti.",
+          "Palawija/tumpangsari sumber dipetakan menjadi satu tanaman per tahap MVP."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar.",
+          "Source secondary-crop/intercropping patterns are mapped to one crop per MVP stage."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "GROBOGAN_DRY",
+          "locator": "Results pp.19-21: padi-padi-palawija",
+          "basis": "mapping"
+        }
+      ]
+    },
+    {
+      "id": "grobogan-padi-padi-kacang-hijau",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "kacang_hijau"
+        }
+      ],
+      "status": "source_checked",
+      "evidence_scope": "grobogan",
+      "evidence_basis": "local_pattern_mapping",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti.",
+          "Palawija/tumpangsari sumber dipetakan menjadi satu tanaman per tahap MVP."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar.",
+          "Source secondary-crop/intercropping patterns are mapped to one crop per MVP stage."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "GROBOGAN_DRY",
+          "locator": "Results pp.19-21: padi-padi-palawija",
+          "basis": "mapping"
+        }
+      ]
+    },
+    {
+      "id": "grobogan-padi-jagung-bera",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "jagung"
+        },
+        {
+          "crop_id": "bera",
+          "months": 4
+        }
+      ],
+      "status": "source_checked",
+      "evidence_scope": "grobogan",
+      "evidence_basis": "local_pattern_mapping",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti.",
+          "Palawija/tumpangsari sumber dipetakan menjadi satu tanaman per tahap MVP.",
+          "Durasi bera dipilih model, bukan pengukuran penelitian."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar.",
+          "Source secondary-crop/intercropping patterns are mapped to one crop per MVP stage.",
+          "Fallow duration is a model choice, not a study measurement."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "GROBOGAN_DRY",
+          "locator": "Results: padi-palawija-bero",
+          "basis": "mapping"
+        },
+        {
+          "source_id": "PRD",
+          "locator": "Section 7: chosen fallow duration within 1-6 months",
+          "basis": "model_assumption"
+        }
+      ]
+    },
+    {
+      "id": "grobogan-padi-kacang-hijau-bera",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "kacang_hijau"
+        },
+        {
+          "crop_id": "bera",
+          "months": 6
+        }
+      ],
+      "status": "source_checked",
+      "evidence_scope": "grobogan",
+      "evidence_basis": "local_pattern_mapping",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti.",
+          "Palawija/tumpangsari sumber dipetakan menjadi satu tanaman per tahap MVP.",
+          "Durasi bera dipilih model, bukan pengukuran penelitian."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar.",
+          "Source secondary-crop/intercropping patterns are mapped to one crop per MVP stage.",
+          "Fallow duration is a model choice, not a study measurement."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "GROBOGAN_DRY",
+          "locator": "Results: padi-palawija-bero",
+          "basis": "mapping"
+        },
+        {
+          "source_id": "PRD",
+          "locator": "Section 7: chosen fallow duration within 1-6 months",
+          "basis": "model_assumption"
+        }
+      ]
+    },
+    {
+      "id": "grobogan-padi-padi-kedelai",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "kedelai"
+        }
+      ],
+      "status": "source_checked",
+      "evidence_scope": "grobogan",
+      "evidence_basis": "reported_sequence",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "GROBOGAN_SOY",
+          "locator": "Section 3.1: reported local sequence",
+          "basis": "direct"
+        }
+      ]
+    },
+    {
+      "id": "grobogan-padi-jagung-kedelai",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "jagung"
+        },
+        {
+          "crop_id": "kedelai"
+        }
+      ],
+      "status": "source_checked",
+      "evidence_scope": "grobogan",
+      "evidence_basis": "reported_sequence",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "GROBOGAN_ROT",
+          "locator": "p.127: Pulokulon sequence",
+          "basis": "direct"
+        },
+        {
+          "source_id": "GROBOGAN_SOY",
+          "locator": "Section 3.1: padi-jagung-kedelai",
+          "basis": "direct"
+        }
+      ]
+    },
+    {
+      "id": "grobogan-padi-jagung-padi",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "jagung"
+        },
+        {
+          "crop_id": "padi_sawah"
+        }
+      ],
+      "status": "source_checked",
+      "evidence_scope": "grobogan",
+      "evidence_basis": "reported_sequence",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "GROBOGAN_ROT",
+          "locator": "p.127: Toroh sequence",
+          "basis": "direct"
+        }
+      ]
+    },
+    {
+      "id": "grobogan-padi-kedelai",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "kedelai"
+        }
+      ],
+      "status": "source_checked",
+      "evidence_scope": "grobogan",
+      "evidence_basis": "reported_sequence",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "GROBOGAN_TRIAL",
+          "locator": "p.35: Sugihan, Toroh; MK I padi, MK II kedelai",
+          "basis": "direct"
+        }
+      ]
+    },
+    {
+      "id": "draft-padi-kedelai-orok",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "kedelai"
+        },
+        {
+          "crop_id": "orok_orok"
+        }
+      ],
+      "status": "draft",
+      "evidence_scope": "proposed_adaptation",
+      "evidence_basis": "proposed_adaptation",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti.",
+          "Belum ada bukti urutan spesifik ini di Grobogan; draft tidak diaktifkan."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar.",
+          "This exact local sequence lacks evidence; the draft is disabled."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "PRD",
+          "locator": "Section 8.3 example; not field verification",
+          "basis": "adaptation"
+        }
+      ]
+    },
+    {
+      "id": "draft-padi-jagung-orok",
+      "stages": [
+        {
+          "crop_id": "padi_sawah"
+        },
+        {
+          "crop_id": "jagung"
+        },
+        {
+          "crop_id": "orok_orok"
+        }
+      ],
+      "status": "draft",
+      "evidence_scope": "proposed_adaptation",
+      "evidence_basis": "proposed_adaptation",
+      "catatan": {
+        "id": [
+          "Urutan pustaka untuk diuji; belum rekomendasi atau kalender tahunan yang pasti.",
+          "Belum ada bukti urutan spesifik ini di Grobogan; draft tidak diaktifkan."
+        ],
+        "en": [
+          "A sourced sequence for evaluation, not a recommendation or guaranteed annual calendar.",
+          "This exact local sequence lacks evidence; the draft is disabled."
+        ]
+      },
+      "sumber": [
+        {
+          "source_id": "SUNN_GREEN",
+          "locator": "General green-manure use; not this exact local sequence",
+          "basis": "adaptation"
+        }
+      ]
+    }
+  ]
+}

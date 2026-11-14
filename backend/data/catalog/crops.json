@@ -1,0 +1,1202 @@
+{
+  "version": "2026-11-14.v1",
+  "crops": [
+    {
+      "crop_id": "padi_sawah",
+      "nama": {
+        "id": "Padi sawah",
+        "en": "Paddy rice"
+      },
+      "scientific_name": "Oryza sativa",
+      "famili": "Poaceae",
+      "peran": {
+        "id": [
+          "produksi"
+        ],
+        "en": [
+          "production"
+        ]
+      },
+      "slot_bulan": 4,
+      "t_abs_min": 10,
+      "t_abs_max": 36,
+      "t_opt_min": 20,
+      "t_opt_max": 30,
+      "ph_abs_min": 4.5,
+      "ph_abs_max": 9,
+      "air_min_mm": 450,
+      "air_max_mm": 700,
+      "water_basis": "direct_fao",
+      "k5_mode": "assessed",
+      "butuh_bulan_basah": true,
+      "penambat_n": false,
+      "penutup_tanah": false,
+      "crop_cycle_days": {
+        "min": 80,
+        "max": 180
+      },
+      "local_cycle_days": null,
+      "aturan_urutan": [],
+      "catatan": {
+        "id": [
+          "Slot adalah pilihan kalender PRD, termasuk persiapan dan panen; varietas tetap memengaruhi durasi."
+        ],
+        "en": [
+          "Slots are PRD calendar choices including preparation and harvest; duration remains cultivar-dependent."
+        ]
+      },
+      "sumber": {
+        "nama": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "scientific_name": [
+          {
+            "source_id": "ECO_RICE_IDENTITY",
+            "locator": "Species heading",
+            "basis": "direct"
+          }
+        ],
+        "famili": [
+          {
+            "source_id": "ECO_RICE_IDENTITY",
+            "locator": "Family; Gramineae normalized to Poaceae, Leguminosae to Fabaceae",
+            "basis": "mapping"
+          }
+        ],
+        "peran": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "butuh_bulan_basah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "penambat_n": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "penutup_tanah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "aturan_urutan": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_abs_min": [
+          {
+            "source_id": "ECO_RICE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_abs_max": [
+          {
+            "source_id": "ECO_RICE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_min": [
+          {
+            "source_id": "ECO_RICE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_max": [
+          {
+            "source_id": "ECO_RICE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_min": [
+          {
+            "source_id": "ECO_RICE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_max": [
+          {
+            "source_id": "ECO_RICE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "crop_cycle_days": [
+          {
+            "source_id": "ECO_RICE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "slot_bulan": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: fixed model slot",
+            "basis": "model_assumption"
+          },
+          {
+            "source_id": "ECO_RICE",
+            "locator": "Crop-cycle compatibility only, not a slot guarantee",
+            "basis": "direct"
+          }
+        ],
+        "air_min_mm": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "air_max_mm": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "water_basis": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "k5_mode": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 10: seasonal-water assessment policy",
+            "basis": "prd_decision"
+          }
+        ]
+      }
+    },
+    {
+      "crop_id": "jagung",
+      "nama": {
+        "id": "Jagung",
+        "en": "Maize"
+      },
+      "scientific_name": "Zea mays ssp. mays",
+      "famili": "Poaceae",
+      "peran": {
+        "id": [
+          "produksi"
+        ],
+        "en": [
+          "production"
+        ]
+      },
+      "slot_bulan": 4,
+      "t_abs_min": 10,
+      "t_abs_max": 47,
+      "t_opt_min": 18,
+      "t_opt_max": 33,
+      "ph_abs_min": 4.5,
+      "ph_abs_max": 8.5,
+      "air_min_mm": 500,
+      "air_max_mm": 800,
+      "water_basis": "direct_fao",
+      "k5_mode": "assessed",
+      "butuh_bulan_basah": false,
+      "penambat_n": false,
+      "penutup_tanah": false,
+      "crop_cycle_days": {
+        "min": 65,
+        "max": 365
+      },
+      "local_cycle_days": {
+        "min": 80,
+        "max": 100
+      },
+      "aturan_urutan": [],
+      "catatan": {
+        "id": [
+          "Slot adalah pilihan kalender PRD, termasuk persiapan dan panen; varietas tetap memengaruhi durasi."
+        ],
+        "en": [
+          "Slots are PRD calendar choices including preparation and harvest; duration remains cultivar-dependent."
+        ]
+      },
+      "sumber": {
+        "nama": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "scientific_name": [
+          {
+            "source_id": "ECO_MAIZE_IDENTITY",
+            "locator": "Species heading",
+            "basis": "direct"
+          }
+        ],
+        "famili": [
+          {
+            "source_id": "ECO_MAIZE_IDENTITY",
+            "locator": "Family; Gramineae normalized to Poaceae, Leguminosae to Fabaceae",
+            "basis": "mapping"
+          }
+        ],
+        "peran": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "butuh_bulan_basah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "penambat_n": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "penutup_tanah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "aturan_urutan": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_abs_min": [
+          {
+            "source_id": "ECO_MAIZE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_abs_max": [
+          {
+            "source_id": "ECO_MAIZE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_min": [
+          {
+            "source_id": "ECO_MAIZE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_max": [
+          {
+            "source_id": "ECO_MAIZE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_min": [
+          {
+            "source_id": "ECO_MAIZE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_max": [
+          {
+            "source_id": "ECO_MAIZE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "crop_cycle_days": [
+          {
+            "source_id": "ECO_MAIZE",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "slot_bulan": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: fixed model slot",
+            "basis": "model_assumption"
+          },
+          {
+            "source_id": "ECO_MAIZE",
+            "locator": "Crop-cycle compatibility only, not a slot guarantee",
+            "basis": "direct"
+          },
+          {
+            "source_id": "GROBOGAN_DRY",
+            "locator": "Supports short-duration cultivar assumption",
+            "basis": "direct"
+          }
+        ],
+        "air_min_mm": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "air_max_mm": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "water_basis": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "k5_mode": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 10: seasonal-water assessment policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "local_cycle_days": [
+          {
+            "source_id": "GROBOGAN_DRY",
+            "locator": "Local harvest age",
+            "basis": "direct"
+          }
+        ]
+      }
+    },
+    {
+      "crop_id": "kedelai",
+      "nama": {
+        "id": "Kedelai",
+        "en": "Soybean"
+      },
+      "scientific_name": "Glycine max",
+      "famili": "Fabaceae",
+      "peran": {
+        "id": [
+          "produksi",
+          "penambat nitrogen"
+        ],
+        "en": [
+          "production",
+          "nitrogen fixer"
+        ]
+      },
+      "slot_bulan": 3,
+      "t_abs_min": 10,
+      "t_abs_max": 38,
+      "t_opt_min": 20,
+      "t_opt_max": 33,
+      "ph_abs_min": 4.5,
+      "ph_abs_max": 8.4,
+      "air_min_mm": 450,
+      "air_max_mm": 700,
+      "water_basis": "direct_fao",
+      "k5_mode": "assessed",
+      "butuh_bulan_basah": false,
+      "penambat_n": true,
+      "penutup_tanah": false,
+      "crop_cycle_days": {
+        "min": 75,
+        "max": 180
+      },
+      "local_cycle_days": {
+        "min": 76,
+        "max": 76
+      },
+      "aturan_urutan": [],
+      "catatan": {
+        "id": [
+          "Slot adalah pilihan kalender PRD, termasuk persiapan dan panen; varietas tetap memengaruhi durasi."
+        ],
+        "en": [
+          "Slots are PRD calendar choices including preparation and harvest; duration remains cultivar-dependent."
+        ]
+      },
+      "sumber": {
+        "nama": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "scientific_name": [
+          {
+            "source_id": "ECO_SOY_IDENTITY",
+            "locator": "Species heading",
+            "basis": "direct"
+          }
+        ],
+        "famili": [
+          {
+            "source_id": "ECO_SOY_IDENTITY",
+            "locator": "Family; Gramineae normalized to Poaceae, Leguminosae to Fabaceae",
+            "basis": "mapping"
+          }
+        ],
+        "peran": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "butuh_bulan_basah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "penambat_n": [
+          {
+            "source_id": "SOY_N",
+            "locator": "Nitrogen fixation trait",
+            "basis": "direct"
+          }
+        ],
+        "penutup_tanah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "aturan_urutan": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_abs_min": [
+          {
+            "source_id": "ECO_SOY",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_abs_max": [
+          {
+            "source_id": "ECO_SOY",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_min": [
+          {
+            "source_id": "ECO_SOY",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_max": [
+          {
+            "source_id": "ECO_SOY",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_min": [
+          {
+            "source_id": "ECO_SOY",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_max": [
+          {
+            "source_id": "ECO_SOY",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "crop_cycle_days": [
+          {
+            "source_id": "ECO_SOY",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "slot_bulan": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: fixed model slot",
+            "basis": "model_assumption"
+          },
+          {
+            "source_id": "ECO_SOY",
+            "locator": "Crop-cycle compatibility only, not a slot guarantee",
+            "basis": "direct"
+          },
+          {
+            "source_id": "SOY_LOCAL",
+            "locator": "Supports short-duration cultivar assumption",
+            "basis": "direct"
+          }
+        ],
+        "air_min_mm": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "air_max_mm": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "water_basis": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "direct"
+          }
+        ],
+        "k5_mode": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 10: seasonal-water assessment policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "local_cycle_days": [
+          {
+            "source_id": "SOY_LOCAL",
+            "locator": "Local harvest age",
+            "basis": "direct"
+          }
+        ]
+      }
+    },
+    {
+      "crop_id": "kacang_hijau",
+      "nama": {
+        "id": "Kacang hijau",
+        "en": "Mung bean"
+      },
+      "scientific_name": "Vigna radiata",
+      "famili": "Fabaceae",
+      "peran": {
+        "id": [
+          "produksi",
+          "penambat nitrogen"
+        ],
+        "en": [
+          "production",
+          "nitrogen fixer"
+        ]
+      },
+      "slot_bulan": 2,
+      "t_abs_min": 8,
+      "t_abs_max": 40,
+      "t_opt_min": 21,
+      "t_opt_max": 36,
+      "ph_abs_min": 4.3,
+      "ph_abs_max": 8.3,
+      "air_min_mm": 300,
+      "air_max_mm": 500,
+      "water_basis": "bean_proxy",
+      "k5_mode": "assessed",
+      "butuh_bulan_basah": false,
+      "penambat_n": true,
+      "penutup_tanah": false,
+      "crop_cycle_days": {
+        "min": 50,
+        "max": 120
+      },
+      "local_cycle_days": {
+        "min": 56,
+        "max": 60
+      },
+      "aturan_urutan": [],
+      "catatan": {
+        "id": [
+          "Slot adalah pilihan kalender PRD, termasuk persiapan dan panen; varietas tetap memengaruhi durasi.",
+          "Air memakai kategori bean FAO sebagai pendekatan sesuai PRD."
+        ],
+        "en": [
+          "Slots are PRD calendar choices including preparation and harvest; duration remains cultivar-dependent.",
+          "Water uses the PRD-approved FAO bean proxy."
+        ]
+      },
+      "sumber": {
+        "nama": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "scientific_name": [
+          {
+            "source_id": "ECO_MUNG_IDENTITY",
+            "locator": "Species heading",
+            "basis": "direct"
+          }
+        ],
+        "famili": [
+          {
+            "source_id": "ECO_MUNG_IDENTITY",
+            "locator": "Family; Gramineae normalized to Poaceae, Leguminosae to Fabaceae",
+            "basis": "mapping"
+          }
+        ],
+        "peran": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "butuh_bulan_basah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "penambat_n": [
+          {
+            "source_id": "MUNG_N",
+            "locator": "Nitrogen fixation trait",
+            "basis": "direct"
+          }
+        ],
+        "penutup_tanah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "aturan_urutan": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_abs_min": [
+          {
+            "source_id": "ECO_MUNG",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_abs_max": [
+          {
+            "source_id": "ECO_MUNG",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_min": [
+          {
+            "source_id": "ECO_MUNG",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_max": [
+          {
+            "source_id": "ECO_MUNG",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_min": [
+          {
+            "source_id": "ECO_MUNG",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_max": [
+          {
+            "source_id": "ECO_MUNG",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "crop_cycle_days": [
+          {
+            "source_id": "ECO_MUNG",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "slot_bulan": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: fixed model slot",
+            "basis": "model_assumption"
+          },
+          {
+            "source_id": "ECO_MUNG",
+            "locator": "Crop-cycle compatibility only, not a slot guarantee",
+            "basis": "direct"
+          },
+          {
+            "source_id": "MUNG_LOCAL",
+            "locator": "Supports short-duration cultivar assumption",
+            "basis": "direct"
+          }
+        ],
+        "air_min_mm": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "proxy"
+          }
+        ],
+        "air_max_mm": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "proxy"
+          }
+        ],
+        "water_basis": [
+          {
+            "source_id": "FAO_WATER",
+            "locator": "Table 14: seasonal crop water requirements",
+            "basis": "proxy"
+          }
+        ],
+        "k5_mode": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 10: seasonal-water assessment policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "local_cycle_days": [
+          {
+            "source_id": "MUNG_LOCAL",
+            "locator": "Local harvest age",
+            "basis": "direct"
+          }
+        ]
+      }
+    },
+    {
+      "crop_id": "orok_orok",
+      "nama": {
+        "id": "Orok-orok",
+        "en": "Sunn hemp"
+      },
+      "scientific_name": "Crotalaria juncea",
+      "famili": "Fabaceae",
+      "peran": {
+        "id": [
+          "pupuk hijau",
+          "penutup tanah"
+        ],
+        "en": [
+          "green manure",
+          "cover crop"
+        ]
+      },
+      "slot_bulan": 2,
+      "t_abs_min": 4,
+      "t_abs_max": 40,
+      "t_opt_min": 20,
+      "t_opt_max": 30,
+      "ph_abs_min": 5,
+      "ph_abs_max": 8.4,
+      "air_min_mm": null,
+      "air_max_mm": null,
+      "water_basis": "unknown",
+      "k5_mode": "exempt_unknown_water",
+      "butuh_bulan_basah": false,
+      "penambat_n": true,
+      "penutup_tanah": true,
+      "crop_cycle_days": {
+        "min": 60,
+        "max": 160
+      },
+      "local_cycle_days": null,
+      "aturan_urutan": [],
+      "catatan": {
+        "id": [
+          "Slot adalah pilihan kalender PRD, termasuk persiapan dan panen; varietas tetap memengaruhi durasi.",
+          "Air musiman belum diketahui; bebas K5 bukan berarti tidak membutuhkan air."
+        ],
+        "en": [
+          "Slots are PRD calendar choices including preparation and harvest; duration remains cultivar-dependent.",
+          "Seasonal water demand is unknown; K5 exemption does not mean water-free."
+        ]
+      },
+      "sumber": {
+        "nama": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "scientific_name": [
+          {
+            "source_id": "ECO_SUNN_IDENTITY",
+            "locator": "Species heading",
+            "basis": "direct"
+          }
+        ],
+        "famili": [
+          {
+            "source_id": "ECO_SUNN_IDENTITY",
+            "locator": "Family; Gramineae normalized to Poaceae, Leguminosae to Fabaceae",
+            "basis": "mapping"
+          }
+        ],
+        "peran": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "butuh_bulan_basah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "penambat_n": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Nitrogen fixation trait",
+            "basis": "direct"
+          }
+        ],
+        "penutup_tanah": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Uses: green manure and cover crop",
+            "basis": "direct"
+          }
+        ],
+        "aturan_urutan": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 8.3, 10: vocabulary, intended roles and rule policy",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_abs_min": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_abs_max": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_min": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "t_opt_max": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_min": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "ph_abs_max": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "crop_cycle_days": [
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Ecology temperature / pH; Cultivation crop-cycle range",
+            "basis": "direct"
+          }
+        ],
+        "slot_bulan": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: fixed model slot",
+            "basis": "model_assumption"
+          },
+          {
+            "source_id": "ECO_SUNN",
+            "locator": "Crop-cycle compatibility only, not a slot guarantee",
+            "basis": "direct"
+          },
+          {
+            "source_id": "SUNN_GREEN",
+            "locator": "Green-manure incorporation at two months",
+            "basis": "direct"
+          }
+        ],
+        "air_min_mm": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: unknown water; K5 exemption and risk",
+            "basis": "prd_decision"
+          }
+        ],
+        "air_max_mm": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: unknown water; K5 exemption and risk",
+            "basis": "prd_decision"
+          }
+        ],
+        "water_basis": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: unknown water; K5 exemption and risk",
+            "basis": "prd_decision"
+          }
+        ],
+        "k5_mode": [
+          {
+            "source_id": "PRD",
+            "locator": "Section 4: unknown water; K5 exemption and risk",
+            "basis": "prd_decision"
+          }
+        ]
+      }
+    },
+    {
+      "crop_id": "bera",
+      "nama": {
+        "id": "Bera",
+        "en": "Fallow"
+      },
+      "scientific_name": null,
+      "famili": null,
+      "peran": {
+        "id": [
+          "lahan terbuka"
+        ],
+        "en": [
+          "bare fallow"
+        ]
+      },
+      "slot_bulan": null,
+      "t_abs_min": null,
+      "t_abs_max": null,
+      "t_opt_min": null,
+      "t_opt_max": null,
+      "ph_abs_min": null,
+      "ph_abs_max": null,
+      "air_min_mm": 0,
+      "air_max_mm": 0,
+      "water_basis": "not_applicable",
+      "k5_mode": "not_applicable",
+      "butuh_bulan_basah": false,
+      "penambat_n": false,
+      "penutup_tanah": false,
+      "crop_cycle_days": null,
+      "local_cycle_days": null,
+      "aturan_urutan": [],
+      "catatan": {
+        "id": [
+          "Bera 1-6 bulan dipilih pengguna; bukan tanaman."
+        ],
+        "en": [
+          "Fallow lasts 1-6 user-selected months; not a crop."
+        ]
+      },
+      "sumber": {
+        "nama": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "scientific_name": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "famili": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "peran": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "slot_bulan": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_abs_min": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_abs_max": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_opt_min": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "t_opt_max": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "ph_abs_min": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "ph_abs_max": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "air_min_mm": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "air_max_mm": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "water_basis": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "k5_mode": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "butuh_bulan_basah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "penambat_n": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "penutup_tanah": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ],
+        "aturan_urutan": [
+          {
+            "source_id": "PRD",
+            "locator": "Sections 4, 7: fallow semantics and duration",
+            "basis": "prd_decision"
+          }
+        ]
+      }
+    }
+  ]
+}

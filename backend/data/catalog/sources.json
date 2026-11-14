@@ -1,0 +1,173 @@
+{
+  "version": "2026-11-14.v1",
+  "sources": [
+    {
+      "id": "PRD",
+      "title": "Field Shift PRD sections 4, 8.3, 10",
+      "url": null,
+      "document": "PRD Field Shift Alat Bantu Rotasi Tanam Berbasis Data NASA.md",
+      "accessed": "2026-11-14",
+      "verification": "project_document"
+    },
+    {
+      "id": "ECO_RICE",
+      "title": "FAO ECOCROP: Oryza sativa",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=1574",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_RICE_IDENTITY",
+      "title": "FAO ECOCROP identity: Oryza sativa",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/cropView?id=1574",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_MAIZE",
+      "title": "FAO ECOCROP: Zea mays ssp. mays",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=238663",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_MAIZE_IDENTITY",
+      "title": "FAO ECOCROP identity: Zea mays ssp. mays",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/cropView?id=238663",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_SOY",
+      "title": "FAO ECOCROP: Glycine max",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=1150",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_SOY_IDENTITY",
+      "title": "FAO ECOCROP identity: Glycine max",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/cropView?id=1150",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_MUNG",
+      "title": "FAO ECOCROP: Vigna radiata",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=2150",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_MUNG_IDENTITY",
+      "title": "FAO ECOCROP identity: Vigna radiata",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/cropView?id=2150",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_SUNN",
+      "title": "FAO ECOCROP: Crotalaria juncea",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/dataSheet?id=801",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "ECO_SUNN_IDENTITY",
+      "title": "FAO ECOCROP identity: Crotalaria juncea",
+      "url": "https://ecocrop.apps.fao.org/ecocrop/srv/en/cropView?id=801",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "FAO_WATER",
+      "title": "FAO Irrigation Water Management Training Manual 3, Table 14",
+      "url": "https://www.fao.org/4/s2022e/s2022e07.htm",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "SOY_LOCAL",
+      "title": "Dinas Pertanian Grobogan: Ngopi Tani Vol 107 (2026)",
+      "url": "https://dispertan.grobogan.go.id/berita/31",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "MUNG_LOCAL",
+      "title": "Balitkabi: Vima 1, 2 dan 3 (2017)",
+      "url": "https://repository.pertanian.go.id/items/1756382c-6ec4-4a9b-94a6-a33a48a5e6f6",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "indexed_primary_excerpt"
+    },
+    {
+      "id": "GROBOGAN_DRY",
+      "title": "Irawati, Fianti, Nurbaiti (2021): Tanaman Jagung dan Kacang Hijau pada Musim Kekeringan di Grobogan",
+      "url": "https://ppjp.ulm.ac.id/journal/index.php/es/article/download/11349/7292",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "GROBOGAN_SOY",
+      "title": "Chanifah, Darwanto, Triastono (2019): Usahatani Kedelai Lokal di Grobogan",
+      "url": "https://www.jurnalpangan.com/index.php/pangan/article/download/456/387",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "GROBOGAN_ROT",
+      "title": "Agroland 26(2), 2019: Pola Usahatani Tanaman Pangan dan Peternakan di Grobogan",
+      "url": "https://jurnal.faperta.untad.ac.id/index.php/agrolandnasional/id/article/view/985/955",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "indexed_primary_excerpt"
+    },
+    {
+      "id": "GROBOGAN_TRIAL",
+      "title": "Puslitbang Tanaman Pangan: Laporan Tahunan 2014, padi-kedelai di Toroh",
+      "url": "https://tanamanpangan.bsip.pertanian.go.id/storage/assets/uploads/informasi_publik/s7DiMTvnt7ZSIuuZIs9cs7G32tcoqxXgD0Dge6cX.pdf",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "indexed_primary_excerpt"
+    },
+    {
+      "id": "SOY_N",
+      "title": "FAO Compendium of forgotten foods, soybean entry p.86",
+      "url": "https://openknowledge.fao.org/3/cc5044en/cc5044en.pdf",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "indexed_primary_excerpt"
+    },
+    {
+      "id": "MUNG_N",
+      "title": "ECHO Plant Information Sheet: Vigna radiata",
+      "url": "https://assets-global.echocommunity.org/pdf/2f10f5a6-ca70-48c6-954c-43bc38cbab0e/en/vigna-radiata.pdf?v=f4241b6ffb5f4e2322c07721cc8bafce",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    },
+    {
+      "id": "SUNN_GREEN",
+      "title": "Feedipedia (INRAE/CIRAD/AFZ/FAO): Crotalaria juncea",
+      "url": "https://feedipedia.review.fao.org/node/313",
+      "document": null,
+      "accessed": "2026-11-14",
+      "verification": "primary_page"
+    }
+  ]
+}

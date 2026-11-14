@@ -20,7 +20,8 @@
       "crop_id": "kedelai",
       "nama": "Kedelai",
       "peran": [
-        "produksi"
+        "produksi",
+        "penambat nitrogen"
       ],
       "slot_bulan": 3
     },
@@ -28,9 +29,10 @@
       "crop_id": "kacang_hijau",
       "nama": "Kacang hijau",
       "peran": [
-        "produksi"
+        "produksi",
+        "penambat nitrogen"
       ],
-      "slot_bulan": 3
+      "slot_bulan": 2
     },
     {
       "crop_id": "orok_orok",
@@ -45,7 +47,7 @@
       "crop_id": "bera",
       "nama": "Bera",
       "peran": [
-        "bera"
+        "lahan terbuka"
       ],
       "slot_bulan": null
     }

@@ -60,8 +60,7 @@ Kurasi agronomi dimulai sebelum mesin rotasi; nilai yang belum diverifikasi tida
 
 Schema request/response analisis, tanaman, pencarian, galat, dan chat tersedia.
 Detail pemetaan ke PRD, keputusan serialisasi, JSON Schema, dan fixture FE ada
-di [contracts/README.md](contracts/README.md). Fixture adalah data uji sintetis,
-bukan data produksi. Endpoint yang belum diimplementasikan tetap tidak terdaftar.
+di [contracts/README.md](contracts/README.md). Fixture analisis adalah data uji sintetis; fixture tanaman mengikuti katalog bersumber. Endpoint yang belum diimplementasikan tetap tidak terdaftar.
 
 
 ## Perubahan lokasi menjadi Polygon
@@ -96,7 +95,7 @@ untuk kedalaman 0-30 cm, memakai seluruh pixel native yang beririsan dengan
 polygon. Akses memakai WebDAV/VRT resmi agar NoData tetap terjaga. Cache kosong
 atau data tidak lengkap menghasilkan penilaian parsial/K3 dilewati.
 Metode dan script sampel: [contracts/soilgrids-data.md](contracts/soilgrids-data.md).
-Ini bagian SoilGrids BE-04; Nominatim dan endpoint analisis belum diimplementasikan.
+Ini bagian SoilGrids BE-04; endpoint analisis belum diimplementasikan.
 
 
 ## Pencarian lokasi (geocode)
@@ -121,3 +120,13 @@ ada, dengan cache hasil dan pemeriksaan checksum sumber. Demo tanpa jaringan:
 Rincian aturan hitung dan batas tahap ini ada di
 [contracts/climate-statistics.md](contracts/climate-statistics.md).
 Endpoint `/analyze` dan mesin rekomendasi tanaman belum dipasang.
+
+
+## Katalog tanaman (BE-12 versi awal dan bagian BE-08)
+
+`GET /api/v1/crops?lang=id` atau `?lang=en` sudah tersedia di Swagger.
+Katalog berisi lima tanaman dan bera, delapan kandidat bersumber (empat berupa
+pemetaan pola lokal) dan dua draft nonaktif. Ini data untuk BE-06, belum
+penilaian/rekomendasi. Periksa dengan `.venv/bin/python scripts/check_catalog.py`.
+Sumber per field, proxy kebutuhan air, dan batas bukti dijelaskan di
+[contracts/crop-data.md](contracts/crop-data.md).
