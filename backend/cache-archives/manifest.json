@@ -56,6 +56,31 @@
       "required_for": "Offline soil sample smoke checks",
       "extract_to": "backend/data/soilgrids",
       "include_in_git": false
+    },
+    {
+      "id": "soilgrids-indonesia-catalogs-grobogan-v1",
+      "filename": "soilgrids-indonesia-catalogs-grobogan-v1.zip",
+      "status": "ready",
+      "upload_status": "not_uploaded",
+      "upload_url": null,
+      "bytes": 2576386,
+      "sha256": "8143371c9c94d694f1c72db2d24831921a6d009a45fc1472f128473eaa0f149f",
+      "contents": {
+        "vrt_catalogs": 45,
+        "catalog_coverage_bbox": [
+          94,
+          -12,
+          142,
+          7
+        ],
+        "region_geotiff_files": 45,
+        "region_metadata_json_files": 45,
+        "region": "Grobogan demo bounding box",
+        "depth": "0-30cm"
+      },
+      "required_for": "Fast soil lookups: local Indonesia catalogs and offline Grobogan soil",
+      "extract_to": "backend/data/soilgrids",
+      "include_in_git": false
     }
   ]
 }

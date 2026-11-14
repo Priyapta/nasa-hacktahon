@@ -3,6 +3,7 @@
 from __future__ import annotations
 import hashlib
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import rasterio
@@ -28,6 +29,10 @@ from app.services.soil_archive import (
 )
 
 METHOD = "native-pixel-area-depth-0-30cm-v1"
+# A field needs 45 layers. Fetching them concurrently keeps a new field inside
+# the PRD 8 s soil budget once catalogs are local. Kept small out of courtesy
+# to the ISRIC file server.
+FETCH_WORKERS = 8
 
 
 def read_layer(archive, spec, metadata):
@@ -63,6 +68,23 @@ class SoilService:
         try:
             projected = project_polygon(shape(location.model_dump()))
             bounds = bounds_for_polygon(projected)
+            specs = [
+                SoilSpec(property_name, depth, statistic, bounds)
+                for property_name in PROPERTIES
+                for statistic in STATISTICS
+                for depth, _ in DEPTHS
+            ]
+
+            def fetch(spec):
+                try:
+                    return self.archive.ensure(
+                        spec, allow_network=allow_network, refresh=refresh
+                    )
+                except SoilDataError as exc:
+                    return exc
+
+            with ThreadPoolExecutor(max_workers=FETCH_WORKERS) as pool:
+                fetched = dict(zip(specs, pool.map(fetch, specs)))
             for property_name in PROPERTIES:
                 layers = {}
                 weights = None
@@ -70,9 +92,9 @@ class SoilService:
                     for depth, _ in DEPTHS:
                         spec = SoilSpec(property_name, depth, statistic, bounds)
                         try:
-                            metadata = self.archive.ensure(
-                                spec, allow_network=allow_network, refresh=refresh
-                            )
+                            metadata = fetched[spec]
+                            if isinstance(metadata, SoilDataError):
+                                raise metadata
                             values, affine = read_layer(self.archive, spec, metadata)
                             if weights is None:
                                 weights = pixel_weights(
