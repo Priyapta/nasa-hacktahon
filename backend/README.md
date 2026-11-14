@@ -13,7 +13,7 @@ backend/.venv/Scripts/python.exe -m pip install -r backend/requirements-dev.lock
 
 Lalu dari folder backend:
 
-`requirements-dev.lock.txt` merekam versi yang sudah diuji (Python 3.13). `requirements.txt` berisi dependensi runtime dan `requirements-dev.txt` menambahkan dependensi pengujian; perbarui lock secara sengaja saat mengganti dependensi.
+`requirements-dev.lock.txt` merekam versi dependensi; fondasi diuji pada Python 3.13 dan perubahan service POWER diuji di WSL Python 3.11. `requirements.txt` berisi dependensi runtime dan `requirements-dev.txt` menambahkan dependensi pengujian; perbarui lock secara sengaja saat mengganti dependensi.
 
 ```powershell
 cd backend
@@ -71,3 +71,12 @@ Polygon. Bentuk titik lama ditolak, termasuk pada konteks chat dan input skenari
 Lihat [contracts/location-polygon.md](contracts/location-polygon.md) untuk contoh
 payload, dependensi baru, validasi, serta metode pengambilan data area yang belum
 ditetapkan. Dokumen PRD tidak diedit; pengecualian dicatat hanya di backend.
+
+
+## NASA POWER untuk polygon (BE-03)
+
+Service pengambilan data harian dan penggabungan semua sel beririsan tersedia.
+Pengunduh cakupan Indonesia berjalan terpisah dari aplikasi; raw cache dan
+hasil data nyata tidak masuk Git. Metode, satuan, script resume, progres,
+serta batas tahap ini dijelaskan di [contracts/power-data.md](contracts/power-data.md).
+Endpoint `/analyze` dan perhitungan rotasi belum diimplementasikan.

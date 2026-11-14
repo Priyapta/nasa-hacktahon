@@ -1,0 +1,6 @@
+raw/
+results/
+*.log
+*.json
+*.lock
+*.part
