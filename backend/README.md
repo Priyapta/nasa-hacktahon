@@ -1,4 +1,9 @@
-# Backend Field Shift — tahap 1
+# Backend Field Shift
+
+**Status terkini dan panduan penerus:** [HANDOVER.md](HANDOVER.md).
+FastAPI, service POWER/SoilGrids, statistik iklim, geocode dan crops sudah tersedia.
+Mesin rekomendasi, `/analyze` dan agent belum tersedia. Bagian fondasi/rencana awal
+di bawah adalah catatan historis; gunakan handover dan root tasks untuk progres kini.
 
 Acuan: PRD bagian 7 dan 12.4, serta `architecture.md`. FastAPI berjalan sebagai satu aplikasi monolit. Kode backend Node/TypeScript lama telah dihapus; integrasi frontend ke endpoint baru belum lengkap.
 
@@ -34,7 +39,7 @@ Untuk menjalankan tes, dari folder backend:
 
 Environment `ALLOWED_ORIGINS` bersifat opsional, daftar origin dipisahkan koma bila frontend mengakses FastAPI langsung. Contoh: `export ALLOWED_ORIGINS="http://localhost:3000"`. Melalui proxy Next.js tidak memerlukan CORS lintas origin.
 
-## Status tahap ini
+## Catatan historis fondasi (tahap 1)
 
 - Selesai: aplikasi FastAPI, router `/api/v1`, health check, dokumentasi OpenAPI, schema empat input, validasi dengan status HTTP 400, pengujian kontrak.
 - Verifikasi tahap 1: 27 tes lulus; health dan dokumentasi juga diperiksa pada server Uvicorn nyata. Ada peringatan deprecation dari TestClient Starlette/httpx, tanpa kegagalan tes.
@@ -44,7 +49,7 @@ Environment `ALLOWED_ORIGINS` bersifat opsional, daftar origin dipisahkan koma b
 - `/analyze` sengaja belum terdaftar. Tidak ada data buatan yang dikembalikan sebagai hasil analisis nyata.
 - Backend Node lama (`src/`, `package.json`, `tsconfig.json`) telah dihapus. `npm run dev` tidak menjalankan Python; gunakan perintah Uvicorn di atas untuk menjalankannya secara lokal. Pencarian lokasi lama di frontend belum memiliki endpoint pengganti di FastAPI.
 
-## Urutan berikutnya, dari kecil ke besar
+## Rencana awal pengembangan (historis)
 
 1. Fondasi: health, schema dan validasi (tahap ini). BE-01 sebagian.
 2. Kontrak hasil/fixture yang jelas berlabel data uji; kurasi awal tabel tanaman, `/crops`, lalu pencarian lokasi. BE-02, BE-12 awal, BE-04 sebagian, BE-08 sebagian.
