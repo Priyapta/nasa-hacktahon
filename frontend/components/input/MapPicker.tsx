@@ -34,7 +34,8 @@ import styles from "./MapPicker.module.css";
 // Purwodadi, Grobogan: the PRD demo region.
 const DEMO_CENTER: [number, number] = [110.91, -7.09];
 const DEMO_ZOOM = 11;
-const GLOBE_ZOOM = 0.6;
+const INDONESIA_CENTER: [number, number] = [118, -2];
+const INDONESIA_ZOOM = 3;
 export const MIN_DRAW_ZOOM = 14;
 // Clarity level 18 tiles fail with CORS-blocked 404s around Central Java, so
 // the map overzooms native level 17 imagery instead.
@@ -76,7 +77,7 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
   const [ready, setReady] = useState(false);
   const [drawing, setDrawing] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
-  const [zoom, setZoom] = useState(props.initialArea ? DEMO_ZOOM : GLOBE_ZOOM);
+  const [zoom, setZoom] = useState(props.initialArea ? DEMO_ZOOM : INDONESIA_ZOOM);
   const [satellite, setSatellite] = useState(true);
   const [tileError, setTileError] = useState(false);
   const [fatal, setFatal] = useState(false);
@@ -123,8 +124,8 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
       m = new MapLibreMap({
         container: container.current,
         style: { ...style, projection: { type: props.editable ? "globe" : "mercator" } },
-        center: DEMO_CENTER,
-        zoom: props.initialArea ? DEMO_ZOOM : container.current.clientWidth >= 1024 ? 2 : GLOBE_ZOOM,
+        center: props.initialArea ? DEMO_CENTER : INDONESIA_CENTER,
+        zoom: props.initialArea ? DEMO_ZOOM : container.current.clientWidth >= 1024 ? 4 : INDONESIA_ZOOM,
         maxZoom: 20,
         dragRotate: false,
         pitchWithRotate: false,

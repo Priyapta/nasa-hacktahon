@@ -1,17 +1,23 @@
 "use client";
 
 import { Minus, Plus, X } from "lucide-react";
-import type { Dictionary } from "@/lib/i18n";
+import { formatMonth, type Dictionary } from "@/lib/i18n";
+import { previewPattern } from "@/lib/plan-preview";
 import {
   FALLOW_MAX_MONTHS,
   FALLOW_MIN_MONTHS,
   MAX_STAGES,
   type Crop,
+  type Horizon,
+  type Lang,
   type Stage,
 } from "@/lib/types";
 
 interface RotationBuilderProps {
   t: Dictionary;
+  lang: Lang;
+  startMonth: string;
+  horizon: Horizon;
   crops: Crop[] | null;
   cropsFailed: boolean;
   onRetry: () => void;
@@ -22,6 +28,9 @@ interface RotationBuilderProps {
 
 export default function RotationBuilder({
   t,
+  lang,
+  startMonth,
+  horizon,
   crops,
   cropsFailed,
   onRetry,
@@ -31,13 +40,15 @@ export default function RotationBuilder({
 }: RotationBuilderProps) {
   const names = new Map(crops?.map((crop) => [crop.crop_id, crop]) ?? []);
   const full = stages.length >= MAX_STAGES;
+  const preview = crops ? previewPattern(stages, crops, startMonth, horizon) : null;
+  const covered = Boolean(preview && preview.total >= horizon);
 
   function update(next: Stage[]) {
     onChange({ hasPattern: true, stages: next });
   }
 
   function add(crop: Crop) {
-    if (full) return;
+    if (full || covered) return;
     update([
       ...stages,
       crop.crop_id === "bera"
@@ -84,6 +95,7 @@ export default function RotationBuilder({
         <p className="m-0 text-sm leading-relaxed text-muted">{t.plan.noPatternNote}</p>
       ) : (
         <>
+          <p className="m-0 text-sm leading-relaxed text-muted">{t.plan.patternHint}</p>
           {stages.length === 0 ? (
             <p className="m-0 rounded-xl border-2 border-dashed border-control px-4 py-3 text-sm text-muted">
               {t.plan.emptyStages}
@@ -91,11 +103,12 @@ export default function RotationBuilder({
           ) : (
             <ol className="m-0 grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-3">
               {stages.map((stage, index) => {
+                const timing = preview?.rows[index];
                 const fallow = stage.crop_id === "bera";
                 const crop = names.get(stage.crop_id);
                 const months = fallow ? (stage.months ?? FALLOW_MIN_MONTHS) : crop?.slot_bulan;
                 return (
-                  <li key={index} className={`tile flex flex-col gap-0.5 py-2 pl-3 pr-1.5 ${fallow ? "tile-fallow" : ""}`}>
+                  <li key={index} className={`tile flex flex-col gap-0.5 py-2 pl-3 pr-1.5 ${fallow ? "tile-fallow" : ""} ${timing?.outside ? "opacity-60" : ""}`}>
                     <div className="flex items-center justify-between">
                       <span className={`text-xs ${fallow ? "text-tanah-strong" : "text-muted"}`}>
                         {t.plan.stage(index + 1)}
@@ -133,8 +146,13 @@ export default function RotationBuilder({
                         </button>
                       </span>
                     ) : (
-                      <span className="text-[13px] text-muted">{months ? t.plan.months(months) : ""}</span>
+                      <span className="text-[13px] text-muted">{months ? t.plan.referenceMonths(months) : ""}</span>
                     )}
+                    {timing && <span className="mt-1 pr-1 text-xs text-muted">
+                      {formatMonth(timing.start, lang, "short")} – {formatMonth(timing.end, lang, "short")}
+                    </span>}
+                    {timing?.outside && <span className="pr-1 text-xs font-bold text-tanah-strong">{t.plan.outside}</span>}
+                    {timing?.continues && <span className="pr-1 text-xs font-bold text-tanah-strong">{t.plan.continues}</span>}
                   </li>
                 );
               })}
@@ -161,7 +179,7 @@ export default function RotationBuilder({
                 <button
                   key={crop.crop_id}
                   type="button"
-                  disabled={full}
+                  disabled={full || covered}
                   onClick={() => add(crop)}
                   className={`btn-secondary min-h-10 px-3 text-sm ${crop.crop_id === "bera" ? "text-tanah-strong" : ""}`}
                 >
@@ -170,6 +188,12 @@ export default function RotationBuilder({
               ))}
             </div>
           )}
+          {preview && preview.total > 0 && <div role="status" className="space-y-1 rounded-lg bg-canvas p-3 text-[13px] text-muted">
+            <p className="m-0 font-bold text-ink">{t.plan.patternTotal(preview.total)}</p>
+            {preview.outside > 0 && <p className="m-0 text-tanah-strong">{t.plan.outsideNote(preview.outside)}</p>}
+            {preview.total < horizon && <p className="m-0">{t.plan.repeatNote}</p>}
+            {covered && !full && <p className="m-0">{t.plan.periodFilled}</p>}
+          </div>}
           {full && <p className="m-0 text-[13px] text-muted">{t.plan.full}</p>}
         </>
       )}

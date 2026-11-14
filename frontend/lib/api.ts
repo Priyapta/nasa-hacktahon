@@ -1,5 +1,5 @@
 import type { LocationResult } from "@field-atlas/shared";
-import type { ApiErrorBody, Crop, CropsResponse, Lang } from "./types";
+import type { AnalyzeRequest, AnalysisResponse, ApiErrorBody, Crop, CropsResponse, Lang } from "./types";
 
 export class ApiError extends Error {
   constructor(
@@ -10,8 +10,8 @@ export class ApiError extends Error {
   }
 }
 
-async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(path, { signal, headers: { Accept: "application/json" } });
+async function requestJson<T>(path: string, options: RequestInit): Promise<T> {
+  const response = await fetch(path, { ...options, headers: { Accept: "application/json", ...options.headers } });
   if (!response.ok) {
     let message = `HTTP ${response.status}`;
     try {
@@ -27,7 +27,7 @@ async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
 }
 
 export async function fetchCrops(lang: Lang, signal?: AbortSignal): Promise<Crop[]> {
-  const body = await getJson<CropsResponse>(`/api/v1/crops?lang=${lang}`, signal);
+  const body = await requestJson<CropsResponse>(`/api/v1/crops?lang=${lang}`, { signal });
   return body.crops;
 }
 
@@ -35,9 +35,18 @@ export async function searchPlaces(
   query: string,
   signal?: AbortSignal,
 ): Promise<LocationResult[]> {
-  const body = await getJson<{ results: LocationResult[] }>(
+  const body = await requestJson<{ results: LocationResult[] }>(
     `/api/v1/geocode?q=${encodeURIComponent(query)}`,
-    signal,
+    { signal },
   );
   return body.results;
+}
+
+export function analyze(request: AnalyzeRequest, signal?: AbortSignal): Promise<AnalysisResponse> {
+  return requestJson<AnalysisResponse>("/api/v1/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+    signal,
+  });
 }

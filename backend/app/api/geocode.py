@@ -29,7 +29,7 @@ def get_geocode_service(request: Request):
         429: {"model": ErrorResponse},
         502: {"model": ErrorResponse},
     },
-    summary="Cari lokasi dalam kotak wilayah demo",
+    summary="Cari desa atau tempat di Indonesia",
 )
 def geocode(
     query: Annotated[GeocodeInput, Query()],

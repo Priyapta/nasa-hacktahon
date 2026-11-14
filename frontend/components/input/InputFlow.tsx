@@ -15,6 +15,7 @@ import TimeControl from "./TimeControl";
 import WaterSourceToggle from "./WaterSourceToggle";
 import { fetchCrops } from "@/lib/api";
 import { measure } from "@/lib/geo";
+import { previewPattern } from "@/lib/plan-preview";
 import { dictionary, formatCenter, formatHectares } from "@/lib/i18n";
 import {
   parsePlan,
@@ -157,7 +158,10 @@ export default function InputFlow() {
       return null;
     }
   }, [plan.area]);
-  const analysisInput = toAnalysisInput(plan);
+  const patternPreview = crops ? previewPattern(plan.stages, crops, plan.startMonth, plan.horizon) : null;
+  const outsidePeriod = plan.hasPattern && Boolean(patternPreview?.outside);
+  const patternBlocked = plan.hasPattern && (!patternPreview || cropsFailed || outsidePeriod);
+  const analysisInput = patternBlocked ? null : toAnalysisInput(plan);
 
   function href(next: PlanState) {
     return `/?${serializePlan(next)}`;
@@ -367,6 +371,9 @@ export default function InputFlow() {
                     </div>
                     <RotationBuilder
                       t={t}
+                      lang={plan.lang}
+                      startMonth={plan.startMonth}
+                      horizon={plan.horizon}
                       crops={crops}
                       cropsFailed={cropsFailed}
                       onRetry={() => setCropsAttempt((n) => n + 1)}
@@ -385,7 +392,7 @@ export default function InputFlow() {
                     <WaterSourceToggle t={t} value={plan.water} onChange={(water) => replacePlan({ water })} />
                   </div>
                   <div className="sticky bottom-0 flex flex-col gap-2 border-t-2 border-hairline bg-surface px-3 py-3 lg:static lg:px-8 lg:pb-6 lg:pt-4">
-                    {!analysisInput && <p className="m-0 text-[13px] text-muted">{t.plan.missing}</p>}
+                    {!analysisInput && <p className="m-0 text-[13px] text-muted">{!measured ? t.land.invalid : outsidePeriod ? t.plan.outsideSubmit : plan.hasPattern && cropsFailed ? t.plan.cropsFailed : plan.hasPattern && !patternPreview ? t.plan.cropsLoading : !plan.water ? t.plan.chooseWater : t.plan.missing}</p>}
                     <div className="flex gap-2.5">
                       <Link href={href({ ...plan, step: 1 })} onNavigate={(event) => navigateStep(event, 1)} className="btn-secondary min-h-14 px-5">
                         {t.plan.back}

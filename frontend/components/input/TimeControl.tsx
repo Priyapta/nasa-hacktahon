@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { CalendarDays, Check } from "lucide-react";
 import { formatMonth, type Dictionary } from "@/lib/i18n";
+import { addMonths } from "@/lib/query";
 import { HORIZONS, type Horizon, type Lang } from "@/lib/types";
 import styles from "./TimeControl.module.css";
 
@@ -72,7 +73,7 @@ export default function TimeControl({
             </button>
           ))}
         </div>
-        <span className="text-[13px] text-muted">{t.plan.horizonUnit}</span>
+        <span className="text-[13px] text-muted">{formatMonth(startMonth, lang, "short")} – {formatMonth(addMonths(startMonth, horizon - 1), lang, "short")}</span>
       </section>
 
       <section aria-labelledby="mulai-judul" className="flex flex-col gap-2">

@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Search } from "lucide-react";
 import { parseCoordinates, type LocationResult } from "@field-atlas/shared";
-import { searchPlaces } from "@/lib/api";
+import { ApiError, searchPlaces } from "@/lib/api";
 import type { Dictionary } from "@/lib/i18n";
 import styles from "./LocationSearch.module.css";
 
@@ -20,8 +20,11 @@ export default function LocationSearch({ t, onSelect, className = "" }: Location
   const [message, setMessage] = useState("");
   const abort = useRef<AbortController | null>(null);
 
+  useEffect(() => () => abort.current?.abort(), []);
+
   function choose(result: LocationResult) {
     setResults(null);
+    setStatus("idle");
     setQuery(result.name);
     onSelect(result);
   }
@@ -50,10 +53,10 @@ export default function LocationSearch({ t, onSelect, className = "" }: Location
       const found = await searchPlaces(text, controller.signal);
       setResults(found);
       setStatus("idle");
-    } catch {
+    } catch (error) {
       if (controller.signal.aborted) return;
       setStatus("error");
-      setMessage(t.search.failed);
+      setMessage(error instanceof ApiError ? error.message : t.search.failed);
       setResults(null);
     }
   }
