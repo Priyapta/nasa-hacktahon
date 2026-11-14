@@ -1,6 +1,7 @@
-import { area, centroid, polygon, booleanValid, kinks } from "@turf/turf";
-import type { FeatureCollection, Polygon } from "geojson";
-import type { FarmField } from "@/types";
+import { area, bbox, booleanValid, centroid, kinks, polygon } from "@turf/turf";
+import type { Polygon } from "geojson";
+
+export class InvalidBoundaryError extends Error {}
 
 export function measure(geometry: Polygon) {
   if (
@@ -17,7 +18,7 @@ export function measure(geometry: Polygon) {
       ),
     )
   ) {
-    throw new Error(
+    throw new InvalidBoundaryError(
       "Field boundaries must contain valid longitude and latitude coordinates.",
     );
   }
@@ -29,7 +30,7 @@ export function measure(geometry: Polygon) {
     squareMeters <= 0 ||
     kinks(feature).features.length
   ) {
-    throw new Error("Draw a valid, non-intersecting field boundary.");
+    throw new InvalidBoundaryError("Draw a valid, non-intersecting field boundary.");
   }
   return {
     areaHectares: squareMeters / 10000,
@@ -37,16 +38,10 @@ export function measure(geometry: Polygon) {
   };
 }
 
-export function fieldsGeoJSON(
-  fields: FarmField[],
-): FeatureCollection<Polygon, Omit<FarmField, "geometry">> {
-  return {
-    type: "FeatureCollection",
-    features: fields.map(({ geometry, ...properties }) => ({
-      type: "Feature",
-      id: properties.id,
-      properties,
-      geometry,
-    })),
-  };
+export function bounds(geometry: Polygon): [[number, number], [number, number]] {
+  const [west, south, east, north] = bbox(geometry);
+  return [
+    [west, south],
+    [east, north],
+  ];
 }
