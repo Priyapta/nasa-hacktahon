@@ -1,8 +1,8 @@
 # Backend Field Shift
 
 **Status terkini dan panduan penerus:** [HANDOVER.md](HANDOVER.md).
-FastAPI, service POWER/SoilGrids, statistik iklim, geocode dan crops sudah tersedia.
-Mesin rekomendasi, `/analyze` dan agent belum tersedia. Bagian fondasi/rencana awal
+FastAPI, service POWER/SoilGrids, statistik iklim, geocode, crops, mesin rotasi
+dan `POST /api/v1/analyze` sudah tersedia. Agent belum tersedia. Bagian fondasi/rencana awal
 di bawah adalah catatan historis; gunakan handover dan root tasks untuk progres kini.
 
 Acuan: PRD bagian 7 dan 12.4, serta `architecture.md`. FastAPI berjalan sebagai satu aplikasi monolit. Kode backend Node/TypeScript lama telah dihapus; integrasi frontend ke endpoint baru belum lengkap.
@@ -83,7 +83,6 @@ Service pengambilan data harian dan penggabungan semua sel beririsan tersedia.
 Pengunduh cakupan Indonesia berjalan terpisah dari aplikasi; raw cache dan
 hasil data nyata tidak masuk Git. Metode, satuan, script resume, progres,
 serta batas tahap ini dijelaskan di [contracts/power-data.md](contracts/power-data.md).
-Endpoint `/analyze` dan perhitungan rotasi belum diimplementasikan.
 
 
 ## Paket cache untuk tim dan deployment
@@ -100,7 +99,7 @@ untuk kedalaman 0-30 cm, memakai seluruh pixel native yang beririsan dengan
 polygon. Akses memakai WebDAV/VRT resmi agar NoData tetap terjaga. Cache kosong
 atau data tidak lengkap menghasilkan penilaian parsial/K3 dilewati.
 Metode dan script sampel: [contracts/soilgrids-data.md](contracts/soilgrids-data.md).
-Ini bagian SoilGrids BE-04; endpoint analisis belum diimplementasikan.
+Ini bagian SoilGrids BE-04.
 
 
 ## Pencarian lokasi (geocode)
@@ -124,7 +123,32 @@ ada, dengan cache hasil dan pemeriksaan checksum sumber. Demo tanpa jaringan:
 
 Rincian aturan hitung dan batas tahap ini ada di
 [contracts/climate-statistics.md](contracts/climate-statistics.md).
-Endpoint `/analyze` dan mesin rekomendasi tanaman belum dipasang.
+
+
+## Analisis rotasi (BE-06, BE-07, BE-09)
+
+`POST /api/v1/analyze` menerima empat input dan `lang`, lalu mengembalikan
+konteks iklim dan tanah, pola biasa serta alternatif, catatan, dan provenance
+sesuai kontrak PRD 7. Iklim dan tanah diambil bersamaan dengan batas 15 detik
+untuk POWER dan 8 detik untuk SoilGrids. Tanah yang gagal atau terlambat
+menjadi penilaian parsial (HTTP 200). Iklim tanpa cache menghasilkan HTTP 502.
+
+Mesin murni ada di `app/core/` (`rotation`, `feasibility`, `dimensions`,
+`selector`, `explain`). Orkestrator `app/services/analysis.py` dipakai endpoint
+dan nanti tool skenario agent, tanpa request HTTP ke server sendiri.
+Keputusan implementasi dan ambang ada di
+[contracts/rotation-engine.md](contracts/rotation-engine.md).
+
+Coba dari folder backend setelah arsip POWER diekstrak dan server berjalan:
+
+```bash
+curl -s -X POST http://127.0.0.1:8000/api/v1/analyze \
+  -H 'Content-Type: application/json' \
+  -d @contracts/fixtures/analyze_request.json
+```
+
+Bulan mulai pada fixture harus masih dalam jendela bulan berjalan WIB sampai
+11 bulan ke depan. Ubah `time.start_month` bila fixture sudah lewat.
 
 
 ## Katalog tanaman (BE-12 versi awal dan bagian BE-08)

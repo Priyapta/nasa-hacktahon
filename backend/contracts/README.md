@@ -13,7 +13,7 @@ Tidak ada perubahan dokumen PRD.
 
 Kontrak sudah tersedia. Endpoint pencarian `/api/v1/geocode` kini sudah
 diimplementasikan; lihat [geocode.md](geocode.md). Endpoint tanaman /api/v1/crops
-juga tersedia; lihat [crop-data.md](crop-data.md). Endpoint analisis dan chat belum diimplementasikan. `/docs` hanya menampilkan route yang benar-benar aktif.
+juga tersedia; lihat [crop-data.md](crop-data.md). Mesin rotasi BE-06 dijelaskan di [rotation-engine.md](rotation-engine.md). `POST /api/v1/analyze` aktif sejak BE-09. Endpoint chat belum diimplementasikan. `/docs` hanya menampilkan route yang benar-benar aktif.
 Fixture dibaca oleh pengembangan/test frontend, bukan oleh route aplikasi atau
 pipeline produksi. Penyelesaian BE-02 tidak menyelesaikan BE-03 atau BE-08.
 
