@@ -1,25 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUp, Plus, Sprout, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUp, Plus, X } from "lucide-react";
 import anime from "animejs";
 import { type ChatLanguage, useAgentChat } from "@/hooks/useAgentChat";
 import styles from "./agent-chat.module.css";
+import CropyOrb from "./CropyOrb";
 
 const copy = {
   id: {
-    open: "Ask AI", title: "Field Atlas", subtitle: "Asisten pertanian",
+    open: "Ask Cropy", title: "Cropy", subtitle: "Asisten pertanian",
     close: "Tutup chat", clear: "Hapus percakapan", welcome: "Apa yang ingin Anda tanyakan?",
     intro: "Rotasi tanam, air, dan kesehatan tanah.",
     label: "Pertanyaan Anda", placeholder: "Tulis pertanyaan tentang tanaman…", send: "Kirim pertanyaan", waiting: "Sedang menyiapkan jawaban…",
-    retry: "Coba kirim ulang", you: "Anda", ai: "Field Atlas",
+    retry: "Coba kirim ulang", you: "Anda", ai: "Cropy",
   },
   en: {
-    open: "Ask AI", title: "Field Atlas", subtitle: "Farming assistant",
+    open: "Ask Cropy", title: "Cropy", subtitle: "Farming assistant",
     close: "Close chat", clear: "Clear conversation", welcome: "What would you like to ask?",
     intro: "Crop rotations, water, and soil health.",
     label: "Your question", placeholder: "Ask a question about crops…", send: "Send question", waiting: "Preparing your reply…",
-    retry: "Try sending again", you: "You", ai: "Field Atlas",
+    retry: "Try sending again", you: "You", ai: "Cropy",
   },
 };
 
@@ -32,106 +33,58 @@ export default function AgentChat({ lang = "id", launcherClassName = "" }: { lan
   const headerRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
-  const chatIconRef = useRef<HTMLSpanElement>(null);
-  const closeIconRef = useRef<HTMLSpanElement>(null);
+  const launcherLabel = useRef<HTMLSpanElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const closing = useRef(false);
-  const idleAnim = useRef<anime.AnimeInstance | null>(null);
-  const isHovered = useRef(false);
   const { messages, pending, error, send, reset, retry } = useAgentChat(lang);
   const t = copy[lang];
 
   useEffect(() => { setDraft(""); }, [lang]);
   useEffect(() => { bottom.current?.scrollIntoView({ block: "nearest" }); }, [messages, pending, error, opened]);
-  const stopIdle = useCallback(() => {
-    idleAnim.current?.pause();
-    if (launcher.current) anime.remove(launcher.current);
-  }, []);
-
-  const startIdle = useCallback(() => {
-    if (typeof window === "undefined" || !launcher.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    stopIdle();
-    idleAnim.current = anime({
-      targets: launcher.current,
-      keyframes: [
-        { scale: 1, rotate: 0, duration: 0 },
-        { scale: 1.05, rotate: -2.5, duration: 250, easing: "easeInOutSine" },
-        { scale: 1.07, rotate: 2.5, duration: 250, easing: "easeInOutSine" },
-        { scale: 1.03, rotate: -1.5, duration: 200, easing: "easeInOutSine" },
-        { scale: 1, rotate: 0, duration: 300, easing: "easeOutQuad" },
-        { scale: 1, rotate: 0, duration: 3200 },
-      ],
-      loop: true,
-      autoplay: true,
-    });
-  }, [stopIdle]);
-
   useEffect(() => {
-    if (!opened && !isHovered.current) startIdle();
-    else stopIdle();
-    return () => { stopIdle(); };
-  }, [opened, startIdle, stopIdle]);
-
-  const handleMouseEnter = () => {
-    isHovered.current = true;
-    if (typeof window === "undefined" || !launcher.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    stopIdle();
+    if (!opened) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); void close(); }
+    };
+    document.addEventListener("keydown", escape);
+    return () => document.removeEventListener("keydown", escape);
+  }, [opened]);
+  function morphLauncher(compact: boolean) {
+    const button = launcher.current;
+    const label = launcherLabel.current;
+    if (!button || !label) return;
+    const textWidth = label.scrollWidth;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    anime.remove([button, label]);
     anime({
-      targets: launcher.current,
-      scale: 1.08,
-      rotate: 0,
-      duration: 250,
-      easing: "easeOutQuad",
+      targets: button,
+      width: compact ? 56 : 66 + textWidth,
+      borderRadius: compact ? 28 : 18,
+      duration: reduced ? 0 : 320,
+      easing: "easeInOutCubic",
     });
-  };
-
-  const handleMouseLeave = () => {
-    isHovered.current = false;
-    if (typeof window === "undefined" || !launcher.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    anime.remove(launcher.current);
     anime({
-      targets: launcher.current,
-      scale: 1,
-      rotate: 0,
-      duration: 250,
-      easing: "easeOutQuad",
-      complete: () => {
-        if (!opened && !isHovered.current) startIdle();
-      },
+      targets: label,
+      width: compact ? 0 : textWidth,
+      marginLeft: compact ? 0 : 10,
+      opacity: compact ? 0 : 1,
+      duration: reduced ? 0 : 260,
+      easing: "easeInOutCubic",
     });
-  };
+  }
+
+  function syncLauncher() {
+    morphLauncher(!launcher.current?.matches(":hover, :focus-visible"));
+  }
 
   function open() {
     if (closing.current || dialog.current?.open) return;
-    stopIdle();
     setOpened(true);
-    dialog.current?.showModal();
+    dialog.current?.show();
+    syncLauncher();
 
     const prefersReduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (chatIconRef.current && closeIconRef.current) {
-      anime.remove([chatIconRef.current, closeIconRef.current]);
-      anime({
-        targets: chatIconRef.current,
-        rotate: 90,
-        opacity: 0,
-        scale: 0.4,
-        duration: prefersReduced ? 0 : 300,
-        easing: "easeOutQuad",
-      });
-      anime({
-        targets: closeIconRef.current,
-        rotate: [-90, 0],
-        opacity: [0, 1],
-        scale: [0.4, 1],
-        duration: prefersReduced ? 0 : 300,
-        easing: "easeOutQuad",
-      });
-    }
 
     if (prefersReduced || !surface.current) {
       if (surface.current) {
@@ -186,32 +139,13 @@ export default function AgentChat({ lang = "id", launcherClassName = "" }: { lan
 
     const prefersReduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (chatIconRef.current && closeIconRef.current) {
-      anime.remove([chatIconRef.current, closeIconRef.current]);
-      anime({
-        targets: chatIconRef.current,
-        rotate: [90, 0],
-        opacity: [0, 1],
-        scale: [0.4, 1],
-        duration: prefersReduced ? 0 : 250,
-        easing: "easeOutQuad",
-      });
-      anime({
-        targets: closeIconRef.current,
-        rotate: [0, -90],
-        opacity: [1, 0],
-        scale: [1, 0.4],
-        duration: prefersReduced ? 0 : 250,
-        easing: "easeOutQuad",
-      });
-    }
+    syncLauncher();
 
     const finish = () => {
       dialog.current?.close();
       setOpened(false);
       closing.current = false;
       launcher.current?.focus();
-      if (!isHovered.current) startIdle();
     };
 
     if (prefersReduced || !surface.current) {
@@ -243,28 +177,24 @@ export default function AgentChat({ lang = "id", launcherClassName = "" }: { lan
       <button
         ref={launcher}
         type="button"
-        className={`flex items-center gap-2.5 min-h-[50px] px-5 py-3 border border-white rounded-[14px] bg-[#163d2b] text-white text-sm font-semibold shadow-lg shadow-black/10 hover:brightness-105 active:brightness-90 transition-colors focus-visible:outline-3 focus-visible:outline-[#163d2b] focus-visible:outline-offset-3 focus-visible:ring-3 focus-visible:ring-white select-none ${styles.launcher}`}
+        className={styles.launcher}
         onClick={() => { if (opened) { void close(); } else { open(); } }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        onPointerEnter={syncLauncher}
+        onPointerLeave={syncLauncher}
+        onFocus={syncLauncher}
+        onBlur={syncLauncher}
+        aria-label={opened ? (lang === "id" ? "Tutup Cropy" : "Close Cropy") : t.open}
         aria-expanded={opened}
         aria-controls="field-agent-chat"
         aria-haspopup="dialog"
       >
-        <span className="relative inline-flex items-center justify-center w-5 h-5 flex-shrink-0" aria-hidden="true">
-          <span ref={chatIconRef} className="absolute inset-0 flex items-center justify-center text-[#c3e77a]">
-            <Sprout size={21} aria-hidden="true" />
-          </span>
-          <span ref={closeIconRef} className="absolute inset-0 flex items-center justify-center opacity-0 -rotate-90 scale-50 text-white">
-            <X size={21} aria-hidden="true" />
-          </span>
-        </span>
-        <span>{t.open}</span>
+        <span className={styles.launcherLogo} aria-hidden="true"><CropyOrb animated thinking={pending} /></span>
+        <span ref={launcherLabel} className={styles.launcherLabel} aria-hidden="true"><span className={styles.launcherText}>{t.open}</span></span>
       </button>
       <dialog
         ref={dialog}
         id="field-agent-chat"
-        className={`fixed inset-auto right-6 bottom-[98px] m-0 p-0 w-[min(410px,calc(100vw-32px))] h-[min(640px,calc(100dvh-122px))] max-w-none max-h-none border-0 bg-transparent text-[#eef2f0] overflow-visible [color-scheme:dark] backdrop:bg-[#10271e26] max-sm:right-3 max-sm:bottom-3 max-sm:w-[calc(100vw-24px)] max-sm:h-[min(640px,calc(100dvh-24px))] ${styles.panel}`}
+        className={styles.panel}
         aria-labelledby="agent-title"
         onCancel={(event) => { event.preventDefault(); void close(); }}
         onClose={() => { setOpened(false); launcher.current?.focus(); }}
@@ -276,7 +206,7 @@ export default function AgentChat({ lang = "id", launcherClassName = "" }: { lan
         >
           <div ref={headerRef} className={`stagger-reveal flex items-center gap-1 px-4.5 py-3 border-b border-[#343b45] bg-[#252b34] max-sm:px-3.5 max-sm:py-2.5 ${styles.heading}`}>
             <div className={`flex items-center gap-2.5 flex-1 min-w-0 ${styles.identity}`}>
-              <span className={styles.avatar} aria-hidden="true"><Sprout size={22} /></span>
+              <span className={styles.avatar} aria-hidden="true"><CropyOrb animated={opened} thinking={pending} /></span>
               <div><h2 id="agent-title" className="text-[15px] font-semibold m-0 leading-tight">{t.title}</h2><p className="text-[10px] leading-relaxed text-[#b5beca] m-0">{t.subtitle}</p></div>
             </div>
             <button type="button" className={`grid place-items-center min-w-[44px] min-h-[44px] rounded-full text-[#d2dae3] bg-transparent hover:bg-[#343c47] focus-visible:outline-2 focus-visible:outline-[#c3e77a] focus-visible:outline-offset-3 disabled:opacity-40 ${styles.iconButton}`} disabled={!messages.length && !draft} onClick={() => { reset(); setDraft(""); input.current?.focus(); }} aria-label={t.clear}><Plus size={20} aria-hidden="true" /></button>
@@ -284,12 +214,12 @@ export default function AgentChat({ lang = "id", launcherClassName = "" }: { lan
           </div>
           <div ref={messagesRef} className={`stagger-reveal flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain p-5.5 max-sm:p-4 [scrollbar-color:#626b79_transparent] ${styles.messages}`}>
             {!messages.length ? <div className={`flex-1 flex flex-col justify-center items-center px-2.5 pb-6 text-center ${styles.empty}`}>
-              <span className={`inline-grid place-items-center w-[58px] h-[58px] mb-5 rounded-[18px_18px_18px_4px] bg-[#303d35] text-[#c3e77a] ${styles.leaf}`}><Sprout size={30} aria-hidden="true" /></span>
+              <span className={styles.leaf}><CropyOrb animated={opened} /></span>
               <h3 className="max-w-[260px] text-[23px] leading-snug mb-2.5 tracking-tight font-medium">{t.welcome}</h3>
               <p className="text-xs leading-relaxed text-[#b5beca] m-0">{t.intro}</p>
             </div> : <div role="log" aria-live="polite" aria-relevant="additions" className={`flex flex-col gap-6 ${styles.log}`}>
               {messages.map((message, index) => <div key={index} className={message.role === "user" ? styles.user : styles.assistant}>
-                {message.role === "assistant" && <span className={styles.avatar} aria-hidden="true"><Sprout size={18} /></span>}
+                {message.role === "assistant" && <span className={styles.avatar} aria-hidden="true"><CropyOrb /></span>}
                 <div className={message.role === "assistant" ? styles.assistantBubble : styles.userBubble}>
                   <span className={styles.sender}>{message.role === "user" ? t.you : t.ai}</span>
                   {message.role === "assistant" ? <AssistantMessage content={message.content} /> : <p>{message.content}</p>}

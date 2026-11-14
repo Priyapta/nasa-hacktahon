@@ -4,6 +4,149 @@ import { join } from "node:path";
 
 test.use({ trace: "on" });
 
+test("Cropy liquid layers and contour flow continuously, then freeze for reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/?lang=id");
+  const launcher = page.locator('button[aria-controls="field-agent-chat"]');
+  const orb = launcher.locator("[data-cropy-orb]");
+  const contour = orb.locator("[data-cropy-contour]");
+  const layers = orb.locator("[data-cropy-fluid]");
+  await expect(orb).toHaveAttribute("data-cropy-state", "idle");
+  await expect(layers).toHaveCount(3);
+  await expect(launcher).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  const initialShape = await contour.getAttribute("d");
+  await expect.poll(() => contour.getAttribute("d")).not.toBe(initialShape);
+  const initialLayers = await layers.evaluateAll(els => els.map(el => el.getAttribute("style")));
+  await expect.poll(() => layers.evaluateAll(els => els.map(el => el.getAttribute("style")))).not.toEqual(initialLayers);
+  const movement = () => orb.evaluate(async el => {
+    const nodes = Array.from(el.querySelectorAll("[data-cropy-fluid]"));
+    const positions = () => nodes.map(node => new DOMMatrix(getComputedStyle(node).transform));
+    let previous = positions();
+    let distance = 0;
+    const start = performance.now();
+    while (performance.now() - start < 350) {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      const next = positions();
+      next.forEach((matrix, i) => { distance += Math.hypot(matrix.m41 - previous[i].m41, matrix.m42 - previous[i].m42); });
+      previous = next;
+    }
+    return distance / (performance.now() - start);
+  });
+  const idleMovement = await movement();
+  await launcher.hover();
+  await expect(orb).toHaveAttribute("data-cropy-state", "hover");
+  await expect.poll(movement).toBeGreaterThan(idleMovement * 1.8);
+  const hoverShape = await contour.getAttribute("d");
+  await expect.poll(() => contour.getAttribute("d")).not.toBe(hoverShape);
+  const viewport = (await orb.boundingBox())!;
+  const shape = (await contour.boundingBox())!;
+  expect(shape.x).toBeGreaterThanOrEqual(viewport.x);
+  expect(shape.y).toBeGreaterThanOrEqual(viewport.y);
+  expect(shape.x + shape.width).toBeLessThanOrEqual(viewport.x + viewport.width);
+  expect(shape.y + shape.height).toBeLessThanOrEqual(viewport.y + viewport.height);
+  await page.screenshot({ path: "/tmp/cropy-liquid-hover.png" });
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(orb).toHaveAttribute("data-cropy-state", "reduced");
+  const still = await orb.evaluate(async el => {
+    const sample = () => Array.from(el.querySelectorAll("[data-cropy-contour], [data-cropy-fluid], svg")).map(node => [node.getAttribute("d"), node.getAttribute("style")]);
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    const before = sample();
+    for (let i = 0; i < 12; i++) await new Promise(resolve => requestAnimationFrame(resolve));
+    return { before, after: sample() };
+  });
+  expect(still.after).toEqual(still.before);
+  await launcher.click();
+  await expect(orb.locator("[data-cropy-ripple]")).toHaveCSS("opacity", "0");
+  await page.screenshot({ path: "/tmp/cropy-liquid-chat.png" });
+});
+
+test("Cropy ripples on click and increases fluid intensity while thinking", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  let release: () => void = () => {};
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/api/v1/agent/chat", async route => {
+    await gate;
+    await route.fulfill({ json: { answer: "Rotasi membantu menjaga kesehatan tanah.", sources: [], scenario: null } });
+  });
+  await page.goto("/?lang=id");
+  const launcher = page.locator('button[aria-controls="field-agent-chat"]');
+  const orb = launcher.locator("[data-cropy-orb]");
+  await launcher.click();
+  const ripple = orb.locator("[data-cropy-ripple]");
+  await expect.poll(() => ripple.evaluate(el => Number(getComputedStyle(el).opacity))).toBeGreaterThan(0);
+  await expect(ripple).toHaveCSS("opacity", "0");
+  await page.getByLabel("Pertanyaan Anda", { exact: true }).fill("Apa manfaat rotasi?");
+  await page.getByRole("button", { name: "Kirim pertanyaan", exact: true }).click();
+  try {
+    await expect(orb).toHaveAttribute("data-cropy-state", "thinking");
+    const headerOrb = page.getByRole("dialog").locator("[data-cropy-orb]").first();
+    await expect(headerOrb).toHaveAttribute("data-cropy-state", "thinking");
+    const before = await orb.locator("[data-cropy-contour]").getAttribute("d");
+    await expect.poll(() => orb.locator("[data-cropy-contour]").getAttribute("d")).not.toBe(before);
+    await page.screenshot({ path: "/tmp/cropy-liquid-thinking.png" });
+  } finally { release(); }
+  await expect(page.getByRole("log")).toContainText("Rotasi membantu");
+  await expect(orb).not.toHaveAttribute("data-cropy-state", "thinking");
+});
+
+for (const motion of ["reduce", "no-preference"] as const) {
+  test(`Cropy launcher morphs to its logo and back with ${motion} motion`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: motion });
+    await page.goto("/?lang=id");
+    const launcher = page.locator('button[aria-controls="field-agent-chat"]');
+    const label = launcher.locator(':scope > span').last();
+    await expect(launcher).toHaveAccessibleName("Ask Cropy");
+    await expect(launcher.locator("[data-cropy-orb]")).toBeVisible();
+    await expect(launcher).toHaveCSS("width", "56px");
+    await expect(label).toHaveCSS("opacity", "0");
+    await launcher.hover();
+    await expect(label).toHaveCSS("opacity", "1");
+    await expect(launcher).toHaveCSS("border-radius", "18px");
+    expect((await launcher.boundingBox())!.width).toBeGreaterThan(120);
+    await page.mouse.move(0, 0);
+    await expect(label).toHaveCSS("opacity", "0");
+    await expect(launcher).toHaveCSS("width", "56px");
+
+    await launcher.click();
+    const panel = page.getByRole("dialog", { name: "Cropy", exact: true });
+    await expect(panel).toBeVisible();
+    await expect(launcher).toHaveAccessibleName("Tutup Cropy");
+    await page.mouse.move(0, 0);
+    await expect(launcher).toHaveCSS("width", "56px");
+    await expect(launcher).toHaveCSS("border-radius", "28px");
+    await expect(label).toHaveCSS("opacity", "0");
+    await expect(label).toHaveCSS("width", "0px");
+    await expect(page.getByLabel("Pertanyaan Anda", { exact: true })).toBeFocused();
+    await page.screenshot({ path: `/tmp/cropy-open-${motion}.png` });
+
+    await launcher.hover();
+    await expect(label).toHaveCSS("opacity", "1");
+    await launcher.click();
+    await expect(panel).not.toBeVisible();
+    await expect(launcher).toHaveAccessibleName("Ask Cropy");
+    await page.mouse.move(0, 0);
+    await expect(launcher).toHaveCSS("border-radius", "28px");
+    await expect(label).toHaveCSS("opacity", "0");
+    await expect(launcher).toBeFocused();
+    await page.keyboard.press("Tab");
+    await launcher.focus();
+    await expect(label).toHaveCSS("opacity", "1");
+
+    await page.setViewportSize({ width: 360, height: 740 });
+    await launcher.click();
+    await expect(panel).toBeVisible();
+    await expect(page.getByLabel("Pertanyaan Anda", { exact: true })).toBeFocused();
+    const panelBox = (await panel.boundingBox())!;
+    const buttonBox = (await launcher.boundingBox())!;
+    expect(panelBox.y).toBeGreaterThanOrEqual(0);
+    expect(panelBox.y + panelBox.height).toBeLessThan(buttonBox.y);
+    await page.keyboard.press("Escape");
+    await expect(panel).not.toBeVisible();
+    await expect(launcher).toBeFocused();
+  });
+}
+
 test("saved-field chat is available on the dashboard and sends the active field on details", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-11-15T05:00:00Z"));
   const fieldId = "af02e2ce-f771-4f8e-aa50-80c6e29a7df1";
@@ -17,7 +160,7 @@ test("saved-field chat is available on the dashboard and sends the active field 
     return route.fulfill({ json: { answer: "Lahan test sedang pada tahap padi menurut rencana tanam tersimpan.", sources: [], scenario: null } });
   });
   await page.goto("/akun?lang=id");
-  await page.getByRole("button", { name: "Ask AI", exact: true }).click();
+  await page.getByRole("button", { name: "Ask Cropy", exact: true }).click();
   await page.getByLabel("Pertanyaan Anda", { exact: true }).fill("Lahan test saya sekarang bagaimana?");
   await page.getByRole("button", { name: "Kirim pertanyaan", exact: true }).click();
   await expect(page.getByRole("log")).toContainText("menurut rencana tanam");
@@ -26,7 +169,7 @@ test("saved-field chat is available on the dashboard and sends the active field 
 
   await page.goto(`/hasil?lahan=${fieldId}&area=110.9,-7.1;110.901,-7.1;110.901,-7.099&pola=kosong&mulai=2026-11&horizon=12&air=irigasi&lang=id`);
   await expect(page.getByRole("navigation", { name: "Navigasi utama" })).toBeVisible();
-  await page.getByRole("button", { name: "Ask AI", exact: true }).click();
+  await page.getByRole("button", { name: "Ask Cropy", exact: true }).click();
   await page.getByLabel("Pertanyaan Anda", { exact: true }).fill("Bagaimana kebutuhan air lahan ini?");
   await page.getByRole("button", { name: "Kirim pertanyaan", exact: true }).click();
   await expect(page.getByRole("log")).toContainText("menurut rencana tanam");
@@ -47,7 +190,7 @@ test("floating chat supports conversation, failure retry, reset, keyboard and mo
     else await route.fulfill({ json: { answer: body.message === "What do cover crops do?" ? "Cover crops help protect the soil." : "Ini jawaban uji tentang rotasi tanaman.", sources: [], scenario: null } });
   });
   await page.goto("/?lang=id");
-  const launcher = page.getByRole("button", { name: "Ask AI", exact: true });
+  const launcher = page.getByRole("button", { name: "Ask Cropy", exact: true });
   await launcher.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
@@ -75,13 +218,13 @@ test("floating chat supports conversation, failure retry, reset, keyboard and mo
   await field.press("Enter");
   await expect(page.getByRole("log")).toContainText("Cover crops help protect the soil.");
   await expect(page.getByRole("log")).toContainText("Apa manfaat rotasi tanaman?");
-  await expect(page.getByRole("heading", { name: "Field Atlas", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cropy", exact: true })).toBeVisible();
   await expect(field).toHaveAttribute("placeholder", "Tulis pertanyaan tentang tanaman…");
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
-  await expect(page.getByRole("button", { name: "Ask AI", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Ask Cropy", exact: true })).toBeFocused();
   await page.setViewportSize({ width: 360, height: 740 });
-  await page.getByRole("button", { name: "Ask AI", exact: true }).click();
+  await page.getByRole("button", { name: "Ask Cropy", exact: true }).click();
   await field.fill("What do cover crops do?");
   await expect(field).toHaveValue("What do cover crops do?");
   await page.getByRole("button", { name: "Hapus percakapan" }).click();
@@ -104,7 +247,7 @@ test("floating chat supports conversation, failure retry, reset, keyboard and mo
 test("dialog animates from its launcher and returns focus after closing", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/?lang=id");
-  const launcher = page.getByRole("button", { name: "Ask AI", exact: true });
+  const launcher = page.getByRole("button", { name: "Ask Cropy", exact: true });
   await launcher.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
@@ -124,7 +267,7 @@ test("clearing a pending request prevents late replies reappearing", async ({ pa
     await route.fulfill({ json: { answer: "Old reply", sources: [], scenario: null } }).catch(() => {});
   });
   await page.goto("/?lang=id");
-  await page.getByRole("button", { name: "Ask AI", exact: true }).click();
+  await page.getByRole("button", { name: "Ask Cropy", exact: true }).click();
   await page.getByLabel("Pertanyaan Anda", { exact: true }).fill("Pertanyaan tertunda");
   await page.getByRole("button", { name: "Kirim pertanyaan", exact: true }).click();
   await expect(page.getByRole("dialog").getByRole("status")).toContainText("Sedang menyiapkan");
@@ -148,7 +291,7 @@ test('policy refusal remains visible but is excluded from subsequent request his
     }
   });
   await page.goto('/?lang=id');
-  await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
+  await page.getByRole('button', { name: 'Ask Cropy', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Run Python code');
   await input.press('Enter');
@@ -167,7 +310,7 @@ test('agronomy answers render compact paragraphs, bold and lists as safe text', 
     answer: 'Saat air mulai terbatas, pertimbangkan tanaman berikut.\n\n- **Pilih palawija**: Contohnya kacang hijau sesudah padi.\n- **Cek tanah**: Cocokkan kondisi lahan bersama PPL.\n\n<script>alert(1)</script>', sources: [], scenario: null,
   } }));
   await page.goto('/?lang=id');
-  await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
+  await page.getByRole('button', { name: 'Ask Cropy', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Apa yang bisa ditanam setelah padi?');
   await input.press('Enter');
@@ -191,7 +334,7 @@ test('waiting dots rotate, respect reduced motion, and disappear after a reply',
     await route.fulfill({ json: { answer: 'Jawaban selesai.', sources: [], scenario: null } });
   });
   await page.goto('/?lang=id');
-  await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
+  await page.getByRole('button', { name: 'Ask Cropy', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Apa manfaat rotasi?');
   await input.press('Enter');

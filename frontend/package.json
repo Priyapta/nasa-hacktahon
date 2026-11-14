@@ -14,22 +14,23 @@
   "dependencies": {
     "@field-atlas/shared": "1.0.0",
     "@turf/turf": "*",
+    "animejs": "^3.2.2",
+    "framer-motion": "14.14.0",
     "lucide-react": "*",
     "maplibre-gl": "^6.18.0",
     "next": "16.4.6",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "terra-draw": "*",
-    "terra-draw-maplibre-gl-adapter": "^1.5.0",
-    "animejs": "^3.2.2"
+    "terra-draw-maplibre-gl-adapter": "^1.5.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "*",
+    "@types/animejs": "^3.1.13",
     "@types/node": "*",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "tailwindcss": "*",
-    "@types/animejs": "^3.1.13"
+    "tailwindcss": "*"
   }
 }
