@@ -138,6 +138,8 @@ Import repo GitHub ini ke Vercel dan pilih:
 
 Build root menyiapkan `packages/shared/dist` sebelum frontend; output tetap `.next` relatif ke `frontend`. Pilih alamat `.vercel.app` bawaan. Set `API_URL` untuk Production dan Preview bila diperlukan; jangan memakai prefix `NEXT_PUBLIC_` atau mengisi key AI di Vercel.
 
+`frontend/vercel.json` menyimpan framework, install command, dan build command di repo agar tidak bergantung pada override manual dashboard. Root Directory tetap harus `frontend` di pengaturan project. Jika muncul error tidak menemukan `pages`, periksa root tersebut, gunakan commit terbaru, dan redeploy tanpa build cache. Aplikasi ini menggunakan `frontend/app`, sehingga tidak perlu membuat folder `pages` baru.
+
 Integrasi Git Vercel otomatis membangun Production saat `main` berubah, dan Preview untuk branch/PR. Tidak perlu GitHub secret `VERCEL_TOKEN` atau deploy hook tambahan. Jalur deployment frontend dan backend berjalan terpisah; Vercel tidak menunggu job checks GitHub secara otomatis. Jadikan job `checks` wajib lewat branch protection/ruleset `main` agar perubahan melalui PR sudah diuji sebelum merge.
 
 ## 6. Operasional setelah deploy pertama
