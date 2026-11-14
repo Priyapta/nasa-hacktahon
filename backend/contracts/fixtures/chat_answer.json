@@ -1,0 +1,12 @@
+{
+  "answer": "DATA UJI: hujan mencukupi di 8 dari 9 tahun acuan [S1].",
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Referensi fixture sintetis, bukan sumber agronomi",
+      "url": "https://example.org/fixture-only",
+      "period": "2016-01-01/2025-12-31"
+    }
+  ],
+  "scenario": null
+}

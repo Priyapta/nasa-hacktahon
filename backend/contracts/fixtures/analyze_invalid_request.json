@@ -1,0 +1,24 @@
+{
+  "location": {
+    "lat": -7.09,
+    "lon": 110.91
+  },
+  "rotation": {
+    "has_pattern": true,
+    "stages": [
+      {
+        "crop_id": "padi_sawah"
+      },
+      {
+        "crop_id": "bera",
+        "months": 4
+      }
+    ]
+  },
+  "time": {
+    "start_month": "2026-11",
+    "horizon_months": 9
+  },
+  "water_source": "tadah_hujan",
+  "lang": "id"
+}

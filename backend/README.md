@@ -54,3 +54,11 @@ Environment `ALLOWED_ORIGINS` bersifat opsional, daftar origin dipisahkan koma b
 6. Rakit `/analyze`, validasi hujan/manual, fallback, integrasi frontend dan agent, migrasi runner, deployment. BE-08 sampai BE-11, BE-13, BE-14.
 
 Kurasi agronomi dimulai sebelum mesin rotasi; nilai yang belum diverifikasi tidak boleh menjadi keputusan produksi. Tiap tahap harus punya contoh input/output atau pemeriksaan nyata sebelum dilanjutkan. Daftar ini tidak menyatakan semua BE-01 selesai: migrasi runner dan kontrak respons masih menyusul.
+
+
+## Kontrak API (BE-02)
+
+Schema request/response analisis, tanaman, pencarian, galat, dan chat tersedia.
+Detail pemetaan ke PRD, keputusan serialisasi, JSON Schema, dan fixture FE ada
+di [contracts/README.md](contracts/README.md). Fixture adalah data uji sintetis,
+bukan data produksi. Endpoint yang belum diimplementasikan tetap tidak terdaftar.
