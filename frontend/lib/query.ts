@@ -1,4 +1,5 @@
 import type { Polygon } from "geojson";
+import { measure } from "./geo";
 import {
   CROP_IDS,
   FALLOW_MAX_MONTHS,
@@ -170,6 +171,7 @@ export function serializePlan(
 export function toAnalysisInput(plan: PlanState): AnalysisInput | null {
   if (!plan.area || !plan.water) return null;
   if (plan.hasPattern && plan.stages.length === 0) return null;
+  try { measure(polygonFromRing(plan.area)); } catch { return null; }
   return {
     location: polygonFromRing(plan.area),
     rotation: {

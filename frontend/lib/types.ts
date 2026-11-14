@@ -62,3 +62,33 @@ export interface ApiErrorBody {
 
 /** Outer ring without the repeated closing position, as kept in the URL. */
 export type OpenRing = Position[];
+
+export interface AnalysisResponse {
+  context: {
+    climate: { period: string };
+    soil: { status: "ok" | "unavailable"; depth: string; ph: number | null; texture_class: string | null; soc_g_per_kg: number | null };
+  };
+  strategies: {
+    id: string;
+    role: "pola_biasa" | "seimbang" | "hemat_air" | "jaga_tanah";
+    label: string;
+    calendar: { crop_id: CropId; start: string; end: string; continues_after_horizon: boolean }[];
+    feasibility: { passed: boolean; failed_rules: string[] };
+    dimensions: {
+      climate_fit: { level: string; evidence: string };
+      water_pressure: { level: string; years_met: number; years_total: number };
+      bare_months: number;
+      soil_contribution: { legume: boolean; cover_crop: boolean; families: number };
+      risks: string[];
+    };
+    reasons: string[];
+    tradeoffs: string[];
+  }[];
+  notes: string[];
+  provenance: {
+    climate: { source: string; rain_validation: { status: string } };
+    soil: { source: string };
+    crop_table_version: string;
+    assumptions: string[];
+  };
+}
