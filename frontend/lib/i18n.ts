@@ -97,8 +97,8 @@ const id = {
       "Tanya AI belum tersambung di versi ini. Perbandingan strategi tetap bisa dipakai tanpa chat.",
   },
   results: {
-    title: "Layar hasil sedang dibuat",
-    body: "Isian Anda sudah tersimpan di alamat halaman ini. Perbandingan strategi akan tampil di sini setelah analisis tersambung.",
+    title: "Perbandingan strategi",
+    body: "Estimasi berdasarkan pola iklim historis untuk lahan dan rencana Anda.",
     back: "Kembali ke rencana",
   },
 };
@@ -201,8 +201,8 @@ const en: Dictionary = {
       "Ask AI is not connected in this version. Strategy comparison still works without chat.",
   },
   results: {
-    title: "The results screen is being built",
-    body: "Your inputs are saved in this page address. The strategy comparison will appear here once analysis is connected.",
+    title: "Strategy comparison",
+    body: "An estimate based on historical climate patterns for your field and plan.",
     back: "Back to the plan",
   },
 };
