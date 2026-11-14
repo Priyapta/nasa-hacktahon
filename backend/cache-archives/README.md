@@ -11,6 +11,7 @@ Semua perubahan pada langkah ini hanya berada di `backend/`.
 | --- | --- | --- | --- | --- |
 | `nasa-power-indonesia-2016-2025-cache.zip` | 600 file data harian NetCDF + 600 JSON metadata; 6 variabel, 2016-2025 | 116.641.078 byte (sekitar 117 MB) | Belum diunggah | `backend/data/power/` |
 | `soilgrids-grobogan-samples-v1.zip` | 45 subset GeoTIFF native + 45 JSON metadata; tiga polygon sampel, kedalaman 0-30 cm | 80.605 byte (sekitar 81 KB) | Belum diunggah | `backend/data/soilgrids/` |
+| `soilgrids-indonesia-catalogs-grobogan-v1.zip` | 45 katalog VRT yang dipangkas ke kotak Indonesia + 45 raster tanah seluruh kotak Grobogan dengan JSON metadata | 2.576.386 byte (sekitar 2.5 MB) | Belum diunggah | `backend/data/soilgrids/` |
 
 Paket SoilGrids tersedia untuk tiga polygon uji kecil dekat Grobogan, bukan seluruh Indonesia. Paket NASA POWER mencakup kotak sekitar Indonesia,
 termasuk laut dan sebagian negara tetangga; hujan belum divalidasi pembanding.
@@ -22,7 +23,8 @@ Unggah ke folder penyimpanan bersama atau object storage:
 
 1. `nasa-power-indonesia-2016-2025-cache.zip`.
 2. `soilgrids-grobogan-samples-v1.zip` untuk sampel tanah.
-3. `checksums.sha256` untuk pemeriksaan integritas unduhan.
+3. `soilgrids-indonesia-catalogs-grobogan-v1.zip` agar tanah lahan baru di Indonesia cepat dan Grobogan bisa tanpa internet.
+4. `checksums.sha256` untuk pemeriksaan integritas unduhan.
 
 README dan `manifest.json` boleh disertakan sebagai panduan. Setelah upload,
 isi URL nyata pada `upload_url` dan ubah `upload_status` di `manifest.json`,
@@ -82,3 +84,32 @@ ZIP tetap tidak masuk Git. Tabel README diperbarui saat ukuran paket berubah.
 Profil iklim bulanan BE-05 adalah cache turunan di `backend/data/power/results/`.
 Tidak perlu paket ZIP atau upload tambahan: hasil dapat dihitung ulang dari
 paket NASA POWER yang sudah ada memakai `scripts/test_climate_sample.py`.
+
+
+## Memakai paket katalog Indonesia dan tanah Grobogan
+
+Dari root repo:
+
+```bash
+unzip backend/cache-archives/soilgrids-indonesia-catalogs-grobogan-v1.zip -d backend/data/soilgrids
+```
+
+Hasilnya `backend/data/soilgrids/catalogs/*.vrt` dan raster Grobogan di
+`backend/data/soilgrids/raw/`. Dengan katalog lokal, tanah untuk lahan baru di
+dalam kotak Indonesia diambil dalam beberapa detik, terukur 5,8 detik untuk
+satu lahan baru di Grobogan dan Lampung. Lahan di dalam kotak Grobogan
+dipotong dari raster lokal tanpa request ke ISRIC, terukur 0,6 detik. Lahan di
+luar kotak Indonesia tetap memakai katalog global seperti sebelumnya.
+
+Membuat ulang paket dari folder backend:
+
+```bash
+.venv/bin/python scripts/prepare_soil_catalogs.py
+.venv/bin/python scripts/prepare_soil_region.py
+```
+
+Script pertama mengunduh 45 katalog global sekali (3,5 sampai 6 MB per katalog)
+dan hanya menyimpan tile di kotak Indonesia (146 sampai 238 KB per katalog,
+total 9,6 MB).
+Script kedua menyiapkan raster Grobogan, membuat ZIP, dan memperbarui manifest
+serta checksum.

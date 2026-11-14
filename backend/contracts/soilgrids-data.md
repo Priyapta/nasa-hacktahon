@@ -153,6 +153,31 @@ Grobogan yang dipilih dari pixel sumber valid, bukan batas lahan hasil survei
 atau lokasi demo yang sudah disepakati tim. Satu subset bersama mencakup ketiga
 polygon sehingga 45 raster dapat dipakai bersama.
 
+## Katalog lokal Indonesia dan wilayah Grobogan
+
+Setiap katalog VRT global berukuran 3,5 sampai 6 MB dan mendaftar 7.692 tile
+dunia. Membaca katalog lewat HTTP untuk setiap lahan memakan sekitar 12 detik
+per lapisan, atau 9 sampai 13 menit untuk 45 lapisan satu lahan. Katalog
+terakhir diubah Juni 2020, sehingga backend menyimpan salinan lokalnya.
+
+`download_catalog` mengunduh katalog sekali, membuang tile di luar kotak
+Indonesia (94 sampai 142 BT, 12 LS sampai 7 LU, sama dengan arsip NASA POWER),
+dan menulis ulang path tile menjadi URL absolut ISRIC. Ukuran raster dan
+geotransform global tidak diubah, sehingga perhitungan window piksel tetap
+sama. Pada katalog pH 0-5 cm tersisa 285 dari 7.692 tile, dari 3.442 KB menjadi
+146 KB. Ke-45 katalog berukuran 146 sampai 238 KB, total 9,6 MB. Empat puluh lima lapisan sebuah lahan diambil bersamaan dengan delapan
+thread.
+
+Lahan di luar kotak Indonesia tetap memakai katalog global jarak jauh. Bila
+katalog lokal gagal diunduh, kode kembali ke katalog global. Raster wilayah
+Grobogan (55.420 piksel per lapisan) disiapkan sekali dan dipakai ulang oleh
+`find_cached` untuk setiap lahan di dalamnya.
+
+| Kasus | Sebelum | Sesudah |
+| --- | --- | --- |
+| Lahan baru di Indonesia | 9 sampai 13 menit | 5,8 detik (Grobogan dan Lampung) |
+| Lahan baru di dalam kotak Grobogan, tanpa internet | Tidak tersedia | 0,6 detik |
+
 ## Perintah WSL
 
 Dari root repo:

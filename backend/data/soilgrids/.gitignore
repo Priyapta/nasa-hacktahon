@@ -5,3 +5,4 @@ probes/
 *-status.json
 *.lock
 *.part
+catalogs/
