@@ -42,13 +42,19 @@ Batas memori service: `MemoryHigh=900M`, `MemoryMax=1200M`, dan swap maksimal 25
 
 ## 3. Nginx dan domain
 
-Selama domain belum dibeli, service dapat diuji melalui SSH memakai health lokal di atas. Nginx masih memakai **`api.example.com`** sebagai placeholder.
+Domain proyek memakai subdomain agar `alworkbench.site` tetap bisa dipakai untuk proyek lain:
 
-Setelah domain tersedia, arahkan DNS A subdomain API ke IPv4 VPS. Buat record AAAA hanya jika IPv6 server benar-benar aktif. Salin konfigurasi dan ganti `server_name` dengan subdomain yang dibeli:
+| Alamat | Tujuan | Record DNS |
+| --- | --- | --- |
+| `atlas.alworkbench.site` | Frontend Vercel | CNAME `atlas` ke target yang diberikan Vercel |
+| `api-atlas.alworkbench.site` | Backend VPS | A `api-atlas` ke IPv4 VPS |
+
+Tambahkan `atlas.alworkbench.site` di Settings → Domains project Vercel, lalu salin nilai CNAME yang ditampilkan ke penyedia DNS domain. Target CNAME mengikuti project, jangan menebak nilainya. Domain utama dan subdomain proyek lain tidak perlu diubah. Service dapat diuji melalui SSH memakai health lokal sebelum DNS/TLS aktif.
+
+Arahkan DNS A `api-atlas` ke IPv4 VPS. Buat record AAAA hanya jika IPv6 server benar-benar aktif. Konfigurasi Nginx sudah memakai `server_name api-atlas.alworkbench.site`:
 
 ```bash
 sudo install -m 0644 /opt/field-shift/deploy/backend/nginx.conf /etc/nginx/sites-available/field-shift
-sudoedit /etc/nginx/sites-available/field-shift
 sudo ln -s /etc/nginx/sites-available/field-shift /etc/nginx/sites-enabled/field-shift
 sudo nginx -t
 sudo systemctl reload nginx
@@ -56,15 +62,15 @@ sudo systemctl reload nginx
 
 Izinkan TCP 80/443 di firewall VPS/provider; port 8000 tetap lokal. Bila UFW sudah dipakai, tambahkan `sudo ufw allow 'Nginx Full'`. Jika baru hendak mengaktifkan UFW, izinkan port SSH yang benar terlebih dahulu agar sesi tidak terputus.
 
-Setelah DNS mengarah ke server, ganti domain pada perintah berikut dengan domain nyata:
+Setelah DNS API mengarah ke server:
 
 ```bash
-sudo certbot --nginx -d api.example.com --redirect
+sudo certbot --nginx -d api-atlas.alworkbench.site --redirect
 sudo certbot renew --dry-run
-curl --fail https://api.example.com/api/v1/health
+curl --fail https://api-atlas.alworkbench.site/api/v1/health
 ```
 
-Certbot memasang konfigurasi TLS dan redirect HTTPS. Jangan menjalankan perintah sertifikat untuk placeholder. Timeout proxy 35 detik melebihi deadline chat 25 detik. Log akses dimatikan agar query pencarian tidak tersimpan di access log; galat proses tersedia di journal.
+Certbot memasang konfigurasi TLS dan redirect HTTPS. Timeout proxy 35 detik melebihi deadline chat 25 detik. Log akses dimatikan agar query pencarian tidak tersimpan di access log; galat proses tersedia di journal.
 
 ## 4. Hubungkan Vercel
 
@@ -73,10 +79,10 @@ Untuk project frontend: pilih root directory `frontend`, aktifkan akses file di 
 Tambahkan environment variable **server-side** di Vercel:
 
 ```dotenv
-API_URL=https://api.example.com
+API_URL=https://api-atlas.alworkbench.site
 ```
 
-Ganti dengan domain API nyata, tanpa `/api/v1` di belakangnya. Set untuk Production dan Preview bila dibutuhkan, lalu redeploy frontend: Next.js menanam tujuan rewrite saat build. Jangan memakai `NEXT_PUBLIC_API_URL` atau menaruh `AI_API_KEY` di Vercel. Browser tetap mengakses `/api/*` pada origin frontend melalui rewrite; tidak perlu CORS wildcard.
+Jangan tambahkan `/api/v1` di belakang URL. Set untuk Production dan Preview bila dibutuhkan, lalu redeploy frontend: Next.js menanam tujuan rewrite saat build. Jangan memakai `NEXT_PUBLIC_API_URL` atau menaruh `AI_API_KEY` di Vercel. Browser tetap mengakses `/api/*` pada origin frontend melalui rewrite; tidak perlu CORS wildcard.
 
 ## 5. Pembaruan dan pemeriksaan
 
@@ -91,4 +97,4 @@ curl --fail http://127.0.0.1:8000/api/v1/health
 
 Health membuktikan proses berjalan, bukan koneksi provider. Uji satu pertanyaan chat pertanian lewat frontend setelah key terpasang. Jika restart gagal, lihat journal; bila unit terkena batas restart, perbaiki penyebab lalu jalankan `sudo systemctl reset-failed field-shift` dan `sudo systemctl start field-shift`.
 
-Referensi: [Uvicorn settings](https://uvicorn.dev/settings/), [systemd resource control](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html), [systemd environment/state directories](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html), [Nginx proxy](https://nginx.org/en/docs/http/ngx_http_proxy_module.html), [Vercel external rewrites](https://vercel.com/docs/routing/rewrites).
+Referensi: [Uvicorn settings](https://uvicorn.dev/settings/), [systemd resource control](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html), [systemd environment/state directories](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html), [Nginx proxy](https://nginx.org/en/docs/http/ngx_http_proxy_module.html), [Vercel external rewrites](https://vercel.com/docs/routing/rewrites), [Vercel domain dan CNAME](https://vercel.com/docs/domains/working-with-domains/add-a-domain).
