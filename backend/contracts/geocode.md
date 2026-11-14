@@ -1,3 +1,10 @@
+> Perubahan disetujui pemilik pada 14 November 2026: pencarian nama diperluas
+> ke Indonesia agar tempat seperti Cinunuk dapat ditemukan. PRD tidak diedit.
+> `GEOCODE_BBOX=94,-12,142,7` mengatur pencarian, terpisah dari wilayah agronomi
+> Grobogan (`DEMO_BBOX` / `DEFAULT_DEMO_BBOX`). Nominatim tetap memakai
+> `countrycodes=id`, cache dan pembatas bersama 1 request/detik.
+> Penyebutan pembatasan pencarian Grobogan di catatan awal di bawah adalah historis.
+
 # Pencarian lokasi Nominatim — BE-04 / bagian endpoint BE-08
 
 Branch `geocode` dibuat dari `soilgrids` setelah rebase pengguna. Base commit

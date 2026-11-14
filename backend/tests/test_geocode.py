@@ -1,9 +1,9 @@
 """HTTP contract, persistent cache, and provider-wide search budget. No live requests."""
 
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from email.utils import formatdate
-import time
 
 import httpx
 import pytest
@@ -253,7 +253,7 @@ def test_corrupt_cache_is_refetched_not_returned(setup):
 
 def test_normalization_filters_outside_bbox_and_deduplicates():
     settings = GeocodeSettings()
-    outside = {**PLACE, "osm_id": 1, "lat": "-6.2", "lon": "106.8"}
+    outside = {**PLACE, "osm_id": 1, "lat": "51.5", "lon": "-0.1"}
     result = normalize_results([PLACE, PLACE, outside], settings.bbox)
     assert len(result.results) == 1
     assert normalize_results([outside], settings.bbox).results == []
@@ -263,14 +263,14 @@ def test_normalization_filters_outside_bbox_and_deduplicates():
 
 def test_configuration_env_and_validation(monkeypatch, tmp_path):
     monkeypatch.setenv("CACHE_DIR", str(tmp_path))
-    monkeypatch.setenv("DEMO_BBOX", "110,-8,112,-6")
+    monkeypatch.setenv("GEOCODE_BBOX", "110,-8,112,-6")
     monkeypatch.setenv("NOMINATIM_BASE_URL", "https://nominatim.example.test/")
     monkeypatch.setenv("NOMINATIM_USER_AGENT", "FieldShift-test/1.0")
     settings = GeocodeSettings.from_env()
     assert settings.cache_dir == tmp_path / "geocode"
     assert settings.bbox == (110, -8, 112, -6)
     assert settings.base_url == "https://nominatim.example.test"
-    monkeypatch.setenv("DEMO_BBOX", "110,-8")
+    monkeypatch.setenv("GEOCODE_BBOX", "110,-8")
     with pytest.raises(ValueError):
         GeocodeSettings.from_env()
     with pytest.raises(ValueError):
@@ -298,3 +298,18 @@ def test_upstream_rate_limit_without_retry_header_defaults_to_one_second(tmp_pat
         with pytest.raises(GeocodeRateLimited) as exc:
             service.search("Grobogan")
         assert exc.value.retry_after == 1
+
+
+def test_cinunuk_is_searchable_without_expanding_agronomic_demo(tmp_path, monkeypatch):
+    from app.config import DEFAULT_DEMO_BBOX
+
+    monkeypatch.delenv("GEOCODE_BBOX", raising=False)
+    monkeypatch.setenv("DEMO_BBOX", "110,-8,112,-6")
+    monkeypatch.setenv("CACHE_DIR", str(tmp_path))
+    place = {**PLACE, "lat": "-6.939", "lon": "107.736", "display_name": "Cinunuk, Jawa Barat, Indonesia"}
+    with httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=[place]))) as client:
+        service = GeocodeService(GeocodeSettings.from_env(), client)
+        response, _ = service.search("Cinunuk")
+    assert response.results[0].name == place["display_name"]
+    assert service.settings.bbox == (94, -12, 142, 7)
+    assert DEFAULT_DEMO_BBOX == (110.5415518, -7.2832140, 111.2468490, -6.9094001)
