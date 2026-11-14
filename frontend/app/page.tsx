@@ -1,4 +1,19 @@
-'use client';
-import dynamic from 'next/dynamic';
-const Workspace=dynamic(()=>import('@/components/workspace'),{ssr:false,loading:()=> <div className="loading">Opening Field Atlas…</div>});
-export default function Page(){return <Workspace/>}
+"use client";
+
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+
+// MapLibre and Terra Draw need `window`, so the whole input flow renders in
+// the browser only.
+const InputFlow = dynamic(() => import("@/components/input/InputFlow"), {
+  ssr: false,
+  loading: () => <div className="h-dvh bg-canvas" />,
+});
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="h-dvh bg-canvas" />}>
+      <InputFlow />
+    </Suspense>
+  );
+}
