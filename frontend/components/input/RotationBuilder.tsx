@@ -171,7 +171,6 @@ export default function RotationBuilder({
             </div>
           )}
           {full && <p className="m-0 text-[13px] text-muted">{t.plan.full}</p>}
-          <p className="m-0 text-[13px] leading-normal text-muted">{t.plan.patternNote}</p>
         </>
       )}
     </section>

@@ -37,6 +37,23 @@ For deployment, set `API_URL` before building the frontend; changing the proxy a
 
 Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the same frontend origin to access existing fields; a different host or port has separate browser storage. PostgreSQL setup is described below; field persistence has not been migrated and there are no user accounts.
 
+## Floating AI chat (DeepSeek)
+
+The bottom-right **Ask AI** button opens a keyboard-accessible chat panel on every page. It supports Indonesian/English, in-memory conversation history, clear/reset, and retry without duplicating the question. Messages are sent to DeepSeek only after the user submits. The dark dialog and rounded composer follow the provided visual reference; opening/closing uses Anime.js animations, with reduced-motion support. Visible footer notices and the input heading were removed at the product owner’s request; the input retains a screen-reader label.
+
+Set these values in `backend/.env`, then restart the backend:
+
+```dotenv
+AI_API_KEY=your-deepseek-api-key
+AI_MODEL=deepseek-flash
+```
+
+Never put the key in frontend variables. The backend uses DeepSeek's [Chat Completions API](https://api-docs.deepseek.com/quick_start/) through native `fetch`, without another SDK. The UI calls `POST /api/v1/agent/chat` through the existing Next.js rewrite. Without a key the API returns 503 and the panel explains the service is not active.
+
+This first implementation handles general farming conversations. Field analysis, curated facts, citations, and scenario tools are not connected yet; the backend asks for clarification instead of inventing field results. It does not send LocalStorage fields or coordinates to the model. The response shape remains `{ answer, sources: [], scenario: null }` for later integration. The current Node backend contains a temporary adapter in `backend/src/agent.ts`; migrate it to the planned FastAPI agent route when that backend is ready. Non-null `analysis_input` is rejected until the pipeline is connected.
+
+Requests are limited to 64 KiB, 2,000 characters per message, ten history entries, 800 output tokens, and a shared 25-second request deadline. This temporary adapter allows five provider requests per minute for the whole API process. It does not yet implement the PRD's daily quota or tool loop; configure an account spending limit before public use. Browser requests time out after 30 seconds. Chat history is not stored in PostgreSQL or browser storage.
+
 ## Local PostgreSQL with Docker
 
 Run PostgreSQL 17 from the repository root. If the root `.env` does not exist, copy `.env.example` to `.env`, then replace `POSTGRES_PASSWORD` with your local password. Keep existing environment files; do not overwrite them.
@@ -121,3 +138,23 @@ npm run test:browser
 `npm test` runs API, frontend, and shared tests. Browser tests use fixture map/terrain tiles to verify fields, map switching, and bounded prefetch; the proxy test calls the real local backend. Use ATLAS_URL for a different running frontend and CHROMIUM_EXECUTABLE_PATH for an installed Chrome executable. Browser fixtures live in `frontend/tests/fixtures`. Real endpoint/imagery checks are separate from fixture tests.
 
 Climate charts remain labeled demo data; NASA POWER is not integrated. Soil values must come from field observations. Crop rotations remain illustrative, with no predicted yield or water-saving percentages.
+
+
+### Chat policy gate
+
+The backend classifies each message and history with DeepSeek JSON Output before generating an answer. Only an explicit validated in-scope decision permits generation. Coding, execution, secrets, prompt injection and unrelated requests receive a localized refusal (`200`, `blocked: true`). Broken/failed classification returns 502/504 without generating an answer. Classification has a 5-second limit within the shared 25-second request deadline. Allowed requests use two provider calls, refused requests one; both consume the existing request quota. The UI retains refusals visually and starts outgoing history after the last refusal. This is a probabilistic filter, not a guarantee against every injection.
+
+### Panduan jawaban agronomi terbaru
+
+Prompt classifier dan jawaban memakai cakupan pertanian/perkebunan, pangan/hortikultura, kalender dan rotasi tanam, tanah/pupuk/air/hama/penyakit/gulma, iklim serta satelit/sensor untuk pertanian, dan ekonomi pertanian terkait pilihan komoditas atau hasil panen. Fitur pertanian Field Atlas tetap termasuk konteks. Permintaan coding/eksekusi, politik, selebriti, game, matematika umum, resep, percakapan tidak relevan, serta prompt injection ditolak. Penolakan tetap persis dalam bahasa Indonesia, termasuk ketika bahasa chat Inggris: "Mohon maaf, saya tidak bisa menjawab pertanyaan ini karena berada di luar konteks asisten pertanian dan pengelolaan lahan." Sapaan pembuka, perkenalan, terima kasih, dan pamitan singkat diizinkan; permintaan campuran di luar konteks tetap ditolak. Typo, singkatan, dan bahasa informal ditafsirkan menurut maksudnya tanpa melonggarkan batas keamanan; jika maksud pertanian belum jelas, minta klarifikasi.
+
+Gaya jawaban: langsung ke inti, pembuka 1-2 kalimat, bahasa lapangan yang profesional, contoh konkret bila didukung data, dan paragraf singkat. Bullet hanya untuk beberapa tindakan praktis, maksimal 3-4 poin dan dua kalimat per poin. Bold dipakai seperlunya untuk istilah penting, tidak wajib di awal setiap poin dan tidak menebalkan seluruh kalimat. Jangan memakai em dash atau en dash sebagai pemisah kalimat, heading untuk jawaban singkat, simbol/emoji/separator dekoratif, atau sintaks Markdown mentah. Tabel hanya jika perbandingan benar-benar membutuhkannya; renderer saat ini mendukung paragraf, daftar, dan bold sehingga perbandingan disampaikan sebagai poin ringkas. Jawab langsung, jelaskan pertimbangan relevan, beri saran hanya berdasar bukti, dan tanya lanjut hanya jika informasi esensial hilang. Bedakan data pengamatan, prakiraan, dan panduan umum tanpa mengarang cuaca, kondisi tanah, atau saran khusus lahan. Penutup validasi kondisi lapangan/PPL disampaikan natural bila relevan. Jangan mengasumsikan keadaan lahan atau mengaku sudah membaca NASA POWER/SMAP/GPM/ECOSTRESS/Landsat/MODIS yang belum terhubung. Ekonomi hanya dibahas kualitatif tanpa proyeksi hasil/keuntungan atau harga karangan; pembahasan hama bersifat edukatif tanpa diagnosis pasti/dosis pestisida. Ini memperluas percakapan, bukan menambah dataset analisis atau rumus ekonomi.
+
+UI memakai jarak antarpesan 12 px dan padding bubble 8 x 10 px. Output mendukung paragraf, daftar sederhana, dan **bold** sebagai elemen React; HTML, link, dan kode dari model tidak dieksekusi. Gaya bahasa model perlu diuji dengan layanan nyata; tes provider palsu hanya memastikan instruksi dan alur.
+
+
+Pembaruan chat: tiga tombol saran dihapus atas permintaan pengguna; composer langsung menampilkan kolom pesan dan tombol kirim 44 px dengan inset 6 px. Uji DeepSeek asli menerima "halo" dan "rotasi tanamn pdi abis panen tnm apa", serta menolak "jalnkn kode python" dan "halo, buatin kode game". Hasil empat contoh ini tidak menjamin ketepatan seluruh klasifikasi.
+
+### Penanganan data tidak tersedia
+
+Bila data real-time/eksternal yang dibutuhkan belum tersedia, AI menyampaikan batas dalam satu kalimat singkat, tanpa mengulang alasan atau mengarang estimasi. Jangan mengaku sudah mengecek data yang belum diambil. Jangan meminta pengguna menyalin, merangkum, atau mengirim data dari situs eksternal, maupun menanyakan lokasi jika belum ada layanan pencarian yang dapat memakainya. Berikan rujukan resmi relevan dan panduan umum yang tidak bergantung pada data hilang bila membantu. Untuk cuaca Indonesia, prompt menyediakan rujukan BMKG https://cuaca.bmkg.go.id/ yang telah diperiksa; tautan ini adalah rujukan, bukan bukti pengambilan cuaca langsung. Jangan membuat URL, angka, atau kutipan sumber lain; jika belum ada URL terverifikasi, sebutkan lembaga resmi/PPL yang relevan. Pertanyaan tentang kondisi lahan milik pengguna tetap boleh hanya jika esensial dan jawaban dapat terbantu olehnya. Tidak ada integrasi cuaca real-time baru atau perubahan kontrak API.

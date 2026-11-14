@@ -32,6 +32,13 @@ test("standalone API serves health and search over HTTP, validates input, and re
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   const health = await fetch(`${base}/health`);
   assert.equal(health.status, 200);
+  const chatMethod = await fetch(`${base}/api/v1/agent/chat`);
+  assert.equal(chatMethod.status, 405);
+  assert.equal(chatMethod.headers.get("Allow"), "POST");
+  const chatInvalid = await fetch(`${base}/api/v1/agent/chat`, { method: "POST", body: "{}" });
+  assert.equal(chatInvalid.status, 400);
+  const oversized = await fetch(`${base}/api/v1/agent/chat`, { method: "POST", body: JSON.stringify({ message: "a".repeat(70_000) }) });
+  assert.equal(oversized.status, 413);
   assert.deepEqual(await health.json(), { status: "ok", service: "field-atlas-api" });
   const invalid = await fetch(`${base}/api/geocode?q=x`);
   assert.equal(invalid.status, 400);

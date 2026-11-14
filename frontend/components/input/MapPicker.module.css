@@ -1,0 +1,65 @@
+.cosmos {
+  background-color: #0d192c;
+  background-image:
+    radial-gradient(1px 1px at 23px 37px, #ffffffb3 95%, transparent),
+    radial-gradient(1px 1px at 89px 113px, #c5d9f28c 95%, transparent),
+    radial-gradient(1.5px 1.5px at 151px 61px, #f0f5ffb3 95%, transparent),
+    radial-gradient(1px 1px at 47px 173px, #ffffff66 95%, transparent),
+    radial-gradient(ellipse at 25% 35%, #24456580, transparent 65%),
+    radial-gradient(ellipse at 85% 75%, #20384a80, transparent 60%);
+  background-size: 173px 191px, 251px 229px, 337px 283px, 397px 347px, 100% 100%, 100% 100%;
+}
+
+.pointHint {
+  pointer-events: none;
+}
+
+.pointHint :global(.maplibregl-popup-content) {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #16201b;
+  color: #fff;
+  font: 500 13px/1.5 var(--font-sans);
+}
+
+.pointHint :global(.maplibregl-popup-tip) {
+  border-top-color: #16201b;
+}
+
+.frame :global(.icon-btn),
+.frame :global(.btn-secondary) {
+  transition: background-color 150ms, border-color 150ms, transform 150ms;
+}
+
+.frame :global(.icon-btn):not(:disabled):hover,
+.frame :global(.btn-secondary):not(:disabled):hover,
+.frame :global(.icon-btn):focus-visible,
+.frame :global(.btn-secondary):focus-visible {
+  background-color: #e3f1e8;
+  border-color: #1f7a4d;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .frame :global(.icon-btn):not(:disabled):hover,
+  .frame :global(.btn-secondary):not(:disabled):hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame :global(.icon-btn),
+  .frame :global(.btn-secondary) {
+    transition: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .frame :global(.maplibregl-ctrl-bottom-left) {
+    left: 560px;
+    max-width: calc(100% - 560px);
+  }
+
+  .frame :global(.maplibregl-ctrl-attrib) {
+    max-width: calc(100% - 20px);
+  }
+}

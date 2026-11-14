@@ -54,12 +54,14 @@ Orang 2 memiliki seluruh aturan dan perhitungan agronomi. Orang 3 memakai hasiln
 
 ## 4. Orang 3: backend agent dan frontend chat
 
+Progres awal: panel mengambang, hook percakapan, bahasa Indonesia/Inggris, serta adapter chat DeepSeek di backend Node sudah dibuat. Provider awal DeepSeek dengan `AI_MODEL=deepseek-flash`; API key belum diisi. Ini belum menyelesaikan seluruh AI-01–AI-10: migrasi FastAPI, konteks analisis, tool, sumber terkurasi, dan kuota harian masih menunggu integrasi. Detail konfigurasi dan batas adapter ada di README.
+
 - [ ] AI-01. Pilih provider/model AI bersama tim berdasarkan tool terstruktur, biaya, bahasa, latensi, retensi data, dan akses API key. Simpan rahasia di env backend dan uji koneksi sebelum integrasi.
 - [ ] AI-02. Sepakati kontrak chat dan bentuk konteks hasil analisis dengan Orang 2. Sepakati props komponen dengan Orang 1: `lang` dan `analysisInput` lengkap atau `null`. Siapkan fixture agar pekerjaan agent tidak menunggu mesin selesai.
 - [ ] AI-03. Implementasikan `/api/v1/agent/chat`, schema chat sesuai kontrak bersama, integrasi penyedia LLM, instruksi agent, dan pembangunan konteks tepercaya dari hasil backend.
 - [ ] AI-04. Implementasikan `get_crop_facts(crop_id)` dari kurasi Orang 2 dan `analyze_scenario(changes)` melalui pipeline Orang 2. Tool hanya mengubah waktu/sumber air pada salinan input dan tidak mengubah aturan atau input aktif pengguna.
 - [ ] AI-05. Pasang validasi tool/sumber, batas pesan/riwayat, batas panggilan/output, laju/kuota, deadline, dan penanganan kegagalan. Jangan menyimpan percakapan permanen atau mencatat isi pesan/kunci pada log.
-- [ ] AI-06. Buat `AgentChat`: panel buka/tutup, daftar pesan, kolom pertanyaan, tombol kirim, status memuat, label AI, sumber yang dapat dibuka, hasil skenario, pemberitahuan pemrosesan AI, dan tampilan Indonesia/Inggris. Ikuti gaya serta komponen UI yang dipakai Orang 1.
+- [ ] AI-06. Buat `AgentChat`: panel buka/tutup, daftar pesan, kolom pertanyaan, tombol kirim, status memuat, label AI, sumber yang dapat dibuka, hasil skenario, dan tampilan Indonesia/Inggris. Ikuti gaya serta komponen UI yang dipakai Orang 1.
 - [ ] AI-07. Buat `useAgentChat`, tipe request/response, dan fungsi API chat: riwayat dalam memori tab, hapus percakapan, retry tanpa pesan ganda, reset saat konteks/bahasa berubah, serta abaikan respons lama.
 - [ ] AI-08. Hubungkan panel langsung ke `/api/v1/agent/chat`. Tangani tanpa konteks, galat, timeout, kuota habis, dan data parsial; pastikan chat tidak menghalangi halaman hasil. Serahkan komponen siap dipasang ke Orang 1 tanpa menambah route chat.
 - [ ] AI-09. Uji backend dengan penyedia AI palsu: argumen salah, sumber tidak dikenal, upaya mengabaikan instruksi, tanpa konteks, tanah tidak tersedia, serta batas penggunaan. Uji UI chat di ponsel dan keyboard, reset, retry, sumber, dan perubahan bahasa.
@@ -109,3 +111,12 @@ Submisi dikerjakan bersama setelah bagian utama terintegrasi: Orang 1 merakit sl
 - [ ] Aplikasi, repositori, dan slide tujuh halaman dapat dibuka tanpa login; daftar submisi PRD sudah diperiksa.
 
 Beban Orang 2 paling besar karena memegang data dan mesin rule-based; selesaikan dataset minimum bersumber dan satu titik analisis nyata lebih dahulu. Orang 3 fokus agent dari backend sampai UI chat. Bila terlambat, potong F-19–F-21 lebih dahulu dan ikuti aturan potong PRD. Agent tetap termasuk cakupan wajib: jika belum lulus, laporkan sebagai belum selesai dan sepakati penyesuaian jadwal/cakupan. Pemilihan library peta yang belum selaras antara kode dan PRD harus diputuskan pada tahap 0 sebelum Orang 1 membuat ulang komponen.
+
+
+Progres keamanan Orang 3: pemeriksa konteks/keamanan DeepSeek ditambahkan sebelum jawaban; keputusan divalidasi backend, kegagalan menghentikan alur, dan penolakan tidak ikut riwayat request berikutnya. Tes provider palsu dan UI mencakup keputusan/galat. Evaluasi kualitas classifier dengan model asli, migrasi FastAPI, dan pipeline analisis tetap belum selesai.
+
+Orang 3: panduan gaya agronomi dan cakupan guardrail terbaru sudah dipasang di prompt classifier/jawaban; penolakan memakai kalimat persis permintaan pengguna. Bubble dirapatkan dan renderer aman mendukung bold/daftar. Evaluasi gaya serta ketepatan klasifikasi model nyata tetap diperlukan.
+
+Orang 3: panduan format tambahan sudah diterapkan pada prompt jawaban. Bold/bullet opsional, tanpa dash pemisah/heading dekoratif, saran berbasis data, dan pertanyaan lanjut hanya untuk informasi esensial. Tidak ada perubahan kontrak API atau renderer.
+
+Orang 3: panduan data tidak tersedia sudah dipasang pada prompt jawaban. Rujukan cuaca BMKG tersedia, tanpa mengarang cuaca atau meminta pengguna menyalin isi situs. Pengambilan data real-time tetap belum diimplementasikan.
