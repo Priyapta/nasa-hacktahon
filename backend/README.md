@@ -87,3 +87,13 @@ Endpoint `/analyze` dan perhitungan rotasi belum diimplementasikan.
 Daftar paket lokal, checksum, tujuan ekstrak, serta status upload dilacak di
 [cache-archives/README.md](cache-archives/README.md) dan manifest pendamping.
 File ZIP dalam folder itu diabaikan Git dan dibagikan melalui penyimpanan file.
+
+
+## SoilGrids untuk polygon
+
+Service tanah menyediakan pH, SOC, tekstur USDA, dan ringkasan ketidakpastian
+untuk kedalaman 0-30 cm, memakai seluruh pixel native yang beririsan dengan
+polygon. Akses memakai WebDAV/VRT resmi agar NoData tetap terjaga. Cache kosong
+atau data tidak lengkap menghasilkan penilaian parsial/K3 dilewati.
+Metode dan script sampel: [contracts/soilgrids-data.md](contracts/soilgrids-data.md).
+Ini bagian SoilGrids BE-04; Nominatim dan endpoint analisis belum diimplementasikan.

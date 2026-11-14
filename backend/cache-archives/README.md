@@ -10,8 +10,9 @@ Semua perubahan pada langkah ini hanya berada di `backend/`.
 | Paket | Isi | Ukuran | Status upload | Tujuan ekstrak |
 | --- | --- | --- | --- | --- |
 | `nasa-power-indonesia-2016-2025-cache.zip` | 600 file data harian NetCDF + 600 JSON metadata; 6 variabel, 2016-2025 | 116.641.078 byte (sekitar 117 MB) | Belum diunggah | `backend/data/power/` |
+| `soilgrids-grobogan-samples-v1.zip` | 45 subset GeoTIFF native + 45 JSON metadata; tiga polygon sampel, kedalaman 0-30 cm | 80.605 byte (sekitar 81 KB) | Belum diunggah | `backend/data/soilgrids/` |
 
-Belum ada cache SoilGrids. Data di atas mencakup kotak sekitar Indonesia,
+Paket SoilGrids tersedia untuk tiga polygon uji kecil dekat Grobogan, bukan seluruh Indonesia. Paket NASA POWER mencakup kotak sekitar Indonesia,
 termasuk laut dan sebagian negara tetangga; hujan belum divalidasi pembanding.
 Rincian mesin ada di `../contracts/power-data.md`.
 
@@ -20,7 +21,8 @@ Rincian mesin ada di `../contracts/power-data.md`.
 Unggah ke folder penyimpanan bersama atau object storage:
 
 1. `nasa-power-indonesia-2016-2025-cache.zip`.
-2. `checksums.sha256` untuk pemeriksaan integritas unduhan.
+2. `soilgrids-grobogan-samples-v1.zip` untuk sampel tanah.
+3. `checksums.sha256` untuk pemeriksaan integritas unduhan.
 
 README dan `manifest.json` boleh disertakan sebagai panduan. Setelah upload,
 isi URL nyata pada `upload_url` dan ubah `upload_status` di `manifest.json`,
@@ -52,3 +54,26 @@ Tambahkan ZIP ke folder ini, satu entri pada `manifest.json`, dan checksum
 pada `checksums.sha256`. Dokumentasikan isi, periode/versi, tujuan ekstrak,
 serta status/link upload. Nama ZIP sebaiknya menyertakan jenis data dan
 periode/versinya. Jangan menggunakan `git add -f` pada ZIP.
+
+
+## Memakai paket sampel SoilGrids
+
+Dari root repo:
+
+```bash
+unzip backend/cache-archives/soilgrids-grobogan-samples-v1.zip -d backend/data/soilgrids
+cd backend
+.venv/bin/python scripts/test_soil_samples.py
+```
+
+Paket ini hanya mencakup tiga polygon uji kecil yang didefinisikan di
+`backend/data/soilgrids/samples.json`. Bukan data tanah seluruh Grobogan atau
+Indonesia. Kode dapat mengambil window baru bila jaringan diizinkan.
+Rebuild paket setelah persiapan sampel lengkap:
+
+```bash
+.venv/bin/python scripts/package_soil_samples.py
+```
+
+Script memverifikasi cache, membuat ZIP, dan memperbarui manifest serta checksum.
+ZIP tetap tidak masuk Git. Tabel README diperbarui saat ukuran paket berubah.
