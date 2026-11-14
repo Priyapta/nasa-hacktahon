@@ -2,22 +2,22 @@
 
 Acuan: PRD bagian 7 dan 12.4, serta `architecture.md`. FastAPI berjalan sebagai satu aplikasi monolit. Kode backend Node/TypeScript lama telah dihapus; integrasi frontend ke endpoint baru belum lengkap.
 
-## Menjalankan di PowerShell
+## Menjalankan di WSL/Linux
 
 Dari root repo, sekali untuk menyiapkan Python environment:
 
-```powershell
-python -m venv backend/.venv
-backend/.venv/Scripts/python.exe -m pip install -r backend/requirements-dev.lock.txt
+```bash
+python3 -m venv backend/.venv
+backend/.venv/bin/python -m pip install -r backend/requirements-dev.lock.txt
 ```
 
 Lalu dari folder backend:
 
 `requirements-dev.lock.txt` merekam versi dependensi; fondasi diuji pada Python 3.13 dan perubahan service POWER diuji di WSL Python 3.11. `requirements.txt` berisi dependensi runtime dan `requirements-dev.txt` menambahkan dependensi pengujian; perbarui lock secara sengaja saat mengganti dependensi.
 
-```powershell
+```bash
 cd backend
-.venv/Scripts/python.exe -m uvicorn app.main:app --reload --port 8000
+.venv/bin/python -m uvicorn app.main:app --reload --port 8000
 ```
 
 Buka http://127.0.0.1:8000/docs untuk mencoba health check. `GET /api/v1/health` menghasilkan `{"status":"ok"}` tanpa memanggil layanan luar. Health hanya menyatakan proses hidup, bukan integrasi data siap.
@@ -28,11 +28,11 @@ Docker Compose hanya untuk PostgreSQL: jalankan `docker compose up -d --wait db`
 
 Untuk menjalankan tes, dari folder backend:
 
-```powershell
-.venv/Scripts/python.exe -m pytest -q
+```bash
+.venv/bin/python -m pytest -q
 ```
 
-Environment `ALLOWED_ORIGINS` bersifat opsional, daftar origin dipisahkan koma bila frontend mengakses FastAPI langsung. Contoh: `$env:ALLOWED_ORIGINS="http://localhost:3000"`. Melalui proxy Next.js tidak memerlukan CORS lintas origin.
+Environment `ALLOWED_ORIGINS` bersifat opsional, daftar origin dipisahkan koma bila frontend mengakses FastAPI langsung. Contoh: `export ALLOWED_ORIGINS="http://localhost:3000"`. Melalui proxy Next.js tidak memerlukan CORS lintas origin.
 
 ## Status tahap ini
 
@@ -97,3 +97,12 @@ polygon. Akses memakai WebDAV/VRT resmi agar NoData tetap terjaga. Cache kosong
 atau data tidak lengkap menghasilkan penilaian parsial/K3 dilewati.
 Metode dan script sampel: [contracts/soilgrids-data.md](contracts/soilgrids-data.md).
 Ini bagian SoilGrids BE-04; Nominatim dan endpoint analisis belum diimplementasikan.
+
+
+## Pencarian lokasi (geocode)
+
+`GET /api/v1/geocode?q=Purwodadi` sudah tersedia di `/docs`. Respons mengikuti
+kontrak FE, dengan cache, pembatas bersama 1 request/detik, dan galat 400/429/502.
+[contracts/geocode.md](contracts/geocode.md) menjelaskan konfigurasi wilayah,
+ketentuan Nominatim, dan integrasi FE yang masih perlu dilakukan: API_URL ke
+port FastAPI serta atribusi OpenStreetMap yang terlihat. Frontend tidak diubah.

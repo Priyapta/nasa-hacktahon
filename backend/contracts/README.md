@@ -11,8 +11,9 @@ Tidak ada perubahan dokumen PRD.
 
 ## Status dan pemakaian oleh frontend / agent
 
-Kontrak sudah tersedia, tetapi endpoint analisis, tanaman, pencarian, dan chat
-belum diimplementasikan. `/docs` hanya menampilkan route yang benar-benar aktif.
+Kontrak sudah tersedia. Endpoint pencarian `/api/v1/geocode` kini sudah
+diimplementasikan; lihat [geocode.md](geocode.md). Endpoint analisis, tanaman,
+dan chat belum diimplementasikan. `/docs` hanya menampilkan route yang benar-benar aktif.
 Fixture dibaca oleh pengembangan/test frontend, bukan oleh route aplikasi atau
 pipeline produksi. Penyelesaian BE-02 tidak menyelesaikan BE-03 atau BE-08.
 
