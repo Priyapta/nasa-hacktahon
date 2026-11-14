@@ -1,0 +1,221 @@
+{
+  "$defs": {
+    "AnalysisContext": {
+      "additionalProperties": false,
+      "properties": {
+        "location": {
+          "$ref": "#/$defs/LocationInput"
+        },
+        "rotation": {
+          "$ref": "#/$defs/RotationInput"
+        },
+        "time": {
+          "$ref": "#/$defs/TimeInput"
+        },
+        "water_source": {
+          "enum": [
+            "tadah_hujan",
+            "irigasi"
+          ],
+          "title": "Water Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "location",
+        "rotation",
+        "time",
+        "water_source"
+      ],
+      "title": "AnalysisContext",
+      "type": "object"
+    },
+    "ChatMessage": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "user",
+            "assistant"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "content": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "title": "ChatMessage",
+      "type": "object"
+    },
+    "LocationInput": {
+      "additionalProperties": false,
+      "description": "GeoJSON geometry directly at location, matching the FE Polygon object.\n\nCoordinates are [longitude, latitude]. No centroid or sampling is computed.\nThe first ring is the exterior; subsequent rings are interior holes.",
+      "properties": {
+        "type": {
+          "const": "Polygon",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            "minItems": 4,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "LocationInput",
+      "type": "object"
+    },
+    "RotationInput": {
+      "additionalProperties": false,
+      "properties": {
+        "has_pattern": {
+          "title": "Has Pattern",
+          "type": "boolean"
+        },
+        "stages": {
+          "items": {
+            "$ref": "#/$defs/RotationStage"
+          },
+          "maxItems": 6,
+          "title": "Stages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "has_pattern",
+        "stages"
+      ],
+      "title": "RotationInput",
+      "type": "object"
+    },
+    "RotationStage": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "enum": [
+            "padi_sawah",
+            "jagung",
+            "kedelai",
+            "kacang_hijau",
+            "orok_orok",
+            "bera"
+          ],
+          "title": "Crop Id",
+          "type": "string"
+        },
+        "months": {
+          "anyOf": [
+            {
+              "maximum": 6,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Months"
+        }
+      },
+      "required": [
+        "crop_id"
+      ],
+      "title": "RotationStage",
+      "type": "object"
+    },
+    "TimeInput": {
+      "additionalProperties": false,
+      "properties": {
+        "start_month": {
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+          "title": "Start Month",
+          "type": "string"
+        },
+        "horizon_months": {
+          "enum": [
+            6,
+            12,
+            18,
+            24
+          ],
+          "title": "Horizon Months",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_month",
+        "horizon_months"
+      ],
+      "title": "TimeInput",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "message": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "history": {
+      "items": {
+        "$ref": "#/$defs/ChatMessage"
+      },
+      "maxItems": 10,
+      "title": "History",
+      "type": "array"
+    },
+    "analysis_input": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AnalysisContext"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lang": {
+      "default": "id",
+      "enum": [
+        "id",
+        "en"
+      ],
+      "title": "Lang",
+      "type": "string"
+    }
+  },
+  "required": [
+    "message",
+    "history",
+    "analysis_input"
+  ],
+  "title": "ChatInput",
+  "type": "object"
+}

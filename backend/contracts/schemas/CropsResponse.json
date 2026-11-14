@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "CropOption": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "enum": [
+            "padi_sawah",
+            "jagung",
+            "kedelai",
+            "kacang_hijau",
+            "orok_orok",
+            "bera"
+          ],
+          "title": "Crop Id",
+          "type": "string"
+        },
+        "nama": {
+          "title": "Nama",
+          "type": "string"
+        },
+        "peran": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Peran",
+          "type": "array"
+        },
+        "slot_bulan": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Slot Bulan"
+        }
+      },
+      "required": [
+        "crop_id",
+        "nama",
+        "peran",
+        "slot_bulan"
+      ],
+      "title": "CropOption",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "crops": {
+      "items": {
+        "$ref": "#/$defs/CropOption"
+      },
+      "title": "Crops",
+      "type": "array"
+    }
+  },
+  "required": [
+    "crops"
+  ],
+  "title": "CropsResponse",
+  "type": "object"
+}

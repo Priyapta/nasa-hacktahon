@@ -1,0 +1,226 @@
+{
+  "context": {
+    "climate": {
+      "period": "2016-01-01/2025-12-31",
+      "monthly": [
+        {
+          "month": 1,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 2,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 3,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 4,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 5,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 6,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 7,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 8,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 9,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 10,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 11,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 12,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        }
+      ]
+    },
+    "soil": {
+      "status": "ok",
+      "depth": "0-30cm",
+      "texture_class": "loam",
+      "ph": 6.5,
+      "soc_g_per_kg": 15.0,
+      "uncertainty": {
+        "phh2o": {
+          "q05": 5.5,
+          "q95": 7.0
+        },
+        "soc": {
+          "q05": 10.0,
+          "q95": 20.0
+        },
+        "clay": {
+          "q05": 10.0,
+          "q95": 30.0
+        },
+        "sand": {
+          "q05": 25.0,
+          "q95": 50.0
+        },
+        "silt": {
+          "q05": 25.0,
+          "q95": 50.0
+        }
+      }
+    }
+  },
+  "strategies": [],
+  "notes": [
+    "DATA UJI SINTETIS untuk pengembangan UI; bukan hasil analisis, pola rekomendasi, atau data agronomi nyata.",
+    "Durasi fixture sintetis; tidak boleh dipakai sebagai tabel agronomi atau pembuktian aturan mesin.",
+    "Belum ada pola untuk dibandingkan, jadi kami menampilkan tiga pilihan.",
+    "Tidak ada kandidat yang memenuhi syarat."
+  ],
+  "provenance": {
+    "climate": {
+      "source": "NASA POWER (nama penyedia; nilai fixture sintetis)",
+      "fetched_at": "2026-11-14T06:00:00Z",
+      "resolution": "DATA UJI",
+      "missing_days": 0,
+      "rain_source": "POWER",
+      "rain_validation": {
+        "reference": null,
+        "annual_diff_pct": null,
+        "months_class_differs": null,
+        "status": "unvalidated"
+      }
+    },
+    "soil": {
+      "source": "SoilGrids 2.0 (nama penyedia; nilai fixture sintetis)",
+      "fetched_at": "2026-11-14T06:00:00Z",
+      "resolution": "250 m"
+    },
+    "crop_table_version": "fixture-only-not-curated",
+    "assumptions": [
+      "DATA UJI: seluruh angka dan kalender sintetis, bukan rekomendasi.",
+      "Estimasi berbasis pola historis, bukan prediksi."
+    ]
+  }
+}

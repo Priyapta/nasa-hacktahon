@@ -1,0 +1,767 @@
+{
+  "$defs": {
+    "CalendarStage": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "enum": [
+            "padi_sawah",
+            "jagung",
+            "kedelai",
+            "kacang_hijau",
+            "orok_orok",
+            "bera"
+          ],
+          "title": "Crop Id",
+          "type": "string"
+        },
+        "start": {
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+          "title": "End",
+          "type": "string"
+        },
+        "continues_after_horizon": {
+          "title": "Continues After Horizon",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "crop_id",
+        "start",
+        "end",
+        "continues_after_horizon"
+      ],
+      "title": "CalendarStage",
+      "type": "object"
+    },
+    "ClimateContext": {
+      "additionalProperties": false,
+      "properties": {
+        "period": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Period",
+          "type": "string"
+        },
+        "monthly": {
+          "items": {
+            "$ref": "#/$defs/MonthlyClimate"
+          },
+          "maxItems": 12,
+          "minItems": 12,
+          "title": "Monthly",
+          "type": "array"
+        }
+      },
+      "required": [
+        "period",
+        "monthly"
+      ],
+      "title": "ClimateContext",
+      "type": "object"
+    },
+    "ClimateFit": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "enum": [
+            "rendah",
+            "sedang",
+            "tinggi"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "level",
+        "evidence"
+      ],
+      "title": "ClimateFit",
+      "type": "object"
+    },
+    "ClimateProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "fetched_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+          "title": "Fetched At",
+          "type": "string"
+        },
+        "resolution": {
+          "title": "Resolution",
+          "type": "string"
+        },
+        "missing_days": {
+          "minimum": 0,
+          "title": "Missing Days",
+          "type": "integer"
+        },
+        "rain_source": {
+          "title": "Rain Source",
+          "type": "string"
+        },
+        "rain_validation": {
+          "$ref": "#/$defs/RainValidation"
+        }
+      },
+      "required": [
+        "source",
+        "fetched_at",
+        "resolution",
+        "missing_days",
+        "rain_source",
+        "rain_validation"
+      ],
+      "title": "ClimateProvenance",
+      "type": "object"
+    },
+    "Dimensions": {
+      "additionalProperties": false,
+      "properties": {
+        "climate_fit": {
+          "$ref": "#/$defs/ClimateFit"
+        },
+        "water_pressure": {
+          "$ref": "#/$defs/WaterPressure"
+        },
+        "bare_months": {
+          "minimum": 0,
+          "title": "Bare Months",
+          "type": "integer"
+        },
+        "soil_contribution": {
+          "$ref": "#/$defs/SoilContribution"
+        },
+        "risks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Risks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "climate_fit",
+        "water_pressure",
+        "bare_months",
+        "soil_contribution",
+        "risks"
+      ],
+      "title": "Dimensions",
+      "type": "object"
+    },
+    "EnvironmentalContext": {
+      "additionalProperties": false,
+      "properties": {
+        "climate": {
+          "$ref": "#/$defs/ClimateContext"
+        },
+        "soil": {
+          "discriminator": {
+            "mapping": {
+              "ok": "#/$defs/SoilAvailable",
+              "unavailable": "#/$defs/SoilUnavailable"
+            },
+            "propertyName": "status"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SoilAvailable"
+            },
+            {
+              "$ref": "#/$defs/SoilUnavailable"
+            }
+          ],
+          "title": "Soil"
+        }
+      },
+      "required": [
+        "climate",
+        "soil"
+      ],
+      "title": "EnvironmentalContext",
+      "type": "object"
+    },
+    "Feasibility": {
+      "additionalProperties": false,
+      "properties": {
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "failed_rules": {
+          "items": {
+            "enum": [
+              "K1",
+              "K2",
+              "K3",
+              "K4",
+              "K5"
+            ],
+            "type": "string"
+          },
+          "title": "Failed Rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "passed",
+        "failed_rules"
+      ],
+      "title": "Feasibility",
+      "type": "object"
+    },
+    "MonthlyClimate": {
+      "additionalProperties": false,
+      "properties": {
+        "month": {
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Month",
+          "type": "integer"
+        },
+        "rain_median_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rain Median Mm"
+        },
+        "rain_min_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rain Min Mm"
+        },
+        "rain_max_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rain Max Mm"
+        },
+        "class": {
+          "anyOf": [
+            {
+              "enum": [
+                "basah",
+                "lembap",
+                "kering"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Class"
+        },
+        "t_mean_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "T Mean C"
+        },
+        "t_min_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "T Min C"
+        },
+        "t_max_c": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "T Max C"
+        },
+        "rad": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rad"
+        },
+        "rh_pct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rh Pct"
+        },
+        "n_years": {
+          "maximum": 10,
+          "minimum": 0,
+          "title": "N Years",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "month",
+        "rain_median_mm",
+        "rain_min_mm",
+        "rain_max_mm",
+        "class",
+        "t_mean_c",
+        "t_min_c",
+        "t_max_c",
+        "rad",
+        "rh_pct",
+        "n_years"
+      ],
+      "title": "MonthlyClimate",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "climate": {
+          "$ref": "#/$defs/ClimateProvenance"
+        },
+        "soil": {
+          "$ref": "#/$defs/SoilProvenance"
+        },
+        "crop_table_version": {
+          "title": "Crop Table Version",
+          "type": "string"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "climate",
+        "soil",
+        "crop_table_version",
+        "assumptions"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "QuantileRange": {
+      "additionalProperties": false,
+      "properties": {
+        "q05": {
+          "title": "Q05",
+          "type": "number"
+        },
+        "q95": {
+          "title": "Q95",
+          "type": "number"
+        }
+      },
+      "required": [
+        "q05",
+        "q95"
+      ],
+      "title": "QuantileRange",
+      "type": "object"
+    },
+    "RainValidation": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reference"
+        },
+        "annual_diff_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Annual Diff Pct"
+        },
+        "months_class_differs": {
+          "anyOf": [
+            {
+              "maximum": 12,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Months Class Differs"
+        },
+        "status": {
+          "minLength": 1,
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference",
+        "annual_diff_pct",
+        "months_class_differs",
+        "status"
+      ],
+      "title": "RainValidation",
+      "type": "object"
+    },
+    "SoilAvailable": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "const": "ok",
+          "title": "Status",
+          "type": "string"
+        },
+        "depth": {
+          "const": "0-30cm",
+          "title": "Depth",
+          "type": "string"
+        },
+        "texture_class": {
+          "minLength": 1,
+          "title": "Texture Class",
+          "type": "string"
+        },
+        "ph": {
+          "maximum": 14,
+          "minimum": 0,
+          "title": "Ph",
+          "type": "number"
+        },
+        "soc_g_per_kg": {
+          "minimum": 0,
+          "title": "Soc G Per Kg",
+          "type": "number"
+        },
+        "uncertainty": {
+          "additionalProperties": {
+            "$ref": "#/$defs/QuantileRange"
+          },
+          "propertyNames": {
+            "enum": [
+              "clay",
+              "sand",
+              "silt",
+              "phh2o",
+              "soc"
+            ]
+          },
+          "title": "Uncertainty",
+          "type": "object"
+        }
+      },
+      "required": [
+        "status",
+        "depth",
+        "texture_class",
+        "ph",
+        "soc_g_per_kg",
+        "uncertainty"
+      ],
+      "title": "SoilAvailable",
+      "type": "object"
+    },
+    "SoilContribution": {
+      "additionalProperties": false,
+      "properties": {
+        "legume": {
+          "title": "Legume",
+          "type": "boolean"
+        },
+        "cover_crop": {
+          "title": "Cover Crop",
+          "type": "boolean"
+        },
+        "families": {
+          "minimum": 0,
+          "title": "Families",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "legume",
+        "cover_crop",
+        "families"
+      ],
+      "title": "SoilContribution",
+      "type": "object"
+    },
+    "SoilProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "fetched_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fetched At"
+        },
+        "resolution": {
+          "title": "Resolution",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "fetched_at",
+        "resolution"
+      ],
+      "title": "SoilProvenance",
+      "type": "object"
+    },
+    "SoilUnavailable": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "const": "unavailable",
+          "title": "Status",
+          "type": "string"
+        },
+        "depth": {
+          "const": "0-30cm",
+          "title": "Depth",
+          "type": "string"
+        },
+        "texture_class": {
+          "title": "Texture Class",
+          "type": "null"
+        },
+        "ph": {
+          "title": "Ph",
+          "type": "null"
+        },
+        "soc_g_per_kg": {
+          "title": "Soc G Per Kg",
+          "type": "null"
+        },
+        "uncertainty": {
+          "additionalProperties": {
+            "$ref": "#/$defs/QuantileRange"
+          },
+          "propertyNames": {
+            "enum": [
+              "clay",
+              "sand",
+              "silt",
+              "phh2o",
+              "soc"
+            ]
+          },
+          "title": "Uncertainty",
+          "type": "object"
+        }
+      },
+      "required": [
+        "status",
+        "depth",
+        "texture_class",
+        "ph",
+        "soc_g_per_kg",
+        "uncertainty"
+      ],
+      "title": "SoilUnavailable",
+      "type": "object"
+    },
+    "Strategy": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "pola_biasa",
+            "hemat_air",
+            "jaga_tanah",
+            "seimbang"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "calendar": {
+          "items": {
+            "$ref": "#/$defs/CalendarStage"
+          },
+          "minItems": 1,
+          "title": "Calendar",
+          "type": "array"
+        },
+        "feasibility": {
+          "$ref": "#/$defs/Feasibility"
+        },
+        "dimensions": {
+          "$ref": "#/$defs/Dimensions"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "tradeoffs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tradeoffs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "label",
+        "calendar",
+        "feasibility",
+        "dimensions",
+        "reasons",
+        "tradeoffs"
+      ],
+      "title": "Strategy",
+      "type": "object"
+    },
+    "WaterPressure": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "enum": [
+            "rendah",
+            "sedang",
+            "tinggi"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "years_met": {
+          "minimum": 0,
+          "title": "Years Met",
+          "type": "integer"
+        },
+        "years_total": {
+          "minimum": 0,
+          "title": "Years Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "level",
+        "years_met",
+        "years_total"
+      ],
+      "title": "WaterPressure",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "context": {
+      "$ref": "#/$defs/EnvironmentalContext"
+    },
+    "strategies": {
+      "items": {
+        "$ref": "#/$defs/Strategy"
+      },
+      "maxItems": 3,
+      "title": "Strategies",
+      "type": "array"
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Notes",
+      "type": "array"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    }
+  },
+  "required": [
+    "context",
+    "strategies",
+    "notes",
+    "provenance"
+  ],
+  "title": "AnalysisResponse",
+  "type": "object"
+}

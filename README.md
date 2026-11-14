@@ -4,14 +4,15 @@ Agricultural mapping app in an npm workspaces monorepo. Requires Node.js 22.9+ a
 
 ```text
 frontend/              Next.js frontend: map, farms, insights, planner
-backend/               Standalone Node.js HTTP backend: location search
+backend/               Python FastAPI monolith (foundation stage)
 packages/
   shared/              Location types, coordinate parsing, Photon normalization
 scripts/
-  run-apps.mjs         Runs and stops the app processes together
+  run-apps.mjs         Runs frontend and shared watcher
+  run-backend.mjs      Runs local FastAPI using backend/.venv
 ```
 
-The frontend uses TypeScript, MapLibre GL JS, Esri Clarity, Terra Draw, Turf, and LocalStorage. The backend runs independently of Next.js and has its own environment and build output. Shared code compiles to ESM and declarations in `packages/shared/dist`.
+The frontend uses TypeScript, MapLibre GL JS, Esri Clarity, Terra Draw, Turf, and LocalStorage. FastAPI runs locally, independently of Next.js. Docker Compose runs PostgreSQL only. Shared code compiles to ESM and declarations in `packages/shared/dist`.
 
 ```sh
 npm ci
@@ -22,18 +23,18 @@ npm run dev
 
 Copy the example environment files only if your local files do not exist. Existing local MapTiler settings have moved to `frontend/.env.local`; API settings belong in `backend/.env`. Local environment files are ignored by Git.
 
-`npm run dev` builds shared code once, then watches shared code, the API, and the frontend together. Open http://localhost:3000. The API listens at http://127.0.0.1:4000. Ctrl+C stops all processes. To run them in separate terminals, use `npm run dev:backend` and `npm run dev:frontend`; after editing shared code in this mode, run `npm run build --workspace @field-atlas/shared`.
+`npm run dev` builds shared code once, then watches shared code and the frontend. Open http://localhost:3000. Run `npm run dev:backend` in another terminal after setting up the Python environment as described in [backend/README.md](backend/README.md). FastAPI listens at http://127.0.0.1:8000, with documentation at `/docs`. Stop each process with Ctrl+C. No API container is required.
 
 Satellite and Street maps work without a MapTiler key. The optional `NEXT_PUBLIC_MAPTILER_KEY` in `frontend/.env.local` enables elevation terrain at zoom >= 11 (exaggeration 1.4), disabled below 11. Without it, the globe and satellite mapping remain interactive with a flat terrain surface. The camera supports zoom 22, pitch 80, and NavigationControl with pitch visualization.
 
 ## API connection and deployment
 
-- `GET /health` on the API returns its service status.
-- `GET /api/geocode?q=Yogyakarta` validates the query, calls Photon, and returns normalized results. Invalid queries return 400, rapid requests return 429 with `Retry-After`, and provider failures return 502. A bounded in-memory cache retains up to 100 searches for 24 hours. The throttle and cache are per process.
-- `API_PORT`, `API_HOST`, and optional `PHOTON_API_URL` live in `backend/.env`. Use `API_HOST=0.0.0.0` for a container or external access.
+- `GET /api/v1/health` returns `{"status":"ok"}` without querying external services or PostgreSQL.
+- The old Node/Photon backend has been removed. FastAPI geocoding and analysis endpoints have not yet been implemented; existing frontend location search is not connected to a replacement.
+- Local Uvicorn does not automatically read `backend/.env`; see the backend README for environment configuration.
 - `API_URL` in `frontend/.env.local` is the backend address reachable by the Next.js server. It defaults to `http://127.0.0.1:4000`. Browser requests keep using `/api/*`, which Next.js proxies to the backend with [external rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites). The browser uses the frontend origin, so this setup needs no cross-origin API configuration.
 
-For deployment, set `API_URL` before building the frontend; changing the proxy address requires rebuilding it. Build from the repository root with `npm run build`. Use `npm start` to run both services, or `npm run start:backend` and `npm run start:frontend` on separate services with their respective environments. Keep the workspace packages and production dependencies available to both services. Generated `dist`, `.next`, and MapLibre worker assets are built locally and are not committed.
+For deployment, set `API_URL` before building the frontend; changing the proxy address requires rebuilding it. `npm run build` builds shared code and the frontend. `npm start` starts the frontend; `npm run start:backend` runs local Uvicorn separately without reload. Generated `dist`, `.next`, and MapLibre worker assets are built locally and are not committed.
 
 Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the same frontend origin to access existing fields; a different host or port has separate browser storage. PostgreSQL setup is described below; field persistence has not been migrated and there are no user accounts.
 
@@ -55,7 +56,7 @@ Set `DATABASE_URL` in `backend/.env`, matching the database name, user, password
 DATABASE_URL=postgresql://field_shift:YOUR_PASSWORD@127.0.0.1:5432/field_shift
 ```
 
-URL-encode special characters in the password when constructing the connection URL. If the backend later runs in the same Compose network, use host `db` and port `5432` instead. Never place this URL in a `NEXT_PUBLIC_` variable or frontend environment file.
+URL-encode special characters in the password when constructing the connection URL. FastAPI runs locally and connects through the database's published host port. Never place this URL in a `NEXT_PUBLIC_` variable or frontend environment file. The current foundation does not yet query PostgreSQL.
 
 ```sh
 docker compose logs --tail=50 db
@@ -91,7 +92,7 @@ The My Farms satellite preview overzooms native level 17 tiles up to camera zoom
 
 `frontend/components/farms/my-farms.tsx` owns selection and the field list/detail layout; `frontend/components/farms/farm-map.tsx` handles the independent 2D map lifecycle and overlays.
 
-Search uses Photon through the standalone API via `/api/geocode`; coordinate searches resolve locally using `packages/shared`. `PHOTON_API_URL` can point to your own Photon service. Fields stay in this browser; LocalStorage is not a backup or multi-device account.
+Coordinate searches resolve locally using `packages/shared`. Text search still needs migration to the planned FastAPI geocoding endpoint. Fields stay in this browser; LocalStorage is not a backup or multi-device account.
 
 ## Bounded tile prefetch
 
@@ -106,7 +107,7 @@ Moving/zooming, switching to Street, or unmounting cancels pending prefetch. A s
 - `frontend/lib/map-prefetch.ts`: bounded tile selection, two workers, cancellation, and HTTP-cache warming.
 - `frontend/store/fields.ts`, `frontend/lib/geo.ts`: field persistence and geographic calculations.
 - `frontend/scripts/copy-map-worker.mjs`: predev/prebuild resolves the installed MapLibre package and copies its worker into frontend public assets.
-- `backend/src/app.ts`, `backend/src/geocode.ts`: HTTP routing and location-search service.
+- `backend/app/main.py`, `backend/app/api/routes.py`: FastAPI application and health endpoint; see the backend README for Python tests.
 - `packages/shared/src/geocoding.ts`: search result types and geographic normalization.
 
 ```sh
