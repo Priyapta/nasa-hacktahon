@@ -19,6 +19,8 @@ test("six-month period stops extra stages and shows the final stage crossing the
   await pattern.getByRole("button", { name: "Jagung", exact: true }).click();
   const stages = pattern.getByRole("listitem");
   await expect(stages).toHaveCount(2);
+  // A final stage ending later is valid in the fixed backend model.
+  await expect(page.getByRole("link", { name: "Bandingkan strategi", exact: true })).toBeVisible();
   await expect(stages.nth(0)).toContainText("4 bulan (acuan)");
   await expect(stages.nth(0)).toContainText("Jan 2027 – Apr 2027");
   await expect(stages.nth(1)).toContainText("Mei 2027 – Agu 2027");
@@ -40,6 +42,15 @@ test("six-month period stops extra stages and shows the final stage crossing the
   await expect(pattern).toContainText("2 tahap dimulai setelah rentang analisis berakhir");
   await expect(pattern.getByText("Tidak masuk rentang analisis", { exact: true })).toHaveCount(2);
   await expect(stages).toHaveCount(4); // Never silently erase a saved pattern.
+  await expect(page.getByRole("button", { name: "Bandingkan strategi", exact: true })).toBeDisabled();
+  await expect(page.getByRole("link", { name: "Bandingkan strategi", exact: true })).toHaveCount(0);
+  await expect(page.getByText("Ada tahap di luar rentang analisis. Perpanjang rentang atau hapus tahap itu untuk lanjut.", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "12 bulan", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Bandingkan strategi", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "6 bulan", exact: true }).click();
+  await pattern.getByRole("button", { name: "Hapus tahap 4", exact: true }).click();
+  await pattern.getByRole("button", { name: "Hapus tahap 3", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Bandingkan strategi", exact: true })).toBeVisible();
 });
 
 test("short patterns explain repetition and only fallow has editable months", async ({ page }) => {
@@ -52,4 +63,20 @@ test("short patterns explain repetition and only fallow has editable months", as
   await pattern.getByRole("button", { name: "Tambah bulan bera" }).click();
   await expect(pattern).toContainText("Satu putaran pola: 7 bulan");
   await expect(pattern.getByRole("listitem").nth(1)).toContainText("Mei 2027 – Jul 2027");
+});
+
+
+test("a saved overlong pattern cannot submit immediately after opening the page", async ({ page }) => {
+  await page.goto(`${base}&pola=padi_sawah,jagung,kedelai`);
+  await expect(page.getByRole("button", { name: "Bandingkan strategi", exact: true })).toBeDisabled();
+  await expect(page.getByText("Ada tahap di luar rentang analisis. Perpanjang rentang atau hapus tahap itu untuk lanjut.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Bandingkan strategi", exact: true })).toHaveCount(0);
+});
+
+test("missing crop metadata blocks patterned submission but no-pattern analysis still works", async ({ page }) => {
+  await page.route("**/api/v1/crops**", (route) => route.fulfill({ status: 502, json: { detail: "Unavailable" } }));
+  await page.goto(`${base}&pola=padi_sawah`);
+  await expect(page.getByRole("button", { name: "Bandingkan strategi", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Belum punya pola", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Bandingkan strategi", exact: true })).toBeVisible();
 });
