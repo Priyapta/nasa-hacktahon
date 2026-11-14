@@ -1,0 +1,39 @@
+{
+  "name": "@field-atlas/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/copy-map-worker.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/copy-map-worker.mjs",
+    "build": "next build",
+    "start": "next start",
+    "test": "tsx --test lib/*.test.ts",
+    "test:browser": "playwright test"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "*",
+    "@turf/turf": "*",
+    "clsx": "*",
+    "framer-motion": "*",
+    "lucide-react": "*",
+    "maplibre-gl": "^6.18.0",
+    "next": "*",
+    "react": "*",
+    "react-dom": "*",
+    "recharts": "*",
+    "tailwind-merge": "*",
+    "terra-draw": "*",
+    "terra-draw-maplibre-gl-adapter": "^1.5.0",
+    "zustand": "*",
+    "@field-atlas/shared": "1.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@tailwindcss/postcss": "*",
+    "@types/node": "*",
+    "@types/react": "*",
+    "@types/react-dom": "*",
+    "tailwindcss": "*"
+  }
+}

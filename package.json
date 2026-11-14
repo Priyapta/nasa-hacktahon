@@ -1,0 +1,27 @@
+{
+  "name": "field-atlas",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "scripts": {
+    "dev": "npm run build --workspace @field-atlas/shared && node scripts/run-apps.mjs dev",
+    "dev:web": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/web --",
+    "dev:api": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/api",
+    "build": "npm run build --workspace @field-atlas/shared && npm run build --workspace @field-atlas/api && npm run build --workspace @field-atlas/web",
+    "start": "node scripts/run-apps.mjs start",
+    "start:web": "npm run start --workspace @field-atlas/web --",
+    "start:api": "npm run start --workspace @field-atlas/api",
+    "test": "npm run build --workspace @field-atlas/shared && npm run test --workspaces --if-present",
+    "test:browser": "npm run test:browser --workspace @field-atlas/web --"
+  },
+  "devDependencies": {
+    "tsx": "*",
+    "typescript": "*"
+  }
+}
