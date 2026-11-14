@@ -10,7 +10,7 @@ Push/merge main
 Browser → Vercel /api/* → HTTPS Nginx → 127.0.0.1:8000 → container FastAPI
 ```
 
-Image dibangun di GitHub, bukan di VPS. Backend memakai satu worker, batas memori 1200 MB, reservasi 900 MB, maksimum CPU 1,5 core, dan log berotasi. Cache geocode memakai named volume sehingga tetap ada ketika container diganti. `restart: unless-stopped` menghidupkan kembali container setelah Docker/VPS reboot, kecuali sebelumnya sengaja dihentikan.
+Image dibangun di GitHub, bukan di VPS. Backend memakai satu worker, batas memori 1200 MB, reservasi 900 MB, maksimum CPU 1,5 core, dan log berotasi. Cache geocode memakai named volume sehingga tetap ada ketika container diganti. Data NASA POWER dan SoilGrids memakai bind mount dari `/opt/field-shift/data/`, terpisah dari image dan checkout repo. `restart: unless-stopped` menghidupkan kembali container setelah Docker/VPS reboot, kecuali sebelumnya sengaja dihentikan.
 
 Health membuktikan API berjalan, bukan koneksi provider. Chat membutuhkan `AI_API_KEY` dan masih berupa percakapan pertanian umum; analisis/tool belum terhubung. Kuota chat awal lima request per menit untuk seluruh proses. Jangan menjalankan batch arsip nasional/raster di VPS ini bersamaan dengan API.
 
@@ -55,6 +55,48 @@ nano /opt/field-shift/backend.env
 ```
 
 Isi `AI_API_KEY` dengan API key OpenAI dan gunakan `AI_MODEL=gpt-6-luna`. Key DeepSeek tidak dapat digunakan pada integrasi ini. File ini hanya disimpan di VPS, tidak dikirim lewat GitHub Actions. Workflow hanya memperbarui `compose.yaml` dan `deploy.sh`. Tidak perlu memasang Python, npm, atau PostgreSQL di host untuk endpoint saat ini.
+
+## Data NASA POWER dan SoilGrids
+
+Siapkan arsip sebelum deployment pertama. Dari laptop, kirim tiga ZIP yang sudah
+diverifikasi mengikuti `backend/cache-archives/README.md`. Buat folder tujuan di VPS
+sebagai user deployment:
+
+```bash
+mkdir -p /opt/field-shift/archives
+```
+
+Dari root repo di laptop:
+
+```bash
+scp backend/cache-archives/*.zip backend/cache-archives/checksums.sha256 DEPLOY_USER@VPS_IP:/opt/field-shift/archives/
+```
+
+Di VPS, periksa checksum dahulu:
+
+```bash
+cd /opt/field-shift/archives
+sha256sum -c checksums.sha256
+```
+
+Jika ketiganya `OK`, ekstrak dan beri UID/GID container akses baca/tulis:
+
+```bash
+sudo apt-get install -y unzip
+mkdir -p /opt/field-shift/data/power /opt/field-shift/data/soilgrids
+unzip -o nasa-power-indonesia-2016-2025-cache.zip -d /opt/field-shift/data/power
+unzip -o soilgrids-grobogan-samples-v1.zip -d /opt/field-shift/data/soilgrids
+unzip -o soilgrids-indonesia-catalogs-grobogan-v1.zip -d /opt/field-shift/data/soilgrids
+sudo chown -R 10001:10001 /opt/field-shift/data
+```
+
+Compose memetakan folder tersebut ke `/app/data/power` dan `/app/data/soilgrids`,
+sesuai lokasi yang dibaca service. Mount tetap dapat ditulis untuk lock dan hasil
+turunan meskipun filesystem container lainnya read-only. Recreate container setelah
+mengganti Compose; restart saja tidak menambahkan mount baru. Healthcheck bukan
+verifikasi kelengkapan arsip. Data ini tidak dimasukkan ke Git/image; deployment
+berikutnya memakai folder yang sama. Untuk mengganti arsip setelah folder dimiliki
+UID 10001, gunakan `sudo unzip` lalu ulangi `chown` di atas.
 
 ## 2. SSH untuk GitHub Actions
 
