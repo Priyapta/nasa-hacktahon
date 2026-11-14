@@ -4,7 +4,6 @@
   "private": true,
   "workspaces": [
     "frontend",
-    "backend",
     "packages/*"
   ],
   "engines": {
@@ -13,11 +12,11 @@
   "scripts": {
     "dev": "npm run build --workspace @field-atlas/shared && node scripts/run-apps.mjs dev",
     "dev:frontend": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/frontend --",
-    "dev:backend": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/backend",
-    "build": "npm run build --workspace @field-atlas/shared && npm run build --workspace @field-atlas/backend && npm run build --workspace @field-atlas/frontend",
+    "dev:backend": "node scripts/run-backend.mjs dev",
+    "build": "npm run build --workspace @field-atlas/shared && npm run build --workspace @field-atlas/frontend",
     "start": "node scripts/run-apps.mjs start",
     "start:frontend": "npm run start --workspace @field-atlas/frontend --",
-    "start:backend": "npm run start --workspace @field-atlas/backend",
+    "start:backend": "node scripts/run-backend.mjs start",
     "test": "npm run build --workspace @field-atlas/shared && npm run test --workspaces --if-present",
     "test:browser": "npm run test:browser --workspace @field-atlas/frontend --"
   },

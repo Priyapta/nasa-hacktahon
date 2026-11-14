@@ -1,6 +1,6 @@
 # Backend Field Shift — tahap 1
 
-Acuan: PRD bagian 7 dan 12.4, serta `architecture.md`. FastAPI berjalan sebagai satu aplikasi monolit. Tahap ini menyiapkan fondasi; belum merupakan migrasi lengkap dari backend Node.
+Acuan: PRD bagian 7 dan 12.4, serta `architecture.md`. FastAPI berjalan sebagai satu aplikasi monolit. Kode backend Node/TypeScript lama telah dihapus; integrasi frontend ke endpoint baru belum lengkap.
 
 ## Menjalankan di PowerShell
 
@@ -22,6 +22,10 @@ cd backend
 
 Buka http://127.0.0.1:8000/docs untuk mencoba health check. `GET /api/v1/health` menghasilkan `{"status":"ok"}` tanpa memanggil layanan luar. Health hanya menyatakan proses hidup, bukan integrasi data siap.
 
+Alternatif dari root repo: `npm run dev:backend` menjalankan Python dari `.venv` dengan reload; `npm run start:backend` tanpa reload. Keduanya menjalankan Uvicorn lokal, bukan Docker. `npm run dev` hanya menjalankan frontend dan watcher shared.
+
+Docker Compose hanya untuk PostgreSQL: jalankan `docker compose up -d --wait db` dari root setelah mengatur password di root `.env`. Health check FastAPI saat ini tidak membutuhkan koneksi database.
+
 Untuk menjalankan tes, dari folder backend:
 
 ```powershell
@@ -38,7 +42,7 @@ Environment `ALLOWED_ORIGINS` bersifat opsional, daftar origin dipisahkan koma b
 - Daftar crop ID pada schema mengikuti cakupan PRD; belum merupakan tabel agronomi yang terverifikasi.
 - Belum dibuat: `/crops`, `/geocode`, `/analyze`, pengambilan data, cache, statistik, aturan rotasi, dan agent.
 - `/analyze` sengaja belum terdaftar. Tidak ada data buatan yang dikembalikan sebagai hasil analisis nyata.
-- Script npm root dan backend Node lama tetap tersedia. `npm run dev` belum menjalankan Python. Proxy/frontend belum dialihkan agar pencarian lokasi lama tetap berfungsi.
+- Backend Node lama (`src/`, `package.json`, `tsconfig.json`) telah dihapus. `npm run dev` tidak menjalankan Python; gunakan perintah Uvicorn di atas untuk menjalankannya secara lokal. Pencarian lokasi lama di frontend belum memiliki endpoint pengganti di FastAPI.
 
 ## Urutan berikutnya, dari kecil ke besar
 
