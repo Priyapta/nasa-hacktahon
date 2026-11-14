@@ -4,7 +4,7 @@
 FastAPI, service POWER/SoilGrids, statistik iklim, geocode, crops, mesin rotasi
 dan `POST /api/v1/analyze` sudah tersedia. Chat umum OpenAI GPT-6 Luna sudah terpasang
 di `/api/v1/agent/chat`; konteks analisis dan tool belum terhubung.
-Set `AI_API_KEY` dan `AI_MODEL` di environment shell sebelum menjalankan Uvicorn.
+Isi `AI_API_KEY` dan `AI_MODEL` di `backend/.env`, lalu jalankan `npm run dev:backend` dari root repo. Launcher memuat file ini otomatis; environment shell yang sudah ada tetap diprioritaskan. Restart backend setelah mengubah env. Jika menjalankan Uvicorn langsung, export variabel di shell terlebih dahulu.
 Bagian fondasi/rencana awal
 di bawah adalah catatan historis; gunakan handover dan root tasks untuk progres kini.
 

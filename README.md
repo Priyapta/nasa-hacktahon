@@ -33,7 +33,7 @@ For an Ubuntu 24.04 amd64 VPS with 2 cores / 2 GB RAM and a Vercel frontend, use
 
 - `GET /api/v1/health` returns `{"status":"ok"}` without querying external services or PostgreSQL.
 - FastAPI serves health, crop options, Nominatim location search, and AI chat. The analysis endpoint is not implemented yet.
-- Local Uvicorn does not automatically read `backend/.env`; see the backend README for environment configuration.
+- `npm run dev:backend` and `npm run start:backend` load `backend/.env` automatically; direct Uvicorn commands need exported variables. See the backend README for environment configuration.
 - `API_URL` in `frontend/.env.local` is the backend address reachable by the Next.js server. It defaults to `http://127.0.0.1:8000`. Browser requests keep using `/api/*`, which Next.js proxies to the backend with [external rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites). The browser uses the frontend origin, so this setup needs no cross-origin API configuration.
 
 For deployment, set `API_URL` before building the frontend; changing the proxy address requires rebuilding it. `npm run build` builds shared code and the frontend. `npm start` starts the frontend; `npm run start:backend` runs local Uvicorn separately without reload. Generated `dist`, `.next`, and MapLibre worker assets are built locally and are not committed.
@@ -44,7 +44,7 @@ Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the sam
 
 The bottom-right **Ask AI** button opens a keyboard-accessible chat panel on every page. It supports Indonesian/English, in-memory conversation history, clear/reset, and retry without duplicating the question. Messages are sent to OpenAI only after the user submits. The dark dialog and rounded composer follow the provided visual reference; opening/closing uses Anime.js animations, with reduced-motion support. Visible footer notices and the input heading were removed at the product owner’s request; the input retains a screen-reader label.
 
-Export these environment variables in the shell that starts FastAPI, then restart the backend (`backend/.env` is a reference and is not loaded automatically):
+Set these variables in `backend/.env`, then restart with `npm run dev:backend` in a separate terminal from the frontend. The launcher loads the file automatically; existing shell variables take precedence. Direct Uvicorn commands still need exported variables:
 
 ```dotenv
 AI_API_KEY=your-openai-api-key

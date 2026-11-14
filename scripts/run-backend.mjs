@@ -6,6 +6,8 @@ const mode = process.argv[2];
 if (mode !== "dev" && mode !== "start") throw new Error("Use dev or start.");
 
 const backend = fileURLToPath(new URL("../backend/", import.meta.url));
+const envFile = fileURLToPath(new URL("../backend/.env", import.meta.url));
+if (existsSync(envFile)) process.loadEnvFile(envFile);
 const python = fileURLToPath(new URL(
   process.platform === "win32"
     ? "../backend/.venv/Scripts/python.exe"
