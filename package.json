@@ -11,14 +11,14 @@
   },
   "scripts": {
     "dev": "npm run build --workspace @field-atlas/shared && node scripts/run-apps.mjs dev",
-    "dev:web": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/web --",
-    "dev:api": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/api",
-    "build": "npm run build --workspace @field-atlas/shared && npm run build --workspace @field-atlas/api && npm run build --workspace @field-atlas/web",
+    "dev:frontend": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/frontend --",
+    "dev:backend": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/backend",
+    "build": "npm run build --workspace @field-atlas/shared && npm run build --workspace @field-atlas/backend && npm run build --workspace @field-atlas/frontend",
     "start": "node scripts/run-apps.mjs start",
-    "start:web": "npm run start --workspace @field-atlas/web --",
-    "start:api": "npm run start --workspace @field-atlas/api",
+    "start:frontend": "npm run start --workspace @field-atlas/frontend --",
+    "start:backend": "npm run start --workspace @field-atlas/backend",
     "test": "npm run build --workspace @field-atlas/shared && npm run test --workspaces --if-present",
-    "test:browser": "npm run test:browser --workspace @field-atlas/web --"
+    "test:browser": "npm run test:browser --workspace @field-atlas/frontend --"
   },
   "devDependencies": {
     "tsx": "*",

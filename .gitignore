@@ -1,6 +1,6 @@
 node_modules
 .next
-apps/web/public/maplibre/
+apps/frontend/public/maplibre/
 dist/
 *.tsbuildinfo
 next-env.d.ts

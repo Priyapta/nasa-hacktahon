@@ -23,9 +23,9 @@ function stop(code) {
 }
 
 for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => stop(0));
-for (const workspace of mode === "dev" ? ["shared", "api", "web"] : ["api", "web"]) {
+for (const workspace of mode === "dev" ? ["shared", "backend", "frontend"] : ["backend", "frontend"]) {
   const args = [process.env.npm_execpath, "run", mode, "--workspace", `@field-atlas/${workspace}`];
-  if (workspace === "web") args.push("--", ...process.argv.slice(3));
+  if (workspace === "frontend") args.push("--", ...process.argv.slice(3));
   const child = spawn(process.execPath, args, {
     cwd: root,
     stdio: "inherit",
