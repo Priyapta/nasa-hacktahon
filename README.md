@@ -3,9 +3,8 @@
 Agricultural mapping app in an npm workspaces monorepo. Requires Node.js 22.9+ and npm. Install dependencies from the repository root; there is one lockfile.
 
 ```text
-apps/
-  frontend/            Next.js frontend: map, farms, insights, planner
-  backend/             Standalone Node.js HTTP backend: location search
+frontend/              Next.js frontend: map, farms, insights, planner
+backend/               Standalone Node.js HTTP backend: location search
 packages/
   shared/              Location types, coordinate parsing, Photon normalization
 scripts/
@@ -16,23 +15,23 @@ The frontend uses TypeScript, MapLibre GL JS, Esri Clarity, Terra Draw, Turf, an
 
 ```sh
 npm ci
-cp apps/frontend/.env.example apps/frontend/.env.local
-cp apps/backend/.env.example apps/backend/.env
+cp frontend/.env.example frontend/.env.local
+cp backend/.env.example backend/.env
 npm run dev
 ```
 
-Copy the example environment files only if your local files do not exist. Existing local MapTiler settings have moved to `apps/frontend/.env.local`; API settings belong in `apps/backend/.env`. Local environment files are ignored by Git.
+Copy the example environment files only if your local files do not exist. Existing local MapTiler settings have moved to `frontend/.env.local`; API settings belong in `backend/.env`. Local environment files are ignored by Git.
 
 `npm run dev` builds shared code once, then watches shared code, the API, and the frontend together. Open http://localhost:3000. The API listens at http://127.0.0.1:4000. Ctrl+C stops all processes. To run them in separate terminals, use `npm run dev:backend` and `npm run dev:frontend`; after editing shared code in this mode, run `npm run build --workspace @field-atlas/shared`.
 
-Satellite and Street maps work without a MapTiler key. The optional `NEXT_PUBLIC_MAPTILER_KEY` in `apps/frontend/.env.local` enables elevation terrain at zoom >= 11 (exaggeration 1.4), disabled below 11. Without it, the globe and satellite mapping remain interactive with a flat terrain surface. The camera supports zoom 22, pitch 80, and NavigationControl with pitch visualization.
+Satellite and Street maps work without a MapTiler key. The optional `NEXT_PUBLIC_MAPTILER_KEY` in `frontend/.env.local` enables elevation terrain at zoom >= 11 (exaggeration 1.4), disabled below 11. Without it, the globe and satellite mapping remain interactive with a flat terrain surface. The camera supports zoom 22, pitch 80, and NavigationControl with pitch visualization.
 
 ## API connection and deployment
 
 - `GET /health` on the API returns its service status.
 - `GET /api/geocode?q=Yogyakarta` validates the query, calls Photon, and returns normalized results. Invalid queries return 400, rapid requests return 429 with `Retry-After`, and provider failures return 502. A bounded in-memory cache retains up to 100 searches for 24 hours. The throttle and cache are per process.
-- `API_PORT`, `API_HOST`, and optional `PHOTON_API_URL` live in `apps/backend/.env`. Use `API_HOST=0.0.0.0` for a container or external access.
-- `API_URL` in `apps/frontend/.env.local` is the backend address reachable by the Next.js server. It defaults to `http://127.0.0.1:4000`. Browser requests keep using `/api/*`, which Next.js proxies to the backend with [external rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites). The browser uses the frontend origin, so this setup needs no cross-origin API configuration.
+- `API_PORT`, `API_HOST`, and optional `PHOTON_API_URL` live in `backend/.env`. Use `API_HOST=0.0.0.0` for a container or external access.
+- `API_URL` in `frontend/.env.local` is the backend address reachable by the Next.js server. It defaults to `http://127.0.0.1:4000`. Browser requests keep using `/api/*`, which Next.js proxies to the backend with [external rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites). The browser uses the frontend origin, so this setup needs no cross-origin API configuration.
 
 For deployment, set `API_URL` before building the frontend; changing the proxy address requires rebuilding it. Build from the repository root with `npm run build`. Use `npm start` to run both services, or `npm run start:backend` and `npm run start:frontend` on separate services with their respective environments. Keep the workspace packages and production dependencies available to both services. Generated `dist`, `.next`, and MapLibre worker assets are built locally and are not committed.
 
@@ -58,7 +57,7 @@ This map has no globe, terrain, or speculative tile prefetch. Satellite tiles ar
 
 The My Farms satellite preview overzooms native level 17 tiles up to camera zoom 22. This avoids the CORS-blocked 404s observed on Clarity level 18 tiles around Sleman; zooming further magnifies available imagery rather than adding detail. Coverage is still provider-dependent. The full satellite editor is unchanged.
 
-`apps/frontend/components/farms/my-farms.tsx` owns selection and the field list/detail layout; `apps/frontend/components/farms/farm-map.tsx` handles the independent 2D map lifecycle and overlays.
+`frontend/components/farms/my-farms.tsx` owns selection and the field list/detail layout; `frontend/components/farms/farm-map.tsx` handles the independent 2D map lifecycle and overlays.
 
 Search uses Photon through the standalone API via `/api/geocode`; coordinate searches resolve locally using `packages/shared`. `PHOTON_API_URL` can point to your own Photon service. Fields stay in this browser; LocalStorage is not a backup or multi-device account.
 
@@ -70,12 +69,12 @@ Moving/zooming, switching to Street, or unmounting cancels pending prefetch. A s
 
 ## Code and checks
 
-- `apps/frontend/components/earth.tsx`: complete map and drawing lifecycle.
-- `apps/frontend/lib/map-style.ts`: Clarity/Street styles and optional DEM threshold.
-- `apps/frontend/lib/map-prefetch.ts`: bounded tile selection, two workers, cancellation, and HTTP-cache warming.
-- `apps/frontend/store/fields.ts`, `apps/frontend/lib/geo.ts`: field persistence and geographic calculations.
-- `apps/frontend/scripts/copy-map-worker.mjs`: predev/prebuild resolves the installed MapLibre package and copies its worker into frontend public assets.
-- `apps/backend/src/app.ts`, `apps/backend/src/geocode.ts`: HTTP routing and location-search service.
+- `frontend/components/earth.tsx`: complete map and drawing lifecycle.
+- `frontend/lib/map-style.ts`: Clarity/Street styles and optional DEM threshold.
+- `frontend/lib/map-prefetch.ts`: bounded tile selection, two workers, cancellation, and HTTP-cache warming.
+- `frontend/store/fields.ts`, `frontend/lib/geo.ts`: field persistence and geographic calculations.
+- `frontend/scripts/copy-map-worker.mjs`: predev/prebuild resolves the installed MapLibre package and copies its worker into frontend public assets.
+- `backend/src/app.ts`, `backend/src/geocode.ts`: HTTP routing and location-search service.
 - `packages/shared/src/geocoding.ts`: search result types and geographic normalization.
 
 ```sh
@@ -87,6 +86,6 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-`npm test` runs API, frontend, and shared tests. Browser tests use fixture map/terrain tiles to verify fields, map switching, and bounded prefetch; the proxy test calls the real local backend. Use ATLAS_URL for a different running frontend and CHROMIUM_EXECUTABLE_PATH for an installed Chrome executable. Browser fixtures live in `apps/frontend/tests/fixtures`. Real endpoint/imagery checks are separate from fixture tests.
+`npm test` runs API, frontend, and shared tests. Browser tests use fixture map/terrain tiles to verify fields, map switching, and bounded prefetch; the proxy test calls the real local backend. Use ATLAS_URL for a different running frontend and CHROMIUM_EXECUTABLE_PATH for an installed Chrome executable. Browser fixtures live in `frontend/tests/fixtures`. Real endpoint/imagery checks are separate from fixture tests.
 
 Climate charts remain labeled demo data; NASA POWER is not integrated. Soil values must come from field observations. Crop rotations remain illustrative, with no predicted yield or water-saving percentages.
