@@ -1,100 +1,164 @@
-# Backend di Ubuntu 24.04 LTS
+# Docker backend dan CI/CD
 
-Konfigurasi untuk VPS 2 core / RAM 2 GB. FastAPI berjalan dengan **satu worker**, Nginx menerima HTTPS, dan systemd menjalankan ulang proses bila gagal. Frontend dibangun di Vercel; server ini tidak membutuhkan Node, npm, Docker, atau PostgreSQL untuk endpoint yang tersedia sekarang.
+Untuk Ubuntu 24.04 LTS **amd64**, 2 core / RAM 2 GB. Frontend memakai alamat `.vercel.app`; backend memakai `api-atlas.alworkbench.site`.
 
 ```text
-Browser → Vercel /api/* → HTTPS Nginx → 127.0.0.1:8000 FastAPI → DeepSeek/Nominatim
+Push/merge main
+  GitHub Actions → tes frontend/backend → build image → GHCR → SSH → VPS Docker Compose
+  Vercel Git integration → build frontend → production .vercel.app
+
+Browser → Vercel /api/* → HTTPS Nginx → 127.0.0.1:8000 → container FastAPI
 ```
 
-API yang tersedia: health, katalog tanaman, geocode, dan chat umum. Endpoint analisis dan tool chat belum tersedia. Kuota chat awal berlaku untuk seluruh proses: lima request per menit. Cache geocode persisten berada di `/var/lib/field-shift/geocode`.
+Image dibangun di GitHub, bukan di VPS. Backend memakai satu worker, batas memori 1200 MB, reservasi 900 MB, maksimum CPU 1,5 core, dan log berotasi. Cache geocode memakai named volume sehingga tetap ada ketika container diganti. `restart: unless-stopped` menghidupkan kembali container setelah Docker/VPS reboot, kecuali sebelumnya sengaja dihentikan.
 
-## 1. Instal aplikasi
+Health membuktikan API berjalan, bukan koneksi provider. Chat membutuhkan `AI_API_KEY` dan masih berupa percakapan pertanian umum; analisis/tool belum terhubung. Kuota chat awal lima request per menit untuk seluruh proses. Jangan menjalankan batch arsip nasional/raster di VPS ini bersamaan dengan API.
 
-Jalankan di VPS lewat SSH sebagai pengguna yang memiliki `sudo`. Contoh branch ini memuat konfigurasi sebelum PR digabung; sesudah merge, gunakan `--branch main`.
+## 1. Persiapan VPS sekali saja
+
+Instal **Docker Engine dan Compose plugin** melalui [panduan resmi Ubuntu](https://docs.docker.com/engine/install/ubuntu/). Jangan gunakan Docker Desktop di VPS. Periksa:
 
 ```bash
+docker --version
+docker compose version
 sudo apt-get update
-sudo apt-get install -y python3-venv git nginx certbot python3-certbot-nginx
-sudo adduser --system --group --home /var/lib/field-shift --no-create-home field-shift
-sudo git clone --branch feat/field-planning-agent-ux https://github.com/Priyapta/nasa-hacktahon.git /opt/field-shift
-sudo python3 -m venv /opt/field-shift/backend/.venv
-sudo /opt/field-shift/backend/.venv/bin/python -m pip install --only-binary=:all: -r /opt/field-shift/backend/requirements.lock.txt
+sudo apt-get install -y nginx certbot python3-certbot-nginx
 ```
 
-Lockfile produksi mengikuti versi yang diuji pada lockfile pengembangan, tanpa pytest. Opsi `--only-binary` menghindari kompilasi paket geospasial di VPS kecil; bila wheel tidak tersedia untuk arsitektur server, instalasi berhenti agar kebutuhan build dapat diperiksa.
-
-## 2. Pasang service dan environment
+Pakai akun SSH deployment yang dapat menjalankan Docker. Bila memakai grup `docker`, tambahkan pengguna lalu login SSH ulang:
 
 ```bash
-sudo install -d -m 0750 /etc/field-shift
-sudo install -m 0600 /opt/field-shift/deploy/backend/.env.example /etc/field-shift/backend.env
-sudoedit /etc/field-shift/backend.env
-sudo install -m 0644 /opt/field-shift/deploy/backend/field-shift.service /etc/systemd/system/field-shift.service
-sudo systemd-analyze verify /etc/systemd/system/field-shift.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now field-shift
-curl --fail http://127.0.0.1:8000/api/v1/health
+sudo usermod -aG docker "$(id -un)"
 ```
 
-Isi `AI_API_KEY` di file environment server. Tanpa key, health tetap bekerja dan chat mengembalikan 503. systemd membaca file tersebut sebagai root; proses aplikasi memakai pengguna `field-shift`. Jangan memasukkan key ke Git atau environment frontend.
-
-Batas memori service: `MemoryHigh=900M`, `MemoryMax=1200M`, dan swap maksimal 256 MB bila server memiliki swap. Ini menyisakan ruang bagi OS/Nginx, bukan jaminan kapasitas analisis. Jangan menjalankan unduhan arsip nasional atau batch raster bersamaan di VPS ini. Kode aplikasi hanya dibaca; direktori state systemd dan temporary directory boleh ditulis.
-
-## 3. Nginx dan domain
-
-Frontend memakai alamat bawaan Vercel. Hanya backend yang memakai subdomain `alworkbench.site`, sehingga domain utama tetap bisa dipakai untuk proyek lain:
-
-| Alamat | Tujuan | Record DNS |
-| --- | --- | --- |
-| Alamat project `.vercel.app` dari Vercel | Frontend Vercel | Dikelola Vercel, tanpa record DNS domain sendiri |
-| `api-atlas.alworkbench.site` | Backend VPS | A `api-atlas` ke IPv4 VPS |
-
-Tidak perlu menambahkan custom domain atau record CNAME untuk frontend. Gunakan alamat `.vercel.app` yang diberikan setelah deployment. Domain utama dan subdomain proyek lain tidak perlu diubah. Service dapat diuji melalui SSH memakai health lokal sebelum DNS/TLS aktif.
-
-Arahkan DNS A `api-atlas` ke IPv4 VPS. Buat record AAAA hanya jika IPv6 server benar-benar aktif. Konfigurasi Nginx sudah memakai `server_name api-atlas.alworkbench.site`:
+Akses grup Docker setara hak root; gunakan key SSH khusus deployment. Setelah login ulang, jalankan sebagai pengguna deployment:
 
 ```bash
-sudo install -m 0644 /opt/field-shift/deploy/backend/nginx.conf /etc/nginx/sites-available/field-shift
+docker info
+sudo install -d -o "$(id -un)" -g "$(id -gn)" -m 0750 /opt/field-shift
+```
+
+Jika konfigurasi systemd aplikasi sebelumnya sudah dipasang, hentikan agar tidak berebut port 8000: `sudo systemctl disable --now field-shift`. Tidak perlu unit systemd khusus aplikasi lagi. Pastikan Docker Engine sendiri aktif otomatis saat boot; instalasi resmi Ubuntu mengaktifkannya secara default.
+
+Repo privat tidak perlu di-clone di VPS. Dari checkout repo di komputer Anda, kirim file awal berikut, dengan mengganti `DEPLOY_USER` dan `VPS_IP`:
+
+```bash
+scp deploy/backend/.env.example DEPLOY_USER@VPS_IP:/opt/field-shift/backend.env
+scp deploy/backend/nginx.conf DEPLOY_USER@VPS_IP:/opt/field-shift/nginx.conf
+```
+
+Di VPS:
+
+```bash
+chmod 600 /opt/field-shift/backend.env
+nano /opt/field-shift/backend.env
+```
+
+Isi `AI_API_KEY`. File ini hanya disimpan di VPS, tidak dikirim lewat GitHub Actions. Workflow hanya memperbarui `compose.yaml` dan `deploy.sh`. Tidak perlu memasang Python, npm, atau PostgreSQL di host untuk endpoint saat ini.
+
+## 2. SSH untuk GitHub Actions
+
+Buat key deployment di komputer yang Anda percaya; simpan private key di GitHub, bukan di repo:
+
+```bash
+ssh-keygen -t ed25519 -f ./atlas-deploy -C atlas-github-actions
+ssh-copy-id -i ./atlas-deploy.pub DEPLOY_USER@VPS_IP
+```
+
+Jangan pakai passphrase untuk key otomatis ini; jangan membagikan private key lewat chat. Key pribadi SSH harian Anda tidak perlu dipakai. Daftarkan secret berikut di **repository → Settings → Secrets and variables → Actions**:
+
+| Nama secret | Isi |
+| --- | --- |
+| `VPS_HOST` | IP publik atau hostname SSH VPS |
+| `VPS_USER` | Pengguna deployment pemilik `/opt/field-shift` |
+| `VPS_SSH_KEY` | Seluruh isi private key `atlas-deploy` |
+| `VPS_KNOWN_HOSTS` | Baris host key SSH VPS yang sudah diverifikasi |
+
+Bila port SSH bukan 22, tambahkan **Actions variable** `VPS_PORT` dengan port sebenarnya. Gunakan port yang sama saat `scp`, `ssh-copy-id`, dan pengambilan host key.
+
+Ambil kandidat host key dari komputer Anda:
+
+```bash
+ssh-keyscan -H -t ed25519 VPS_IP
+```
+
+Verifikasi fingerprint melalui console VPS/provider dengan `sudo ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` sebelum mempercayainya. `ssh-keyscan` sendiri tidak memverifikasi identitas server. Salin baris yang sudah diverifikasi ke `VPS_KNOWN_HOSTS`; untuk port nonstandar gunakan `ssh-keyscan -p PORT -H -t ed25519 VPS_IP`.
+
+Workflow memakai `StrictHostKeyChecking=yes`, sehingga tidak menerima host key asing secara otomatis. Repo ini privat; image juga bisa tetap privat. Workflow memakai `GITHUB_TOKEN` bawaan untuk publish/pull GHCR, lalu mengirim token sementara lewat stdin SSH. Kredensial registry sementara di VPS dibersihkan setelah deploy; tidak perlu PAT registry permanen di VPS.
+
+Image akan bernama `ghcr.io/priyapta/nasa-hacktahon-api`. Jika package sudah pernah dibuat tanpa terhubung ke repo, beri repository ini akses Actions pada pengaturan package GHCR. Untuk package baru, label source repo pada workflow menghubungkannya ke repo.
+
+## 3. Trigger otomatis dan penanganan kegagalan
+
+Workflow `.github/workflows/ci-deploy.yml` menjalankan tes/build pada PR ke `main`. Setelah push/merge ke `main`, job deployment berjalan **setelah checks lulus**. Workflow juga bisa dijalankan manual dari tab Actions dengan memilih branch `main`.
+
+GitHub membangun image `linux/amd64`, menandainya dengan SHA commit, lalu mengirim digest pastinya ke VPS. VPS menarik image dan menunggu healthcheck maksimal 120 detik. Hanya deployment sehat yang dicatat di `.release.env`; image sebelumnya dicatat di `.previous.env`. Jika image baru gagal sehat, script mencoba mengembalikan image sebelumnya dan job tetap gagal agar terlihat di Actions. Pada deployment pertama yang gagal, container dihentikan. Volume cache tidak dihapus.
+
+Deployment backend diantrekan agar tidak saling memotong. Workflow commit lama yang sudah didahului commit `main` lebih baru tidak akan mengganti server. Deployment bisa menyebabkan jeda singkat karena hanya ada satu container. Rollback ini untuk image aplikasi; perubahan database atau konfigurasi yang tidak kompatibel tetap memerlukan penanganan tersendiri.
+
+## 4. Nginx dan HTTPS
+
+Arahkan record DNS **A `api-atlas`** pada `alworkbench.site` ke IPv4 VPS. Tambahkan AAAA hanya jika IPv6 benar-benar aktif. Frontend `.vercel.app` tidak memerlukan record DNS domain Anda.
+
+Di VPS:
+
+```bash
+sudo install -m 0644 /opt/field-shift/nginx.conf /etc/nginx/sites-available/field-shift
 sudo ln -s /etc/nginx/sites-available/field-shift /etc/nginx/sites-enabled/field-shift
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-Izinkan TCP 80/443 di firewall VPS/provider; port 8000 tetap lokal. Bila UFW sudah dipakai, tambahkan `sudo ufw allow 'Nginx Full'`. Jika baru hendak mengaktifkan UFW, izinkan port SSH yang benar terlebih dahulu agar sesi tidak terputus.
+Port 8000 dipublikasikan hanya di loopback host. Port publik yang dibutuhkan adalah 80/443 dan port SSH Anda. Bila memakai UFW, izinkan `Nginx Full`; jangan mengaktifkan firewall sebelum mengizinkan SSH yang benar.
 
-Setelah DNS API mengarah ke server:
+Setelah DNS mengarah ke VPS dan backend sudah berhasil deploy:
 
 ```bash
+curl --fail http://127.0.0.1:8000/api/v1/health
 sudo certbot --nginx -d api-atlas.alworkbench.site --redirect
 sudo certbot renew --dry-run
 curl --fail https://api-atlas.alworkbench.site/api/v1/health
 ```
 
-Certbot memasang konfigurasi TLS dan redirect HTTPS. Timeout proxy 35 detik melebihi deadline chat 25 detik. Log akses dimatikan agar query pencarian tidak tersimpan di access log; galat proses tersedia di journal.
+Nginx tetap dipasang sekali di host; GitHub Actions tidak menimpa konfigurasi TLS Certbot pada setiap push. Timeout proxy 35 detik melebihi deadline chat 25 detik. Trust proxy Uvicorn berlaku di jaringan container; pemetaan port host tetap hanya `127.0.0.1`.
 
-## 4. Hubungkan Vercel
+## 5. Vercel auto-deploy
 
-Untuk project frontend: pilih root directory `frontend`, aktifkan akses file di luar root directory karena memakai workspace `packages/shared`, dan gunakan preset Next.js. Set Install Command ke `cd .. && npm ci` dan Build Command ke `cd .. && npm run build`. Build root menyiapkan `packages/shared/dist` sebelum frontend; output frontend tetap `.next` relatif terhadap root directory `frontend`.
+Import repo GitHub ini ke Vercel dan pilih:
 
-Tambahkan environment variable **server-side** di Vercel:
+| Pengaturan | Nilai |
+| --- | --- |
+| Framework | Next.js |
+| Root Directory | `frontend` |
+| Include files outside Root Directory | Aktif |
+| Install Command | `cd .. && npm ci` |
+| Build Command | `cd .. && npm run build` |
+| Production Branch | `main` |
+| Environment `API_URL` | `https://api-atlas.alworkbench.site` |
 
-```dotenv
-API_URL=https://api-atlas.alworkbench.site
-```
+Build root menyiapkan `packages/shared/dist` sebelum frontend; output tetap `.next` relatif ke `frontend`. Pilih alamat `.vercel.app` bawaan. Set `API_URL` untuk Production dan Preview bila diperlukan; jangan memakai prefix `NEXT_PUBLIC_` atau mengisi key AI di Vercel.
 
-Jangan tambahkan `/api/v1` di belakang URL. Set untuk Production dan Preview bila dibutuhkan, lalu redeploy frontend: Next.js menanam tujuan rewrite saat build. Jangan memakai `NEXT_PUBLIC_API_URL` atau menaruh `AI_API_KEY` di Vercel. Browser tetap mengakses `/api/*` pada origin frontend melalui rewrite; tidak perlu CORS wildcard.
+Integrasi Git Vercel otomatis membangun Production saat `main` berubah, dan Preview untuk branch/PR. Tidak perlu GitHub secret `VERCEL_TOKEN` atau deploy hook tambahan. Jalur deployment frontend dan backend berjalan terpisah; Vercel tidak menunggu job checks GitHub secara otomatis. Jadikan job `checks` wajib lewat branch protection/ruleset `main` agar perubahan melalui PR sudah diuji sebelum merge.
 
-## 5. Pembaruan dan pemeriksaan
+## 6. Operasional setelah deploy pertama
+
+Sebagai pengguna deployment di VPS:
 
 ```bash
-sudo git -C /opt/field-shift pull --ff-only
-sudo /opt/field-shift/backend/.venv/bin/python -m pip install --only-binary=:all: -r /opt/field-shift/backend/requirements.lock.txt
-sudo systemctl restart field-shift
-sudo systemctl status field-shift --no-pager
-sudo journalctl -u field-shift -n 80 --no-pager
+cd /opt/field-shift
+docker compose --env-file .release.env -f compose.yaml ps
+docker compose --env-file .release.env -f compose.yaml logs --tail 80 api
+docker compose --env-file .release.env -f compose.yaml restart api
 curl --fail http://127.0.0.1:8000/api/v1/health
 ```
 
-Health membuktikan proses berjalan, bukan koneksi provider. Uji satu pertanyaan chat pertanian lewat frontend setelah key terpasang. Jika restart gagal, lihat journal; bila unit terkena batas restart, perbaiki penyebab lalu jalankan `sudo systemctl reset-failed field-shift` dan `sudo systemctl start field-shift`.
+Untuk rollback manual tanpa menarik ulang image yang sudah ada:
 
-Referensi: [Uvicorn settings](https://uvicorn.dev/settings/), [systemd resource control](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html), [systemd environment/state directories](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html), [Nginx proxy](https://nginx.org/en/docs/http/ngx_http_proxy_module.html), [Vercel external rewrites](https://vercel.com/docs/routing/rewrites), [Vercel domain dan CNAME](https://vercel.com/docs/domains/working-with-domains/add-a-domain).
+```bash
+docker compose --env-file .previous.env -f compose.yaml up -d --wait --pull never api
+cp .previous.env .release.env
+```
+
+Periksa hasil perintah sebelum menyalin `.previous.env`. Jika env/key AI berubah, jalankan `docker compose --env-file .release.env -f compose.yaml up -d --force-recreate --wait api`, bukan hanya restart. Jangan hapus named volume atau image release sebelumnya; rollback membutuhkannya. Pantau ruang disk dan bersihkan image lama secara berkala sambil mempertahankan image aktif dan sebelumnya.
+
+Referensi: [Docker production Compose](https://docs.docker.com/compose/how-tos/production/), [restart policy](https://docs.docker.com/engine/containers/start-containers-automatically/), [GHCR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry), [Vercel Git deployments](https://vercel.com/docs/git), [Nginx proxy](https://nginx.org/en/docs/http/ngx_http_proxy_module.html).

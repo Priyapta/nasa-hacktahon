@@ -12,7 +12,7 @@ scripts/
   run-backend.mjs      Runs local FastAPI using backend/.venv
 ```
 
-The frontend uses TypeScript, MapLibre GL JS, Esri Clarity, Terra Draw, Turf, and LocalStorage. FastAPI runs locally, independently of Next.js. Docker Compose runs PostgreSQL only. Shared code compiles to ESM and declarations in `packages/shared/dist`.
+The frontend uses TypeScript, MapLibre GL JS, Esri Clarity, Terra Draw, Turf, and LocalStorage. FastAPI runs independently of Next.js. The root Docker Compose file runs local PostgreSQL; production backend Compose lives in `deploy/backend/`. Shared code compiles to ESM and declarations in `packages/shared/dist`.
 
 ```sh
 npm ci
@@ -29,7 +29,7 @@ Satellite and Street maps work without a MapTiler key. The optional `NEXT_PUBLIC
 
 ## API connection and deployment
 
-For an Ubuntu 24.04 VPS with 2 cores / 2 GB RAM and a Vercel frontend, use [the backend deployment guide](deploy/backend/README.md). It includes systemd, Nginx, environment configuration, HTTPS setup, and Vercel build settings. The frontend uses its assigned `.vercel.app` address; the backend uses `api-atlas.alworkbench.site`. Configure the backend DNS before activating TLS.
+For an Ubuntu 24.04 amd64 VPS with 2 cores / 2 GB RAM and a Vercel frontend, use [the backend deployment guide](deploy/backend/README.md). It includes Docker Compose, Nginx, SSH secrets, GitHub Actions CI/CD, HTTPS setup, and Vercel build settings. Pushes to `main` run checks and publish the backend image to GHCR before SSH deployment; Vercel's Git integration deploys the frontend separately. The frontend uses its assigned `.vercel.app` address; the backend uses `api-atlas.alworkbench.site`. VPS bootstrap, GitHub SSH secrets, Vercel Git connection, and backend DNS/TLS must be configured once before automatic deployments work.
 
 - `GET /api/v1/health` returns `{"status":"ok"}` without querying external services or PostgreSQL.
 - FastAPI serves health, crop options, Nominatim location search, and AI chat. The analysis endpoint is not implemented yet.
