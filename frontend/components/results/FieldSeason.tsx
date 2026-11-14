@@ -291,12 +291,12 @@ export default function FieldSeason({ ring, hectares, strategy, monthly, startMo
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2.5 min-[400px]:grid-cols-2 lg:grid-cols-4">
         <div className="min-h-[72px] rounded-[10px] px-3 py-2.5" style={{ background: look.tint }}>
           <div className="text-[11px] text-muted">{t.rainMedian}</div>
           <div className="text-[19px] font-bold" style={{ color: look.ink }}>
             {rain === null ? t.noData : `${number.format(rain)} mm`}{" "}
-            <span className="text-[13px]">{climate?.class ? t.rainClass[climate.class] : ""}</span>
+            <span className="block min-h-5 text-[13px] lg:inline">{climate?.class ? t.rainClass[climate.class] : ""}</span>
           </div>
         </div>
         <div className="min-h-[72px] rounded-[10px] bg-canvas px-3 py-2.5">
@@ -314,16 +314,15 @@ export default function FieldSeason({ ring, hectares, strategy, monthly, startMo
           <div className="text-[17px] font-bold">
             {crop === "bera" ? t.none : water ? t.years(water.years_met, water.years_total) : t.notAssessed}
           </div>
-          {water && crop !== "bera" && (
-            <div className="mt-1.5 flex flex-wrap gap-[3px]" aria-hidden="true">
-              {Array.from({ length: water.years_total }, (_, i) => (
-                <span
-                  key={i}
-                  className={`size-3 rounded-[3px] ${i < water.years_met ? "bg-sawah" : "border-2 border-tanah-lip bg-white"}`}
-                />
-              ))}
-            </div>
-          )}
+          {/* Always rendered so the tile row keeps its height when a month has no water check. */}
+          <div className={`mt-1.5 flex min-h-3 flex-wrap gap-[3px] ${water && crop !== "bera" ? "" : "invisible"}`} aria-hidden="true">
+            {Array.from({ length: water?.years_total ?? strategy.dimensions.water_pressure.years_total }, (_, i) => (
+              <span
+                key={i}
+                className={`size-3 rounded-[3px] ${water && i < water.years_met ? "bg-sawah" : "border-2 border-tanah-lip bg-white"}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
