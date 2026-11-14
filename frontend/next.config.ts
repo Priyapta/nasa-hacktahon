@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 import { fileURLToPath } from "node:url";
 
-const apiUrl = (process.env.API_URL || "http://127.0.0.1:4000").replace(/\/$/, "");
+const apiUrl = (process.env.API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
 const config: NextConfig = {
   transpilePackages: ["@field-atlas/shared"],
   turbopack: { root: fileURLToPath(new URL("..", import.meta.url)) },

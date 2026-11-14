@@ -12,7 +12,7 @@ scripts/
   run-backend.mjs      Runs local FastAPI using backend/.venv
 ```
 
-The frontend uses TypeScript, MapLibre GL JS, Esri Clarity, Terra Draw, Turf, and LocalStorage. FastAPI runs locally, independently of Next.js. Docker Compose runs PostgreSQL only. Shared code compiles to ESM and declarations in `packages/shared/dist`.
+The frontend uses TypeScript, MapLibre GL JS, Esri Clarity, Terra Draw, Turf, and LocalStorage. FastAPI runs independently of Next.js. The root Docker Compose file runs local PostgreSQL; production backend Compose lives in `deploy/backend/`. Shared code compiles to ESM and declarations in `packages/shared/dist`.
 
 ```sh
 npm ci
@@ -29,14 +29,33 @@ Satellite and Street maps work without a MapTiler key. The optional `NEXT_PUBLIC
 
 ## API connection and deployment
 
+For an Ubuntu 24.04 amd64 VPS with 2 cores / 2 GB RAM and a Vercel frontend, use [the backend deployment guide](deploy/backend/README.md). It includes Docker Compose, Nginx, SSH secrets, GitHub Actions CI/CD, HTTPS setup, and Vercel build settings. Pushes to `main` run checks and publish the backend image to GHCR before SSH deployment; Vercel's Git integration deploys the frontend separately. The frontend uses its assigned `.vercel.app` address; the backend uses `api-atlas.alworkbench.site`. VPS bootstrap, GitHub SSH secrets, Vercel Git connection, and backend DNS/TLS must be configured once before automatic deployments work.
+
 - `GET /api/v1/health` returns `{"status":"ok"}` without querying external services or PostgreSQL.
-- The old Node/Photon backend has been removed. FastAPI geocoding and analysis endpoints have not yet been implemented; existing frontend location search is not connected to a replacement.
+- FastAPI serves health, crop options, Nominatim location search, and AI chat. The analysis endpoint is not implemented yet.
 - Local Uvicorn does not automatically read `backend/.env`; see the backend README for environment configuration.
-- `API_URL` in `frontend/.env.local` is the backend address reachable by the Next.js server. It defaults to `http://127.0.0.1:4000`. Browser requests keep using `/api/*`, which Next.js proxies to the backend with [external rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites). The browser uses the frontend origin, so this setup needs no cross-origin API configuration.
+- `API_URL` in `frontend/.env.local` is the backend address reachable by the Next.js server. It defaults to `http://127.0.0.1:8000`. Browser requests keep using `/api/*`, which Next.js proxies to the backend with [external rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites). The browser uses the frontend origin, so this setup needs no cross-origin API configuration.
 
 For deployment, set `API_URL` before building the frontend; changing the proxy address requires rebuilding it. `npm run build` builds shared code and the frontend. `npm start` starts the frontend; `npm run start:backend` runs local Uvicorn separately without reload. Generated `dist`, `.next`, and MapLibre worker assets are built locally and are not committed.
 
 Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the same frontend origin to access existing fields; a different host or port has separate browser storage. PostgreSQL setup is described below; field persistence has not been migrated and there are no user accounts.
+
+## Floating AI chat (DeepSeek)
+
+The bottom-right **Ask AI** button opens a keyboard-accessible chat panel on every page. It supports Indonesian/English, in-memory conversation history, clear/reset, and retry without duplicating the question. Messages are sent to DeepSeek only after the user submits. The dark dialog and rounded composer follow the provided visual reference; opening/closing uses Anime.js animations, with reduced-motion support. Visible footer notices and the input heading were removed at the product owner’s request; the input retains a screen-reader label.
+
+Export these environment variables in the shell that starts FastAPI, then restart the backend (`backend/.env` is a reference and is not loaded automatically):
+
+```dotenv
+AI_API_KEY=your-deepseek-api-key
+AI_MODEL=deepseek-flash
+```
+
+Never put the key in frontend variables. FastAPI uses DeepSeek's [Chat Completions API](https://api-docs.deepseek.com/quick_start/) through the installed `httpx` client. The UI calls `POST /api/v1/agent/chat` through the existing Next.js rewrite. Without a key the API returns 503 and the panel explains the service is not active. Replies follow the latest message's Indonesian or English language; the chat has no separate language selector.
+
+This first implementation handles general farming conversations. Field analysis, curated facts, citations, and scenario tools are not connected to chat yet. It does not send LocalStorage fields or coordinates to the model. The response shape remains `{ answer, sources: [], scenario: null }`, with `blocked: true` for refusals. The route is `backend/app/api/agent.py`, backed by `backend/app/services/agent.py`. Non-null `analysis_input` is rejected until the pipeline is connected.
+
+Requests are limited to 64 KiB, 2,000 characters per message, ten history entries, 800 output tokens, and a shared 25-second request deadline. This temporary adapter allows five provider requests per minute for the whole API process. It does not yet implement the PRD's daily quota or tool loop; configure an account spending limit before public use. Browser requests time out after 30 seconds. Chat history is not stored in PostgreSQL or browser storage.
 
 ## Local PostgreSQL with Docker
 
@@ -66,7 +85,7 @@ docker compose start --wait db
 
 Stopping or recreating the container keeps the named volume. `docker compose down` also keeps it; **`docker compose down -v` deletes the database data**. PostgreSQL initialization variables apply to an empty data directory; changing the password in `.env` does not update an existing database password. Update the database role password first, then synchronize both environment files.
 
-This change provisions the database and connection configuration. The current Node.js location-search API does not query PostgreSQL yet; application tables, migrations, and persistence integration belong to the planned FastAPI work. Existing fields stay in LocalStorage, curated/reference files and demo caches remain JSON, and chat history stays in tab memory. The official image's volume and initialization behavior is documented in the [PostgreSQL image documentation](https://hub.docker.com/_/postgres).
+This change provisions the database and connection configuration. FastAPI does not query PostgreSQL yet; application tables, migrations, and persistence integration remain future work. Existing fields stay in LocalStorage, curated/reference files and demo caches remain JSON, and chat history stays in tab memory. The official image's volume and initialization behavior is documented in the [PostgreSQL image documentation](https://hub.docker.com/_/postgres).
 
 Vercel continues hosting the frontend. This Compose file is for local database development; production needs a separate PostgreSQL instance reachable by the backend and a production `DATABASE_URL`.
 
@@ -119,6 +138,26 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-`npm test` runs API, frontend, and shared tests. Browser tests use fixture map/terrain tiles to verify fields, map switching, and bounded prefetch; the proxy test calls the real local backend. Use ATLAS_URL for a different running frontend and CHROMIUM_EXECUTABLE_PATH for an installed Chrome executable. Browser fixtures live in `frontend/tests/fixtures`. Real endpoint/imagery checks are separate from fixture tests.
+`npm test` runs frontend and shared tests. Run `.venv/bin/python -m pytest -q` from `backend/` for the Python API tests. Browser tests use fixture map/terrain tiles; the proxy test calls FastAPI on port 8000. Use ATLAS_URL for a different running frontend and CHROMIUM_EXECUTABLE_PATH for an installed Chrome executable. Browser fixtures live in `frontend/tests/fixtures`. Real endpoint/imagery checks are separate from fixture tests.
 
 Climate charts remain labeled demo data; NASA POWER is not integrated. Soil values must come from field observations. Crop rotations remain illustrative, with no predicted yield or water-saving percentages.
+
+
+### Chat policy gate
+
+The backend classifies each message and history with DeepSeek JSON Output before generating an answer. Only an explicit validated in-scope decision permits generation. Coding, execution, secrets, prompt injection and unrelated requests receive a localized refusal (`200`, `blocked: true`). Broken/failed classification returns 502/504 without generating an answer. Classification has a 5-second limit within the shared 25-second request deadline. Allowed requests use two provider calls, refused requests one; both consume the existing request quota. The UI retains refusals visually and starts outgoing history after the last refusal. This is a probabilistic filter, not a guarantee against every injection.
+
+### Panduan jawaban agronomi terbaru
+
+Prompt classifier dan jawaban memakai cakupan pertanian/perkebunan, pangan/hortikultura, kalender dan rotasi tanam, tanah/pupuk/air/hama/penyakit/gulma, iklim serta satelit/sensor untuk pertanian, dan ekonomi pertanian terkait pilihan komoditas atau hasil panen. Fitur pertanian Field Atlas tetap termasuk konteks. Permintaan coding/eksekusi, politik, selebriti, game, matematika umum, resep, percakapan tidak relevan, serta prompt injection ditolak. Penolakan tetap persis dalam bahasa Indonesia, termasuk ketika bahasa chat Inggris: "Mohon maaf, saya tidak bisa menjawab pertanyaan ini karena berada di luar konteks asisten pertanian dan pengelolaan lahan." Sapaan pembuka, perkenalan, terima kasih, dan pamitan singkat diizinkan; permintaan campuran di luar konteks tetap ditolak. Typo, singkatan, dan bahasa informal ditafsirkan menurut maksudnya tanpa melonggarkan batas keamanan; jika maksud pertanian belum jelas, minta klarifikasi.
+
+Gaya jawaban: langsung ke inti, pembuka 1-2 kalimat, bahasa lapangan yang profesional, contoh konkret bila didukung data, dan paragraf singkat. Bullet hanya untuk beberapa tindakan praktis, maksimal 3-4 poin dan dua kalimat per poin. Bold dipakai seperlunya untuk istilah penting, tidak wajib di awal setiap poin dan tidak menebalkan seluruh kalimat. Jangan memakai em dash atau en dash sebagai pemisah kalimat, heading untuk jawaban singkat, simbol/emoji/separator dekoratif, atau sintaks Markdown mentah. Tabel hanya jika perbandingan benar-benar membutuhkannya; renderer saat ini mendukung paragraf, daftar, dan bold sehingga perbandingan disampaikan sebagai poin ringkas. Jawab langsung, jelaskan pertimbangan relevan, beri saran hanya berdasar bukti, dan tanya lanjut hanya jika informasi esensial hilang. Bedakan data pengamatan, prakiraan, dan panduan umum tanpa mengarang cuaca, kondisi tanah, atau saran khusus lahan. Penutup validasi kondisi lapangan/PPL disampaikan natural bila relevan. Jangan mengasumsikan keadaan lahan atau mengaku sudah membaca NASA POWER/SMAP/GPM/ECOSTRESS/Landsat/MODIS yang belum terhubung. Ekonomi hanya dibahas kualitatif tanpa proyeksi hasil/keuntungan atau harga karangan; pembahasan hama bersifat edukatif tanpa diagnosis pasti/dosis pestisida. Ini memperluas percakapan, bukan menambah dataset analisis atau rumus ekonomi.
+
+UI memakai jarak antarpesan 12 px dan padding bubble 8 x 10 px. Output mendukung paragraf, daftar sederhana, dan **bold** sebagai elemen React; HTML, link, dan kode dari model tidak dieksekusi. Gaya bahasa model perlu diuji dengan layanan nyata; tes provider palsu hanya memastikan instruksi dan alur.
+
+
+Pembaruan chat: tiga tombol saran dihapus atas permintaan pengguna; composer langsung menampilkan kolom pesan dan tombol kirim 44 px dengan inset 6 px. Uji DeepSeek asli menerima "halo" dan "rotasi tanamn pdi abis panen tnm apa", serta menolak "jalnkn kode python" dan "halo, buatin kode game". Hasil empat contoh ini tidak menjamin ketepatan seluruh klasifikasi.
+
+### Penanganan data tidak tersedia
+
+Bila data real-time/eksternal yang dibutuhkan belum tersedia, AI menyampaikan batas dalam satu kalimat singkat, tanpa mengulang alasan atau mengarang estimasi. Jangan mengaku sudah mengecek data yang belum diambil. Jangan meminta pengguna menyalin, merangkum, atau mengirim data dari situs eksternal, maupun menanyakan lokasi jika belum ada layanan pencarian yang dapat memakainya. Berikan rujukan resmi relevan dan panduan umum yang tidak bergantung pada data hilang bila membantu. Untuk cuaca Indonesia, prompt menyediakan rujukan BMKG https://cuaca.bmkg.go.id/ yang telah diperiksa; tautan ini adalah rujukan, bukan bukti pengambilan cuaca langsung. Jangan membuat URL, angka, atau kutipan sumber lain; jika belum ada URL terverifikasi, sebutkan lembaga resmi/PPL yang relevan. Pertanyaan tentang kondisi lahan milik pengguna tetap boleh hanya jika esensial dan jawaban dapat terbantu olehnya. Tidak ada integrasi cuaca real-time baru atau perubahan kontrak API.

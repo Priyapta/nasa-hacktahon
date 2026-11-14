@@ -12,3 +12,7 @@ playwright-report/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+deploy/backend/backend.env
+deploy/backend/.release.env*
+deploy/backend/.previous.env
+deploy/backend/.deploy.lock

@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { parseCoordinates, type LocationResult } from "@field-atlas/shared";
 import { searchPlaces } from "@/lib/api";
 import type { Dictionary } from "@/lib/i18n";
+import styles from "./LocationSearch.module.css";
 
 interface LocationSearchProps {
   t: Dictionary;
@@ -58,7 +59,7 @@ export default function LocationSearch({ t, onSelect, className = "" }: Location
   }
 
   return (
-    <form role="search" onSubmit={submit} className={`surface flex items-center gap-2 py-1 pl-4 pr-1 focus-within:border-sawah ${className}`}>
+    <form role="search" onSubmit={submit} className={`${styles.search} surface flex items-center gap-2 py-1 pl-4 pr-1 ${className}`}>
       <Search size={20} className="shrink-0 text-muted" aria-hidden="true" />
       <label htmlFor="cari-lokasi" className="sr-only-label">
         {t.search.label}
@@ -70,7 +71,7 @@ export default function LocationSearch({ t, onSelect, className = "" }: Location
         onChange={(event) => setQuery(event.target.value)}
         placeholder={t.search.placeholder}
         autoComplete="off"
-        className="min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-muted focus-visible:outline-none"
+        className="min-w-0 flex-1 bg-transparent text-base text-ink placeholder:text-muted"
       />
       <button type="submit" className="btn-primary min-h-11 px-4 text-[15px]" disabled={status === "loading"}>
         {status === "loading" ? t.search.searching : t.search.submit}

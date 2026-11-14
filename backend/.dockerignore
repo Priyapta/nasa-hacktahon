@@ -1,0 +1,15 @@
+.venv
+.env*
+*.env
+__pycache__
+**/__pycache__
+.pytest_cache
+*.pyc
+dist
+src
+tests
+contracts
+cache-archives
+data/geocode
+data/power
+data/soilgrids
