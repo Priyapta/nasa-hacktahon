@@ -92,9 +92,9 @@ test("language toggle and Ask AI panel", async ({ page }) => {
   await expect(page).toHaveURL(/lang=en/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
 
-  const launcher = page.getByRole("button", { name: "Ask AI" });
+  const launcher = page.getByRole("button", { name: "Ask Cropy" });
   await launcher.click();
-  const panel = page.getByRole("dialog", { name: "Field Atlas", exact: true });
+  const panel = page.getByRole("dialog", { name: "Cropy", exact: true });
   await expect(panel).toBeVisible();
   await expect(panel.getByLabel("Your question", { exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
