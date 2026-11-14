@@ -117,21 +117,21 @@ export default function FieldSeason({ ring, hectares, strategy, monthly, startMo
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_150px]">
         <div className="relative flex flex-col gap-2 md:block">
-          <div className="surface w-full !rounded-[12px] px-3 py-2.5 md:absolute md:left-3 md:top-3 md:z-10 md:w-[250px]" aria-live="polite">
+          <div className="surface w-full !rounded-[12px] px-2.5 py-2 md:absolute md:left-3 md:top-3 md:z-10 md:w-[200px]" aria-live="polite">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-bold">{monthLabel}</span>
-              <span className="rounded-[8px] px-2.5 py-1 text-xs font-bold" style={{ background: phase[0], color: phase[1] }}>
+              <span className="text-[15px] font-bold">{monthLabel}</span>
+              <span className="rounded-[7px] px-2 py-0.5 text-[11px] font-bold" style={{ background: phase[0], color: phase[1] }}>
                 {t.phase[now.phase]}
               </span>
             </div>
-            <div className="mt-1 text-sm font-bold">{t.crops[crop]}</div>
-            <div className="mt-px text-xs text-muted">
+            <div className="mt-0.5 text-[13px] font-bold">{t.crops[crop]}</div>
+            <div className="mt-px text-[11px] leading-snug text-muted">
               {crop === "bera"
                 ? t.fallowFor(now.n)
                 : `${t.stageOf(now.k, now.n)}${water ? ` · ${t.stageRain(water.years_met, water.years_total)}` : ""}`}
             </div>
             {warning && (
-              <div className="mt-2 rounded-[8px] bg-[#FBE7DA] px-2 py-1.5 text-xs font-bold text-tanah-strong">⚠ {warning}</div>
+              <div className="mt-1.5 rounded-[7px] bg-[#FBE7DA] px-2 py-1 text-[11px] font-bold leading-snug text-tanah-strong">⚠ {warning}</div>
             )}
           </div>
           <div ref={sceneRef} className={styles.scene} role="img" aria-label={`${monthLabel}: ${t.crops[crop]}, ${t.rainMedian.toLowerCase()} ${rain === null ? t.noData : `${number.format(rain)} mm`}`}>
