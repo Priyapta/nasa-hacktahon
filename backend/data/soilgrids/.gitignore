@@ -6,3 +6,4 @@ probes/
 *.lock
 *.part
 catalogs/
+soil-region-manifest.json
