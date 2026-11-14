@@ -38,7 +38,7 @@ Environment `ALLOWED_ORIGINS` bersifat opsional, daftar origin dipisahkan koma b
 
 - Selesai: aplikasi FastAPI, router `/api/v1`, health check, dokumentasi OpenAPI, schema empat input, validasi dengan status HTTP 400, pengujian kontrak.
 - Verifikasi tahap 1: 27 tes lulus; health dan dokumentasi juga diperiksa pada server Uvicorn nyata. Ada peringatan deprecation dari TestClient Starlette/httpx, tanpa kegagalan tes.
-- Schema menerima koordinat global. Peringatan wilayah Grobogan nanti dihasilkan pipeline, bukan penolakan input.
+- Schema menerima GeoJSON Polygon dengan koordinat global. Peringatan wilayah Grobogan nanti dihasilkan pipeline, bukan penolakan input.
 - Daftar crop ID pada schema mengikuti cakupan PRD; belum merupakan tabel agronomi yang terverifikasi.
 - Belum dibuat: `/crops`, `/geocode`, `/analyze`, pengambilan data, cache, statistik, aturan rotasi, dan agent.
 - `/analyze` sengaja belum terdaftar. Tidak ada data buatan yang dikembalikan sebagai hasil analisis nyata.
@@ -62,3 +62,12 @@ Schema request/response analisis, tanaman, pencarian, galat, dan chat tersedia.
 Detail pemetaan ke PRD, keputusan serialisasi, JSON Schema, dan fixture FE ada
 di [contracts/README.md](contracts/README.md). Fixture adalah data uji sintetis,
 bukan data produksi. Endpoint yang belum diimplementasikan tetap tidak terdaftar.
+
+
+## Perubahan lokasi menjadi Polygon
+
+Sesuai instruksi pengguna, lokasi analisis sekarang berupa geometry GeoJSON
+Polygon. Bentuk titik lama ditolak, termasuk pada konteks chat dan input skenario.
+Lihat [contracts/location-polygon.md](contracts/location-polygon.md) untuk contoh
+payload, dependensi baru, validasi, serta metode pengambilan data area yang belum
+ditetapkan. Dokumen PRD tidak diedit; pengecualian dicatat hanya di backend.

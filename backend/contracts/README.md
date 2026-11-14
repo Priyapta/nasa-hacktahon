@@ -1,7 +1,10 @@
 # Kontrak backend BE-02
 
 PRD bagian 7, 7.1, 8.2, 9, 10, 11, dan 12.4 adalah acuan utama.
-Dokumen ini melengkapi detail serialisasi; tidak mengganti aturan PRD.
+Dokumen ini melengkapi detail serialisasi. **Pengecualian yang disetujui pengguna:**
+lokasi sekarang berupa Polygon, bukan titik PRD. Lihat
+[location-polygon.md](location-polygon.md) untuk bentuk, validasi, dan batasannya.
+Aturan PRD lainnya tetap berlaku.
 `architecture.md` dipakai hanya untuk detail yang konsisten dengan PRD.
 Schema Python ada di `app/schemas.py`; JSON Schema yang diekspor ada di `schemas/`.
 Tidak ada perubahan dokumen PRD.
@@ -30,7 +33,8 @@ tes dibekukan; fixture bukan payload yang valid selamanya.
 ## Yang sudah ditentukan PRD dan tetap dipertahankan
 
 - Lima endpoint dengan prefix `/api/v1` (bagian 12.4).
-- Input `/analyze`, batas input, dan default `lang=id` (bagian 7).
+- Input `/analyze`, batas rotasi/waktu/sumber air, dan default `lang=id` (bagian 7).
+  Bentuk lokasi menggunakan pengecualian polygon yang dijelaskan di atas.
 - Respons `/analyze`: `context`, `strategies`, `notes`, `provenance`, termasuk
   nama field bersarang, empat role strategi, dan lima dimensi (bagian 7).
 - `level` selalu `rendah`, `sedang`, atau `tinggi`; tidak diganti angka/skor/null.

@@ -1,13 +1,16 @@
-"""Four-input contract from PRD section 7 and architecture section 3.
+"""Four-input contract with the authorized polygon location override.
 
 Crop IDs are the PRD's fixed MVP vocabulary, not an agronomic crop table.
 Durations and agronomic thresholds will come from reviewed data later.
+See contracts/location-polygon.md for the backend-only change to PRD location.
 """
 
 import re
 from datetime import datetime
 from typing import Annotated, Literal, Self
 from zoneinfo import ZoneInfo
+
+from shapely import Polygon, is_valid_reason
 
 from pydantic import (
     BaseModel,
@@ -33,9 +36,37 @@ class ContractModel(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
 
 
+Position = Annotated[
+    list[Annotated[float, Field(allow_inf_nan=False)]],
+    Field(min_length=2, max_length=2),
+]
+LinearRing = Annotated[list[Position], Field(min_length=4)]
+
+
 class LocationInput(ContractModel):
-    lat: Annotated[float, Field(ge=-90, le=90, allow_inf_nan=False)]
-    lon: Annotated[float, Field(ge=-180, le=180, allow_inf_nan=False)]
+    """GeoJSON geometry directly at location, matching the FE Polygon object.
+
+    Coordinates are [longitude, latitude]. No centroid or sampling is computed.
+    The first ring is the exterior; subsequent rings are interior holes.
+    """
+
+    type: Literal["Polygon"]
+    coordinates: Annotated[list[LinearRing], Field(min_length=1)]
+
+    @field_validator("coordinates")
+    @classmethod
+    def validate_polygon(cls, rings: list[list[list[float]]]) -> list[list[list[float]]]:
+        for ring in rings:
+            if any(not (-180 <= lon <= 180 and -90 <= lat <= 90) for lon, lat in ring):
+                raise ValueError("Koordinat polygon harus [lon, lat] dalam rentang geografis.")
+            if ring[0] != ring[-1]:
+                raise ValueError("Ring polygon harus tertutup: titik pertama sama dengan terakhir.")
+            if len({tuple(position) for position in ring[:-1]}) < 3:
+                raise ValueError("Ring polygon membutuhkan minimal tiga titik berbeda.")
+        geometry = Polygon(rings[0], holes=rings[1:])
+        if geometry.is_empty or not geometry.is_valid or geometry.area <= 0:
+            raise ValueError("Polygon tidak valid atau luasnya nol: " + is_valid_reason(geometry))
+        return rings
 
 
 class RotationStage(ContractModel):
@@ -107,7 +138,8 @@ class HealthResponse(ContractModel):
     status: Literal["ok"] = "ok"
 
 
-# Response fields follow PRD 7 / 7.1. Technical details are documented in
+# Response fields follow PRD 7 / 7.1; input location uses the polygon override.
+# Technical details are documented in
 # backend/contracts/README.md. No fixture is used by application routes.
 FiniteNumber = Annotated[float, Field(allow_inf_nan=False)]
 NonNegative = Annotated[float, Field(ge=0, allow_inf_nan=False)]

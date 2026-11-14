@@ -13,7 +13,7 @@ def payload(monkeypatch):
     # Freeze the contract's clock rather than tying tests to today's month.
     monkeypatch.setattr("app.schemas.current_month_index", lambda: 2026 * 12 + 10)
     return {
-        "location": {"lat": -7.09, "lon": 110.91},
+        "location": {"type": "Polygon", "coordinates": [[[110.90, -7.10], [110.92, -7.10], [110.92, -7.08], [110.90, -7.10]]]},
         "rotation": {
             "has_pattern": True,
             "stages": [
@@ -37,7 +37,7 @@ def test_health_and_documentation_without_providers():
         assert client.post("/api/v1/analyze", json={}).status_code == 404
 
 
-def test_prd_request_and_no_pattern(payload):
+def test_polygon_request_and_no_pattern(payload):
     parsed = AnalysisInput.model_validate(payload)
     assert parsed.lang == "id"
     assert parsed.rotation.stages[-1].months == 4
@@ -79,13 +79,13 @@ def test_reject_inconsistent_rotation(payload, rotation):
 
 @pytest.mark.parametrize("latitude", [91, float("nan"), float("inf"), "-7.09", True])
 def test_reject_invalid_coordinates(payload, latitude):
-    payload["location"]["lat"] = latitude
+    payload["location"]["coordinates"][0][1][1] = latitude
     with pytest.raises(ValidationError):
         AnalysisInput.model_validate(payload)
 
 
 def test_global_coordinates_allowed_for_later_demo_warning(payload):
-    payload["location"] = {"lat": 0, "lon": 0}
+    payload["location"] = {"type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 0]]]}
     AnalysisInput.model_validate(payload)
 
 
