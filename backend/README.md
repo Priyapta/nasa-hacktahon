@@ -80,3 +80,10 @@ Pengunduh cakupan Indonesia berjalan terpisah dari aplikasi; raw cache dan
 hasil data nyata tidak masuk Git. Metode, satuan, script resume, progres,
 serta batas tahap ini dijelaskan di [contracts/power-data.md](contracts/power-data.md).
 Endpoint `/analyze` dan perhitungan rotasi belum diimplementasikan.
+
+
+## Paket cache untuk tim dan deployment
+
+Daftar paket lokal, checksum, tujuan ekstrak, serta status upload dilacak di
+[cache-archives/README.md](cache-archives/README.md) dan manifest pendamping.
+File ZIP dalam folder itu diabaikan Git dan dibagikan melalui penyimpanan file.
