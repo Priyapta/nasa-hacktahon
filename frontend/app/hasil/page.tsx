@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CloudRain, PenLine, Waves } from "lucide-react";
 import AppHeader from "@/components/shell/AppHeader";
 import AgentChat from "@/components/agent/agent-chat";
 import FieldSeason from "@/components/results/FieldSeason";
@@ -13,8 +13,7 @@ import { ApiError } from "@/lib/api";
 import { analyze, periodYears, timeline, type AnalysisResponse } from "@/lib/analysis";
 import { measure } from "@/lib/geo";
 import { dictionary, formatHectares, formatMonth } from "@/lib/i18n";
-import { addMonths, parsePlan, polygonFromRing, serializePlan, startMonthOptions, toAnalysisInput, type PlanState } from "@/lib/query";
-import { HORIZONS } from "@/lib/types";
+import { addMonths, parsePlan, polygonFromRing, serializePlan, toAnalysisInput } from "@/lib/query";
 
 type Load = { status: "loading" } | { status: "error"; climate: boolean } | { status: "done"; result: AnalysisResponse };
 
@@ -49,12 +48,10 @@ function Results() {
     return () => controller.abort();
   }, [request, attempt]);
 
-  const update = (next: Partial<PlanState>) =>
-    router.replace(`/hasil?${serializePlan({ ...plan, ...next }, { includeStep: false })}`, { scroll: false });
   const back = `/?${serializePlan({ ...plan, step: plan.area ? 2 : 1 })}`;
-  const hectares = useMemo(() => (plan.area ? formatHectares(measure(polygonFromRing(plan.area)).areaHectares, plan.lang) : ""), [plan.area, plan.lang]);
-  const startOptions = startMonthOptions(now);
-  const startAt = startOptions.indexOf(plan.startMonth);
+  // input is null when measure() rejects the boundary, so this call cannot throw.
+  const hectares = useMemo(() => (plan.area && input ? formatHectares(measure(polygonFromRing(plan.area)).areaHectares, plan.lang) : ""), [plan.area, input, plan.lang]);
+  const WaterIcon = plan.water === "irigasi" ? Waves : CloudRain;
 
   const header = (
     <AppHeader
@@ -102,51 +99,25 @@ function Results() {
               </h1>
               <p className="m-0 mt-1.5 text-[15px] text-muted">{r.subtitle(from, to)}</p>
             </div>
-            <div className="flex flex-wrap items-center gap-3.5">
-              <span className="inline-flex min-h-10 items-center rounded-[10px] border-2 border-b-4 border-control bg-white">
-                <button
-                  type="button"
-                  aria-label={r.prevMonth}
-                  disabled={startAt <= 0}
-                  onClick={() => update({ startMonth: startOptions[startAt - 1] })}
-                  className="flex w-9 justify-center border-0 bg-transparent text-sawah disabled:text-[#B5BCB3]"
-                >
-                  <ChevronLeft size={18} aria-hidden="true" />
-                </button>
-                <span className="px-1 text-sm font-bold">{r.startLabel(formatMonth(plan.startMonth, plan.lang, "short"))}</span>
-                <button
-                  type="button"
-                  aria-label={r.nextMonth}
-                  disabled={startAt >= startOptions.length - 1}
-                  onClick={() => update({ startMonth: startOptions[startAt + 1] })}
-                  className="flex w-9 justify-center border-0 bg-transparent text-sawah disabled:text-[#B5BCB3]"
-                >
-                  <ChevronRight size={18} aria-hidden="true" />
-                </button>
-              </span>
-              <div role="group" aria-label={t.plan.horizon} className="flex gap-1">
-                {HORIZONS.map((h) => (
-                  <button key={h} type="button" aria-pressed={plan.horizon === h} onClick={() => update({ horizon: h })} className="seg min-h-10 px-3 text-sm">
-                    {r.horizonShort(h)}
-                  </button>
-                ))}
-              </div>
-              <div role="radiogroup" aria-label={t.plan.water} className="flex gap-1">
-                {(["tadah_hujan", "irigasi"] as const).map((w) => (
-                  <button
-                    key={w}
-                    type="button"
-                    role="radio"
-                    aria-checked={plan.water === w}
-                    aria-pressed={plan.water === w}
-                    onClick={() => update({ water: w })}
-                    className="seg min-h-10 px-3 text-sm"
-                  >
-                    {w === "tadah_hujan" ? t.plan.rainfed : t.plan.irrigated}
-                  </button>
-                ))}
-              </div>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <dl aria-label={r.planSummary} className="m-0 flex flex-wrap gap-x-6 gap-y-2">
+                <div>
+                  <dt className="text-xs font-bold text-muted">{t.plan.horizon}</dt>
+                  <dd className="m-0 mt-0.5 text-[15px] font-bold">
+                    {formatMonth(plan.startMonth, plan.lang, "short")} – {formatMonth(addMonths(plan.startMonth, plan.horizon - 1), plan.lang, "short")}
+                    <span className="font-normal text-muted"> · {t.plan.months(plan.horizon)}</span>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-bold text-muted">{t.plan.water}</dt>
+                  <dd className="m-0 mt-0.5 flex items-center gap-1.5 text-[15px] font-bold">
+                    <WaterIcon size={16} className="text-sawah" aria-hidden="true" />
+                    {plan.water === "irigasi" ? t.plan.irrigated : t.plan.rainfed}
+                  </dd>
+                </div>
+              </dl>
               <Link href={back} className="btn-secondary min-h-10 px-3 text-sm">
+                <PenLine size={16} aria-hidden="true" />
                 {r.back}
               </Link>
             </div>

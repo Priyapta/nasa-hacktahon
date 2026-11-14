@@ -56,17 +56,20 @@ test("the results screen animates the chosen strategy month by month", async ({ 
   await expect(page.getByText("2.183 mm")).toBeVisible();
 });
 
-test("changing the water source runs the analysis again from the URL", async ({ page }) => {
-  const sources: string[] = [];
-  await page.route("**/api/v1/analyze", async (route) => {
-    sources.push(route.request().postDataJSON().water_source);
-    await route.fulfill({ contentType: "application/json", body: analysis });
-  });
+test("the results screen shows the submitted plan and changes it only through the form", async ({ page }) => {
+  await page.route("**/api/v1/analyze", (route) => route.fulfill({ contentType: "application/json", body: analysis }));
   await page.goto(`/hasil?${plan}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pola biasa Anda dan dua pilihan lain");
-  await page.getByRole("radio", { name: "Irigasi" }).click();
-  await expect(page).toHaveURL(/air=irigasi/);
-  await expect.poll(() => sources.at(-1)).toBe("irigasi");
+
+  const summary = page.getByRole("definition");
+  await expect(summary.first()).toHaveText("Nov 2026 – Okt 2027 · 12 bulan");
+  await expect(summary.nth(1)).toHaveText("Tadah hujan");
+  await expect(page.getByRole("radio", { name: "Irigasi" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^(6|18|24|12 bln)$/ })).toHaveCount(0);
+
+  const edit = new URL((await page.getByRole("link", { name: "Ubah rencana" }).getAttribute("href"))!, "http://x");
+  expect(edit.pathname).toBe("/");
+  expect(Object.fromEntries(edit.searchParams)).toMatchObject({ langkah: "2", mulai: "2026-11", horizon: "12", air: "tadah_hujan" });
 });
 
 test("a climate outage shows a retry instead of an empty page", async ({ page }) => {
