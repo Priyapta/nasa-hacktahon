@@ -140,7 +140,7 @@ test("drawing allows undo and only closes by pressing its first point", async ({
   const area = new URL(page.url()).searchParams.get("area")!;
   expect(area.split(";")).toHaveLength(4);
   await page.mouse.move(x + 60, y + 50);
-  await expect(page.getByText("Geser untuk memperbaiki; klik kanan untuk menghapus", { exact: true })).toBeVisible();
+  await expect(page.getByText("Geser untuk memperbaiki. Klik kanan untuk menghapus", { exact: true })).toBeVisible();
   await page.mouse.click(x + 60, y + 50, { button: "right" });
   await expect.poll(() => new URL(page.url()).searchParams.get("area")?.split(";").length).toBe(3);
 });

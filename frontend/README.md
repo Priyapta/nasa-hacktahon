@@ -74,3 +74,14 @@ Verifikasi lokal 14 November 2026: build berhasil, 19 unit tests lulus
 Request nyata melalui proxy menghasilkan HTTP 200, tanah ok dan 3 strategi;
 pengukuran satu request hangat sekitar 2,8 detik, bukan jaminan latensi.
 Tiga sampel tanah juga berhasil dibaca dari cache baru tanpa jaringan.
+
+## Pola fixed pada halaman input
+
+Durasi tanaman tetap memakai slot dari `/crops`. Hanya bera yang dapat diubah
+1–6 bulan. Tiap tahap menampilkan tanggal awal/akhir dan penanda bila melewati
+rentang analisis. Tambah tahap dinonaktifkan setelah pola mencakup rentang itu.
+Pola yang sudah ada tidak dihapus saat rentang diperpendek. Tahap yang dimulai
+di luar rentang diberi tanda tidak ikut dihitung. Jika pola lebih pendek,
+form menjelaskan pengulangan dari tahap pertama. Perilaku ini mengikuti kalender
+BE yang sudah ada. Tidak ada perubahan durasi, rumus, kontrak API atau PRD.
+Tes contoh enam tanaman x 4 bulan pada rentang 6 bulan ada di frontend dan backend.
