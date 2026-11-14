@@ -15,7 +15,7 @@ Acuan: [PRD Field Shift](<PRD Field Shift Alat Bantu Rotasi Tanam Berbasis Data 
 | Iklim | NASA POWER, sepuluh tahun kalender lengkap terakhir |
 | Tanah | SoilGrids, kedalaman agregat 0–30 cm |
 | Pencarian lokasi | Nominatim melalui backend |
-| Agent AI | DeepSeek melalui Chat Completions; model awal `deepseek-flash`, dapat diatur lewat `AI_MODEL`; tool analisis menyusul setelah pipeline tersedia |
+| Agent AI | OpenAI melalui Chat Completions; model default `gpt-6-luna`, dapat diatur lewat `AI_MODEL`; tool analisis menyusul setelah pipeline tersedia |
 | Hosting target | Frontend di Vercel, backend di Render |
 
 Frontend mengumpulkan empat input, menampilkan hasil, dan menyediakan panel tanya AI. Seluruh perhitungan yang menentukan strategi dilakukan backend. LLM dipakai untuk percakapan dan pemilihan tool; mesin analisis tidak melatih model ML. Tidak ada login, prediksi panen, perhitungan keuntungan, atau skor gabungan.
@@ -336,7 +336,7 @@ Daftar ini menjadi verifikasi saat implementasi. Pembuatan dokumen arsitektur be
 
 ## 9. Agent AI dan kontrak chat
 
-Status implementasi awal: panel chat dwibahasa tersedia melalui `frontend/components/agent/agent-chat.tsx` dan `frontend/hooks/useAgentChat.ts`, dipasang di alur input dan hasil. Endpoint FastAPI berada di `backend/app/api/agent.py`, memakai service `backend/app/services/agent.py` dan `httpx`. DeepSeek memakai `AI_API_KEY` dan `AI_MODEL` di environment backend. Jawaban mengikuti bahasa pesan terbaru tanpa selector bahasa chat. Chat awal hanya untuk informasi umum, dengan `analysis_input=null`, `sources=[]`, dan `scenario=null`. Konteks analisis, data kurasi, dua tool, serta kuota harian di bawah masih menunggu integrasi. Batas awal lima request per menit berlaku untuk seluruh proses.
+Status implementasi awal: panel chat dwibahasa tersedia melalui `frontend/components/agent/agent-chat.tsx` dan `frontend/hooks/useAgentChat.ts`, dipasang di alur input dan hasil. Endpoint FastAPI berada di `backend/app/api/agent.py`, memakai service `backend/app/services/agent.py` dan `httpx`. OpenAI memakai `AI_API_KEY` dan `AI_MODEL` di environment backend. Jawaban mengikuti bahasa pesan terbaru tanpa selector bahasa chat. Chat awal hanya untuk informasi umum, dengan `analysis_input=null`, `sources=[]`, dan `scenario=null`. Konteks analisis, data kurasi, dua tool, serta kuota harian di bawah masih menunggu integrasi. Batas awal lima request per menit berlaku untuk seluruh proses.
 
 ### `POST /api/v1/agent/chat`
 
@@ -392,18 +392,18 @@ Tool adalah fungsi internal, tanpa endpoint HTTP baru dan tanpa request HTTP ke 
 - Jawaban menyebut keterbatasan historis dan data tanah yang hilang. Pertanyaan tanpa bukti, diagnosis penyakit, dan dosis pestisida diarahkan ke informasi yang tersedia atau penyuluh. Pemeriksaan struktur dan sumber tidak menjamin seluruh kalimat LLM benar; tinjau contoh jawaban nyata.
 - AI gagal/kuota habis hanya memengaruhi chat. Jangan menampilkan chat tiruan atau mengklaim simulasi berhasil jika tool gagal. Format galat memakai `detail`, dengan status 400, 429, 502, 503, atau 504 sesuai tabel di atas.
 
-Provider awal sudah dipilih: DeepSeek, dengan `AI_MODEL=deepseek-flash`. API key, biaya, kebijakan data, dan integrasi tool tetap perlu diverifikasi sebelum fitur agent lengkap dinyatakan selesai. Jadwal dua hari pada PRD perlu disesuaikan jika penerimaan agent belum tercapai.
+Provider chat sudah dimigrasikan dari DeepSeek ke OpenAI, dengan `AI_MODEL=gpt-6-luna` dan `reasoning_effort=none`. API key harus milik OpenAI. Biaya, kebijakan data, kualitas jawaban model asli, dan integrasi tool tetap perlu diverifikasi sebelum fitur agent lengkap dinyatakan selesai. Jadwal dua hari pada PRD perlu disesuaikan jika penerimaan agent belum tercapai.
 
 
 ### Pemeriksaan konteks dan keamanan chat
 
-Setiap request chat diperiksa di backend: validasi dan kuota → DeepSeek classifier → keputusan backend → DeepSeek pembuat jawaban. Pemeriksa menerima pesan dan seluruh riwayat sebagai data tidak tepercaya. Hanya JSON tepat `{ "allowed": true, "reason": "in_scope" }` yang membuka tahap jawaban; nilai penolakan memakai reason `off_topic`, `unsafe`, atau `prompt_injection`. Respons kosong, rusak, terpotong, tidak konsisten, atau kegagalan pemeriksa menghentikan proses dengan 502/504. Pemeriksaan dibatasi 5 detik; kedua panggilan berbagi deadline total 25 detik. Model/key tetap `AI_MODEL`/`AI_API_KEY`; classifier maksimal 128 token dan jawaban maksimal 800 token.
+Setiap request chat diperiksa di backend: validasi dan kuota → OpenAI classifier → keputusan backend → OpenAI pembuat jawaban. Pemeriksa menerima pesan dan seluruh riwayat sebagai data tidak tepercaya. Hanya JSON tepat `{ "allowed": true, "reason": "in_scope" }` yang membuka tahap jawaban; nilai penolakan memakai reason `off_topic`, `unsafe`, atau `prompt_injection`. Respons kosong, rusak, terpotong, tidak konsisten, atau kegagalan pemeriksa menghentikan proses dengan 502/504. Pemeriksaan dibatasi 5 detik; kedua panggilan berbagi deadline total 25 detik. Model/key tetap `AI_MODEL`/`AI_API_KEY`; `max_completion_tokens` membatasi classifier 128 token dan jawaban 800 token.
 
 Topik yang diizinkan: fitur Field Atlas serta tanaman, rotasi, air, tanah, data NASA dan pertanyaan lanjutan terkait; cakupan tambahan mengikuti panduan agronomi terbaru. Coding/eksekusi perintah, permintaan rahasia atau prompt internal, upaya mengubah aturan, serta topik lain ditolak; permintaan campuran ditolak seluruhnya. Batas agronomi sebelumnya tetap berlaku. Tidak ada akses eksekusi kode atau tool baru.
 
 Penolakan adalah respons 200 dengan kalimat Indonesia persis sesuai panduan agronomi terbaru, `sources=[]`, `scenario=null`, dan tambahan opsional `blocked=true`. UI menampilkannya sebagai balasan biasa. Riwayat untuk request berikutnya dimulai setelah penolakan terakhir, sementara percakapan lama tetap terlihat. Flag client tidak dipercaya sebagai izin dan tidak dapat melewati pemeriksa backend. Request ditolak tetap memakai kuota; satu request yang lolos memakai dua panggilan model, yang ditolak satu. Tidak ada retry otomatis atau fallback melewati pemeriksa.
 
-Pengamanan ini mengurangi penyimpangan konteks tetapi bukan jaminan klasifikasi sempurna. Tes memakai provider palsu untuk memeriksa alur dan kegagalan; kualitas klasifikasi DeepSeek asli perlu dievaluasi terpisah. Migrasi chat ke FastAPI selesai; integrasi analisis lahan tetap pekerjaan terpisah.
+Pengamanan ini mengurangi penyimpangan konteks tetapi bukan jaminan klasifikasi sempurna. Tes memakai provider palsu untuk memeriksa alur dan kegagalan; kualitas klasifikasi OpenAI asli perlu dievaluasi terpisah. Migrasi chat ke FastAPI selesai; integrasi analisis lahan tetap pekerjaan terpisah.
 
 ### Panduan jawaban agronomi terbaru
 

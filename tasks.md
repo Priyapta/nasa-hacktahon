@@ -59,7 +59,7 @@ Status frontend/agent tidak diaudit pada pembaruan ini dan checkbox-nya tidak di
 
 ## 4. Orang 3: backend agent dan frontend chat
 
-Progres awal: panel mengambang, hook percakapan, bahasa Indonesia/Inggris, serta service chat DeepSeek di FastAPI sudah dibuat. Provider awal DeepSeek dengan `AI_MODEL=deepseek-flash`; set API key di environment backend. Ini belum menyelesaikan seluruh AI-01–AI-10: konteks analisis, tool, sumber terkurasi, dan kuota harian masih menunggu integrasi. Detail konfigurasi dan batas penggunaan ada di README.
+Progres awal: panel mengambang, hook percakapan, bahasa Indonesia/Inggris, serta service chat di FastAPI sudah dibuat. Provider dimigrasikan dari DeepSeek ke OpenAI dengan `AI_MODEL=gpt-6-luna`; set API key OpenAI di environment backend. Ini belum menyelesaikan seluruh AI-01–AI-10: konteks analisis, tool, sumber terkurasi, dan kuota harian masih menunggu integrasi. Detail konfigurasi dan batas penggunaan ada di README.
 
 - [ ] AI-01. Pilih provider/model AI bersama tim berdasarkan tool terstruktur, biaya, bahasa, latensi, retensi data, dan akses API key. Simpan rahasia di env backend dan uji koneksi sebelum integrasi.
 - [ ] AI-02. Sepakati kontrak chat dan bentuk konteks hasil analisis dengan Orang 2. Sepakati props komponen dengan Orang 1: `lang` dan `analysisInput` lengkap atau `null`. Siapkan fixture agar pekerjaan agent tidak menunggu mesin selesai.
@@ -118,7 +118,7 @@ Submisi dikerjakan bersama setelah bagian utama terintegrasi: Orang 1 merakit sl
 Beban Orang 2 paling besar karena memegang data dan mesin rule-based; selesaikan dataset minimum bersumber dan satu titik analisis nyata lebih dahulu. Orang 3 fokus agent dari backend sampai UI chat. Bila terlambat, potong F-19–F-21 lebih dahulu dan ikuti aturan potong PRD. Agent tetap termasuk cakupan wajib: jika belum lulus, laporkan sebagai belum selesai dan sepakati penyesuaian jadwal/cakupan. Pemilihan library peta yang belum selaras antara kode dan PRD harus diputuskan pada tahap 0 sebelum Orang 1 membuat ulang komponen.
 
 
-Progres keamanan Orang 3: pemeriksa konteks/keamanan DeepSeek ditambahkan sebelum jawaban; keputusan divalidasi backend, kegagalan menghentikan alur, dan penolakan tidak ikut riwayat request berikutnya. Tes provider palsu dan UI mencakup keputusan/galat. Migrasi FastAPI selesai; evaluasi kualitas classifier dengan model asli dan pipeline analisis tetap belum selesai.
+Progres keamanan Orang 3: pemeriksa konteks/keamanan kini memakai OpenAI sebelum jawaban; keputusan divalidasi backend, kegagalan menghentikan alur, dan penolakan tidak ikut riwayat request berikutnya. Tes provider palsu dan UI mencakup keputusan/galat. Migrasi FastAPI selesai; evaluasi kualitas classifier dengan model asli dan pipeline analisis tetap belum selesai.
 
 Orang 3: panduan gaya agronomi dan cakupan guardrail terbaru sudah dipasang di prompt classifier/jawaban; penolakan memakai kalimat persis permintaan pengguna. Bubble dirapatkan dan renderer aman mendukung bold/daftar. Evaluasi gaya serta ketepatan klasifikasi model nyata tetap diperlukan.
 

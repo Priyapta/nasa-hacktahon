@@ -54,7 +54,7 @@ chmod 600 /opt/field-shift/backend.env
 nano /opt/field-shift/backend.env
 ```
 
-Isi `AI_API_KEY`. File ini hanya disimpan di VPS, tidak dikirim lewat GitHub Actions. Workflow hanya memperbarui `compose.yaml` dan `deploy.sh`. Tidak perlu memasang Python, npm, atau PostgreSQL di host untuk endpoint saat ini.
+Isi `AI_API_KEY` dengan API key OpenAI dan gunakan `AI_MODEL=gpt-6-luna`. Key DeepSeek tidak dapat digunakan pada integrasi ini. File ini hanya disimpan di VPS, tidak dikirim lewat GitHub Actions. Workflow hanya memperbarui `compose.yaml` dan `deploy.sh`. Tidak perlu memasang Python, npm, atau PostgreSQL di host untuk endpoint saat ini.
 
 ## 2. SSH untuk GitHub Actions
 

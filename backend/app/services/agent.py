@@ -31,7 +31,7 @@ class AgentService:
         self.requests += 1
         checking = True
         history = [message.model_dump() for message in body.history]
-        model = os.getenv("AI_MODEL", "deepseek-flash")
+        model = os.getenv("AI_MODEL", "gpt-6-luna")
         try:
             async with asyncio.timeout(25), httpx.AsyncClient(
                 transport=self.transport,
@@ -40,10 +40,10 @@ class AgentService:
             ) as client:
                 async with asyncio.timeout(5):
                     response = await client.post(
-                        "https://api.deepseek.com/chat/completions",
+                        "https://api.openai.com/v1/chat/completions",
                         json={
-                            "model": model, "thinking": {"type": "disabled"},
-                            "stream": False, "max_tokens": 128,
+                            "model": model, "reasoning_effort": "none",
+                            "stream": False, "max_completion_tokens": 128,
                             "response_format": {"type": "json_object"},
                             "messages": [
                                 {"role": "system", "content": POLICY_PROMPT},
@@ -68,10 +68,10 @@ class AgentService:
                     return JSONResponse({"answer": REFUSAL, "sources": [], "scenario": None, "blocked": True})
                 checking = False
                 response = await client.post(
-                    "https://api.deepseek.com/chat/completions",
+                    "https://api.openai.com/v1/chat/completions",
                     json={
-                        "model": model, "thinking": {"type": "disabled"},
-                        "stream": False, "max_tokens": 800,
+                        "model": model, "reasoning_effort": "none",
+                        "stream": False, "max_completion_tokens": 800,
                         "messages": [
                             {"role": "system", "content": answer_prompt(body.lang)},
                             *history,
@@ -88,5 +88,5 @@ class AgentService:
             if checking:
                 detail = "Pemeriksaan pesan belum tersedia. Silakan coba lagi." if indonesian else "Message checking is unavailable. Please try again."
             else:
-                detail = "DeepSeek belum dapat menjawab. Coba kirim ulang sebentar lagi." if indonesian else "DeepSeek could not reply. Please try again shortly."
+                detail = "AI belum dapat menjawab. Coba kirim ulang sebentar lagi." if indonesian else "The AI service could not reply. Please try again shortly."
             return JSONResponse(status_code=504 if isinstance(exc, (TimeoutError, httpx.TimeoutException)) else 502, content={"detail": detail})

@@ -20,6 +20,7 @@ def completion(content, **kwargs):
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setenv("AI_API_KEY", "test-only-secret")
+    monkeypatch.delenv("AI_MODEL", raising=False)
     app = create_app()
     with TestClient(app) as client:
         yield client
@@ -55,19 +56,27 @@ def test_analysis_is_rejected_until_connected(client, monkeypatch):
     assert client.post("/api/v1/agent/chat", json=payload).status_code == 503
 
 
-def test_reply_language_history_and_quota(client):
+@pytest.mark.parametrize("model", [None, "gpt-6.1-sol"])
+def test_reply_language_history_and_quota(client, monkeypatch, model):
+    if model is not None:
+        monkeypatch.setenv("AI_MODEL", model)
     calls = []
 
     def provider(request):
-        assert str(request.url) == "https://api.deepseek.com/chat/completions"
+        assert str(request.url) == "https://api.openai.com/v1/chat/completions"
         assert request.headers["Authorization"] == "Bearer test-only-secret"
         body = json.loads(request.content)
+        assert body["model"] == (model or "gpt-6-luna")
+        assert body["reasoning_effort"] == "none"
+        assert body["stream"] is False
+        assert "thinking" not in body
+        assert "max_tokens" not in body
         calls.append(body)
         if "response_format" in body:
-            assert body["max_tokens"] == 128
+            assert body["max_completion_tokens"] == 128
             assert json.loads(body["messages"][1]["content"])["history"][0]["content"] == "Jelaskan rotasi"
             return completion(json.dumps(ALLOW))
-        assert body["max_tokens"] == 800
+        assert body["max_completion_tokens"] == 800
         prompt = body["messages"][0]["content"]
         for instruction in [
             "language of the latest user message: Indonesian or English",

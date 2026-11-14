@@ -2,7 +2,7 @@
 
 **Status terkini dan panduan penerus:** [HANDOVER.md](HANDOVER.md).
 FastAPI, service POWER/SoilGrids, statistik iklim, geocode, crops, mesin rotasi
-dan `POST /api/v1/analyze` sudah tersedia. Chat umum DeepSeek sudah terpasang
+dan `POST /api/v1/analyze` sudah tersedia. Chat umum OpenAI GPT-6 Luna sudah terpasang
 di `/api/v1/agent/chat`; konteks analisis dan tool belum terhubung.
 Set `AI_API_KEY` dan `AI_MODEL` di environment shell sebelum menjalankan Uvicorn.
 Bagian fondasi/rencana awal

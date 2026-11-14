@@ -40,18 +40,18 @@ For deployment, set `API_URL` before building the frontend; changing the proxy a
 
 Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the same frontend origin to access existing fields; a different host or port has separate browser storage. PostgreSQL setup is described below; field persistence has not been migrated and there are no user accounts.
 
-## Floating AI chat (DeepSeek)
+## Floating AI chat (OpenAI GPT-6 Luna)
 
-The bottom-right **Ask AI** button opens a keyboard-accessible chat panel on every page. It supports Indonesian/English, in-memory conversation history, clear/reset, and retry without duplicating the question. Messages are sent to DeepSeek only after the user submits. The dark dialog and rounded composer follow the provided visual reference; opening/closing uses Anime.js animations, with reduced-motion support. Visible footer notices and the input heading were removed at the product owner’s request; the input retains a screen-reader label.
+The bottom-right **Ask AI** button opens a keyboard-accessible chat panel on every page. It supports Indonesian/English, in-memory conversation history, clear/reset, and retry without duplicating the question. Messages are sent to OpenAI only after the user submits. The dark dialog and rounded composer follow the provided visual reference; opening/closing uses Anime.js animations, with reduced-motion support. Visible footer notices and the input heading were removed at the product owner’s request; the input retains a screen-reader label.
 
 Export these environment variables in the shell that starts FastAPI, then restart the backend (`backend/.env` is a reference and is not loaded automatically):
 
 ```dotenv
-AI_API_KEY=your-deepseek-api-key
-AI_MODEL=deepseek-flash
+AI_API_KEY=your-openai-api-key
+AI_MODEL=gpt-6-luna
 ```
 
-Never put the key in frontend variables. FastAPI uses DeepSeek's [Chat Completions API](https://api-docs.deepseek.com/quick_start/) through the installed `httpx` client. The UI calls `POST /api/v1/agent/chat` through the existing Next.js rewrite. Without a key the API returns 503 and the panel explains the service is not active. Replies follow the latest message's Indonesian or English language; the chat has no separate language selector.
+Never put the key in frontend variables. FastAPI uses OpenAI's [Chat Completions API](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create) through the installed `httpx` client, with `reasoning_effort=none` and `max_completion_tokens` limits. The UI calls `POST /api/v1/agent/chat` through the existing Next.js rewrite. Without a key the API returns 503 and the panel explains the service is not active. Replies follow the latest message's Indonesian or English language; the chat has no separate language selector.
 
 This first implementation handles general farming conversations. Field analysis, curated facts, citations, and scenario tools are not connected to chat yet. It does not send LocalStorage fields or coordinates to the model. The response shape remains `{ answer, sources: [], scenario: null }`, with `blocked: true` for refusals. The route is `backend/app/api/agent.py`, backed by `backend/app/services/agent.py`. Non-null `analysis_input` is rejected until the pipeline is connected.
 
@@ -145,7 +145,7 @@ Climate charts remain labeled demo data; NASA POWER is not integrated. Soil valu
 
 ### Chat policy gate
 
-The backend classifies each message and history with DeepSeek JSON Output before generating an answer. Only an explicit validated in-scope decision permits generation. Coding, execution, secrets, prompt injection and unrelated requests receive a localized refusal (`200`, `blocked: true`). Broken/failed classification returns 502/504 without generating an answer. Classification has a 5-second limit within the shared 25-second request deadline. Allowed requests use two provider calls, refused requests one; both consume the existing request quota. The UI retains refusals visually and starts outgoing history after the last refusal. This is a probabilistic filter, not a guarantee against every injection.
+The backend classifies each message and history with OpenAI JSON mode before generating an answer. Only an explicit validated in-scope decision permits generation. Coding, execution, secrets, prompt injection and unrelated requests receive a localized refusal (`200`, `blocked: true`). Broken/failed classification returns 502/504 without generating an answer. Classification has a 5-second limit within the shared 25-second request deadline. Allowed requests use two provider calls, refused requests one; both consume the existing request quota. The UI retains refusals visually and starts outgoing history after the last refusal. This is a probabilistic filter, not a guarantee against every injection. Provider tests use mocks; historical DeepSeek checks below do not validate GPT-6 Luna quality.
 
 ### Panduan jawaban agronomi terbaru
 

@@ -81,7 +81,7 @@ file `.env`. Export variabel di shell bila diperlukan. Detail: [README](README.m
 | GET `/api/v1/crops?lang=id` / `lang=en` | Aktif, 6 opsi lokal tanpa jaringan |
 | GET `/api/v1/geocode?q=Purwodadi` | Aktif, cache + Nominatim bila perlu |
 | POST `/api/v1/analyze` | Belum dipasang; 404 memang disengaja |
-| POST `/api/v1/agent/chat` | Chat umum DeepSeek; konteks analisis/tool belum terhubung; perlu `AI_API_KEY` |
+| POST `/api/v1/agent/chat` | Chat umum OpenAI GPT-6 Luna; konteks analisis/tool belum terhubung; perlu `AI_API_KEY` OpenAI |
 
 Pencarian Nominatim dilakukan saat submit, bukan autocomplete. Cache 7 hari,
 pembatas bersama 1 request/detik serta fallback stale sudah ada. Pembatas berbasis
