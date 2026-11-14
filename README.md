@@ -35,7 +35,39 @@ Satellite and Street maps work without a MapTiler key. The optional `NEXT_PUBLIC
 
 For deployment, set `API_URL` before building the frontend; changing the proxy address requires rebuilding it. Build from the repository root with `npm run build`. Use `npm start` to run both services, or `npm run start:backend` and `npm run start:frontend` on separate services with their respective environments. Keep the workspace packages and production dependencies available to both services. Generated `dist`, `.next`, and MapLibre worker assets are built locally and are not committed.
 
-Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the same frontend origin to access existing fields; a different host or port has separate browser storage. This split does not add a database or user accounts.
+Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the same frontend origin to access existing fields; a different host or port has separate browser storage. PostgreSQL setup is described below; field persistence has not been migrated and there are no user accounts.
+
+## Local PostgreSQL with Docker
+
+Run PostgreSQL 17 from the repository root. If the root `.env` does not exist, copy `.env.example` to `.env`, then replace `POSTGRES_PASSWORD` with your local password. Keep existing environment files; do not overwrite them.
+
+```sh
+docker compose up -d --wait db
+docker compose ps
+docker compose exec db psql -U field_shift -d field_shift
+```
+
+The database listens on `127.0.0.1:5432` and persists data in the Compose `postgres_data` named volume. `POSTGRES_PORT` in the root `.env` can change the host port. The root `.env` is for Compose; `backend/.env` is for the backend. Both are ignored by Git.
+
+Set `DATABASE_URL` in `backend/.env`, matching the database name, user, password, and host port from the root `.env`:
+
+```dotenv
+DATABASE_URL=postgresql://field_shift:YOUR_PASSWORD@127.0.0.1:5432/field_shift
+```
+
+URL-encode special characters in the password when constructing the connection URL. If the backend later runs in the same Compose network, use host `db` and port `5432` instead. Never place this URL in a `NEXT_PUBLIC_` variable or frontend environment file.
+
+```sh
+docker compose logs --tail=50 db
+docker compose stop db
+docker compose start --wait db
+```
+
+Stopping or recreating the container keeps the named volume. `docker compose down` also keeps it; **`docker compose down -v` deletes the database data**. PostgreSQL initialization variables apply to an empty data directory; changing the password in `.env` does not update an existing database password. Update the database role password first, then synchronize both environment files.
+
+This change provisions the database and connection configuration. The current Node.js location-search API does not query PostgreSQL yet; application tables, migrations, and persistence integration belong to the planned FastAPI work. Existing fields stay in LocalStorage, curated/reference files and demo caches remain JSON, and chat history stays in tab memory. The official image's volume and initialization behavior is documented in the [PostgreSQL image documentation](https://hub.docker.com/_/postgres).
+
+Vercel continues hosting the frontend. This Compose file is for local database development; production needs a separate PostgreSQL instance reachable by the backend and a production `DATABASE_URL`.
 
 ## Satellite, street, and field mapping
 

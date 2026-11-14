@@ -18,7 +18,7 @@ Field Shift adalah alat bantu keputusan berbasis web yang menerima empat input p
 | 6 | Metode: klimatologi sepuluh tahun, uji per jendela tahun, kelas bulan Oldeman, ambang kelayakan air 60%. | Bisa dihitung ulang dengan tangan, memakai klasifikasi yang dikenal penyuluh Indonesia, dan tidak mengklaim prediksi. | 9, 10 |
 | 7 | Hasil: pola biasa ditambah "Hemat air" dan "Jaga tanah", tanpa skor gabungan. | Dua kompromi yang paling dekat dengan brief: kebutuhan air dan kesehatan tanah. | 10 |
 | 8 | Input: horizon 6, 12, 18, atau 24 bulan (default 12). Lama tahap diambil dari tabel tanaman, hanya bera yang bisa diubah. | Mengurangi isian dan kesalahan pengguna. | 5 |
-| 9 | Teknologi: Next.js di Vercel, FastAPI di Render, tanpa basis data. | Sudah dipilih tim. Satu pilihan hosting menghemat waktu diskusi. | 12 |
+| 9 | Teknologi: Next.js di Vercel, FastAPI di Render, PostgreSQL sebagai database aplikasi. Pengembangan database memakai Docker Compose. | PostgreSQL ditambahkan atas keputusan pemilik produk; data kurasi dan cache demo tetap tersedia sebagai JSON. | 12 |
 | 10 | Bahasa: antarmuka dwibahasa, Indonesia sebagai default dan Inggris lewat tombol. Halaman proyek dan slide berbahasa Inggris. | Global Judging mensyaratkan bahasa Inggris pada halaman proyek dan materi yang ditautkan. Petani sasaran berbahasa Indonesia. | 6, 15 |
 | 11 | Demo submisi: slide tujuh halaman berbahasa Inggris, bukan video 30 detik. | Tujuh slide memuat bukti data dan validasi yang tidak muat dalam 30 detik. | 15 |
 | 12 | Tidak ada pelatihan ML atau model prediksi agronomi, tidak ada angka ekonomi, dan semua hasil analisis berlabel estimasi berbasis pola historis. LLM hanya digunakan untuk agent percakapan. | Mempertahankan perhitungan yang bisa ditelusuri sambil memberi ruang tanya jawab. | 3, 9, 12.9 |
@@ -555,7 +555,7 @@ Setiap kegagalan berujung pada salah satu dari tiga hal: hasil parsial yang dita
 
 ## 12. Arsitektur dan kebutuhan non-fungsional
 
-Frontend Next.js hanya mengumpulkan input dan menampilkan hasil. Semua perhitungan ada di backend FastAPI, tanpa basis data. Seluruh bagian ini berstatus keputusan.
+Frontend Next.js mengumpulkan input dan menampilkan hasil. Semua perhitungan ada di backend FastAPI. PostgreSQL menjadi database aplikasi sesuai keputusan pemilik produk; pengembangan lokal memakai Docker Compose. Penyediaan database belum berarti tabel dan integrasi persistensi aplikasi selesai. Seluruh bagian ini berstatus keputusan.
 
 ### 12.1 Diagram arsitektur
 
@@ -571,7 +571,7 @@ Browser tidak pernah memanggil NASA POWER, SoilGrids, Nominatim, atau penyedia A
 | Peta | Leaflet lewat react-leaflet, ubin OpenStreetMap | Dimuat dengan `next/dynamic` dan `ssr: false` karena Leaflet butuh `window` |
 | Backend | FastAPI, Pydantic, pandas, httpx | Lima endpoint `/api/v1`, tanpa akun pengguna |
 | Agent | LLM eksternal dengan pemanggilan tool terstruktur | Penyedia/model dipilih sebelum implementasi; tanpa training model atau database vektor |
-| Penyimpanan | Berkas JSON di disk | Tanpa basis data |
+| Penyimpanan | PostgreSQL 17, lokal lewat Docker Compose | Tabel/migrasi dan koneksi FastAPI dikerjakan bersama kebutuhan persistensi; JSON kurasi/cache tetap tersedia |
 | Data kurasi | `crops.json` dan `rotations.json` di repositori | Ditinjau manual, punya nomor versi |
 | Pengujian | pytest untuk mesin analisis | Minimal uji data hujan buatan (A-08) |
 
@@ -709,10 +709,13 @@ Cache titik demo ikut di-commit ke repositori. Banyak hosting gratis menghapus d
 | --- | --- | --- |
 | Frontend | Vercel | `API_URL` untuk tujuan `rewrites`, mengikuti nama yang sudah dipakai repositori |
 | Backend | Render | `CACHE_DIR`, `DEMO_BBOX`, `NOMINATIM_USER_AGENT`, `ALLOWED_ORIGINS` |
+| Database | Lokal: Docker Compose; produksi: PostgreSQL terpisah yang dapat dijangkau backend | Root `.env`: `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT`; backend: `DATABASE_URL` |
 | Agent AI | Melalui FastAPI | `AI_API_KEY`, `AI_MODEL`, `AI_DAILY_REQUEST_LIMIT` (default demo 100 request per proses per hari WIB) |
 | Lokal | Next.js di port 3000 dan `uvicorn app.main:app --reload` di port 8000 | `API_URL=http://localhost:8000`; script root disesuaikan saat migrasi FastAPI |
 
 Server gratis sering tertidur saat tidak dipakai. Panggil `/api/v1/health` beberapa menit sebelum presentasi, dan siapkan rekaman video sebagai cadangan. Kunci AI tidak masuk bundle browser atau repositori.
+
+Jalankan database lokal dengan `docker compose up -d --wait db`. Port hanya dibuka di localhost dan data disimpan di named volume; kredensial tidak dikirim ke frontend. PostgreSQL tidak menambah akun, penyimpanan percakapan, atau endpoint CRUD secara otomatis. Migrasi data field dari LocalStorage dan pemindahan cache JSON bukan bagian penyediaan Docker ini.
 
 ### 12.8 Kebutuhan non-fungsional
 

@@ -11,7 +11,7 @@ Acuan: [PRD Field Shift](<PRD Field Shift Alat Bantu Rotasi Tanam Berbasis Data 
 | Frontend | Next.js App Router, TypeScript, Tailwind CSS |
 | Backend | FastAPI, Pydantic, pandas, httpx |
 | Komunikasi | JSON melalui HTTP dengan prefix `/api/v1` |
-| Penyimpanan | Berkas JSON untuk data kurasi, validasi hujan, dan cache; tanpa database |
+| Penyimpanan | PostgreSQL 17 melalui Docker Compose untuk database aplikasi; JSON tetap untuk data kurasi, validasi hujan, dan cache demo |
 | Iklim | NASA POWER, sepuluh tahun kalender lengkap terakhir |
 | Tanah | SoilGrids, kedalaman agregat 0–30 cm |
 | Pencarian lokasi | Nominatim melalui backend |
@@ -25,6 +25,7 @@ flowchart TD
     User[Petani / penyuluh] --> FE[Next.js: input dan hasil]
     FE -->|/api/v1/* melalui rewrite| API[FastAPI]
     API --> Geo[Nominatim: pencarian lokasi]
+    API -->|Integrasi saat implementasi FastAPI| DB[(PostgreSQL)]
     API --> Services[Pengambilan dan cache data]
     Services --> Power[NASA POWER]
     Services --> Soil[SoilGrids]
@@ -275,6 +276,7 @@ API_URL=http://127.0.0.1:8000
 | Konfigurasi backend | Fungsi |
 | --- | --- |
 | `CACHE_DIR` | Direktori cache runtime |
+| `DATABASE_URL` | Koneksi PostgreSQL backend; tidak dikirim ke frontend atau LLM |
 | `DEMO_BBOX` | Batas wilayah Grobogan untuk peringatan dan pencarian |
 | `NOMINATIM_USER_AGENT` | Identitas aplikasi saat mengakses Nominatim |
 | `ALLOWED_ORIGINS` | Origin yang diizinkan bila frontend mengakses backend langsung saat pengembangan |
@@ -283,6 +285,12 @@ API_URL=http://127.0.0.1:8000
 | `AI_DAILY_REQUEST_LIMIT` | Kuota chat bersama per proses per hari WIB, default demo 100 |
 
 Perintah backend target dari direktori `backend/`: `uvicorn app.main:app --reload --port 8000`. Frontend tetap dijalankan dengan script Next.js pada port 3000.
+
+Database lokal dijalankan terpisah lewat `docker compose up -d --wait db` dari root repositori. `compose.yaml` memakai image `postgres:17`, healthcheck, port `127.0.0.1:5432`, dan named volume persisten. `.env` di root memasok `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, serta `POSTGRES_PORT`. `backend/.env` memasok `DATABASE_URL` yang sesuai. Password wajib diisi; kredensial hanya untuk backend. Lihat langkah operasional di [README](README.md#local-postgresql-with-docker).
+
+Penyediaan database sudah diimplementasikan; backend Node.js saat ini belum menggunakannya. Orang 2 menentukan tabel/migrasi dan menghubungkan FastAPI ketika kebutuhan data aplikasi diimplementasikan. Penambahan PostgreSQL tidak otomatis memigrasikan field LocalStorage, data kurasi/cache JSON, atau menyimpan chat. Aplikasi tetap tanpa akun dan riwayat chat permanen. Tidak ditambahkan tabel untuk fitur yang belum diminta.
+
+Compose ini untuk pengembangan lokal. Pada deployment Vercel/Render, PostgreSQL berada di layanan terpisah yang dapat diakses backend melalui `DATABASE_URL` produksi; Compose lokal tidak otomatis ikut terdeploy ke Vercel.
 
 Produksi memakai rewrite dari origin frontend sehingga browser tidak perlu CORS lintas origin untuk API. Backend tetap memvalidasi semua input. Konfigurasi hosting harus mengizinkan waktu request di bawah target 20 detik untuk titik baru; target cache di bawah 5 detik. Jalankan backend satu proses untuk MVP agar pembatas Nominatim satu proses berlaku konsisten; deployment multiworker membutuhkan pembatas laju bersama.
 
@@ -303,12 +311,14 @@ Repositori saat ini sudah memakai Next.js, tetapi backend masih Node.js HTTP den
 | `package.json`, `scripts/run-apps.mjs`, lockfile | Sesuaikan orkestrasi, workspace backend, build, dan test yang saat ini mengasumsikan backend npm |
 | Env backend dan `README.md` | Ganti konfigurasi Photon/Node.js dengan konfigurasi FastAPI/Nominatim dan petunjuk menjalankan aplikasi |
 | Pengujian API dan proxy | Migrasikan tes backend ke pytest dan ubah tes proxy frontend ke `/api/v1` |
+| PostgreSQL | Service Docker Compose tersedia; hubungkan backend FastAPI lewat `DATABASE_URL` dan tambahkan tabel/migrasi sesuai kebutuhan persistensi |
 | Panel agent, hook, tipe, dan env | Tambahkan chat, kontrak request/response, service LLM dan dua tool; kunci AI tidak masuk frontend |
 
 PRD memilih Leaflet, sedangkan implementasi peta sekarang memakai MapLibre. Pergantian library peta merupakan pekerjaan migrasi terpisah dari routing; endpoint di atas tidak bergantung pada library peta.
 
 ## 8. Verifikasi implementasi
 
+- Validasi Compose, healthcheck, koneksi SQL dengan password, penolakan password salah lewat jaringan, dan persistensi data setelah container dibuat ulang. Pastikan `.env` serta URL berkredensial tidak ikut Git.
 - Tes kontrak lima endpoint, validasi input 400, serta bentuk hasil pencarian yang dipakai frontend.
 - Tes mesin dengan data hujan buatan yang jawabannya diketahui, termasuk batas 60% dan data yang hilang.
 - Pastikan pola biasa tetap tampil ketika gagal, alternatif berbeda, dan mode tanpa pola menangani tiga alternatif atau jumlah yang tersedia.
