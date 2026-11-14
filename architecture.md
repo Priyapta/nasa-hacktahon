@@ -288,7 +288,7 @@ Perintah backend target dari direktori `backend/`: `uvicorn app.main:app --reloa
 
 Database lokal dijalankan terpisah lewat `docker compose up -d --wait db` dari root repositori. `docker-compose.yml` memakai image `postgres:17`, healthcheck, port `127.0.0.1:5432`, dan named volume persisten. `.env` di root memasok `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, serta `POSTGRES_PORT`. `backend/.env` memasok `DATABASE_URL` yang sesuai. Password wajib diisi; kredensial hanya untuk backend. Lihat langkah operasional di [README](README.md#local-postgresql-with-docker).
 
-Penyediaan database sudah diimplementasikan; backend Node.js saat ini belum menggunakannya. Orang 2 menentukan tabel/migrasi dan menghubungkan FastAPI ketika kebutuhan data aplikasi diimplementasikan. Penambahan PostgreSQL tidak otomatis memigrasikan field LocalStorage, data kurasi/cache JSON, atau menyimpan chat. Aplikasi tetap tanpa akun dan riwayat chat permanen. Tidak ditambahkan tabel untuk fitur yang belum diminta.
+Penyediaan database sudah diimplementasikan; backend FastAPI saat ini belum menggunakannya. Orang 2 menentukan tabel/migrasi ketika kebutuhan data aplikasi diimplementasikan. Penambahan PostgreSQL tidak otomatis memigrasikan field LocalStorage, data kurasi/cache JSON, atau menyimpan chat. Aplikasi tetap tanpa akun dan riwayat chat permanen. Tidak ditambahkan tabel untuk fitur yang belum diminta.
 
 Compose ini untuk pengembangan lokal. Pada deployment Vercel/Render, PostgreSQL berada di layanan terpisah yang dapat diakses backend melalui `DATABASE_URL` produksi; Compose lokal tidak otomatis ikut terdeploy ke Vercel.
 
@@ -298,7 +298,7 @@ Target chat dengan konteks ter-cache di bawah 15 detik, dengan deadline total 30
 
 ## 7. Migrasi dari kode saat ini
 
-Repositori saat ini sudah memakai Next.js, tetapi backend masih Node.js HTTP dengan Photon. Dokumen ini belum mengganti implementasinya.
+Repositori memakai Next.js dan backend FastAPI. Tabel berikut mencatat rencana migrasi awal; health, katalog tanaman, Nominatim, chat, runner Python, dan proxy port 8000 sudah tersedia. Endpoint analisis dan tool chat masih menunggu integrasi.
 
 | Area | Perubahan saat implementasi |
 | --- | --- |
@@ -336,7 +336,7 @@ Daftar ini menjadi verifikasi saat implementasi. Pembuatan dokumen arsitektur be
 
 ## 9. Agent AI dan kontrak chat
 
-Status implementasi awal: tombol kanan bawah dan panel chat dwibahasa tersedia melalui `frontend/components/agent/agent-chat.tsx` dan `frontend/hooks/useAgentChat.ts`. Komponen dipasang sekali di layout root. Endpoint chat sementara berada di `backend/src/agent.ts` pada server Node yang sudah berjalan; pemindahan ke FastAPI tetap diperlukan. DeepSeek memakai `AI_API_KEY` dan `AI_MODEL` di backend, tanpa SDK tambahan. Chat awal hanya untuk informasi umum, dengan `analysis_input=null`, `sources=[]`, dan `scenario=null`. Konteks analisis, data kurasi, dua tool, serta kuota harian di bawah masih merupakan target integrasi, belum diimplementasikan. Adapter awal membatasi lima panggilan per menit untuk seluruh proses.
+Status implementasi awal: panel chat dwibahasa tersedia melalui `frontend/components/agent/agent-chat.tsx` dan `frontend/hooks/useAgentChat.ts`, dipasang di alur input dan hasil. Endpoint FastAPI berada di `backend/app/api/agent.py`, memakai service `backend/app/services/agent.py` dan `httpx`. DeepSeek memakai `AI_API_KEY` dan `AI_MODEL` di environment backend. Jawaban mengikuti bahasa pesan terbaru tanpa selector bahasa chat. Chat awal hanya untuk informasi umum, dengan `analysis_input=null`, `sources=[]`, dan `scenario=null`. Konteks analisis, data kurasi, dua tool, serta kuota harian di bawah masih menunggu integrasi. Batas awal lima request per menit berlaku untuk seluruh proses.
 
 ### `POST /api/v1/agent/chat`
 
@@ -403,7 +403,7 @@ Topik yang diizinkan: fitur Field Atlas serta tanaman, rotasi, air, tanah, data 
 
 Penolakan adalah respons 200 dengan kalimat Indonesia persis sesuai panduan agronomi terbaru, `sources=[]`, `scenario=null`, dan tambahan opsional `blocked=true`. UI menampilkannya sebagai balasan biasa. Riwayat untuk request berikutnya dimulai setelah penolakan terakhir, sementara percakapan lama tetap terlihat. Flag client tidak dipercaya sebagai izin dan tidak dapat melewati pemeriksa backend. Request ditolak tetap memakai kuota; satu request yang lolos memakai dua panggilan model, yang ditolak satu. Tidak ada retry otomatis atau fallback melewati pemeriksa.
 
-Pengamanan ini mengurangi penyimpangan konteks tetapi bukan jaminan klasifikasi sempurna. Tes memakai provider palsu untuk memeriksa alur dan kegagalan; kualitas klasifikasi DeepSeek asli perlu dievaluasi terpisah. Migrasi FastAPI dan integrasi analisis lahan tetap pekerjaan terpisah.
+Pengamanan ini mengurangi penyimpangan konteks tetapi bukan jaminan klasifikasi sempurna. Tes memakai provider palsu untuk memeriksa alur dan kegagalan; kualitas klasifikasi DeepSeek asli perlu dievaluasi terpisah. Migrasi chat ke FastAPI selesai; integrasi analisis lahan tetap pekerjaan terpisah.
 
 ### Panduan jawaban agronomi terbaru
 

@@ -1,0 +1,12 @@
+{
+  "detail": [
+    {
+      "loc": [
+        "body",
+        "time",
+        "horizon_months"
+      ],
+      "msg": "Pilih horizon 6, 12, 18, atau 24 bulan."
+    }
+  ]
+}

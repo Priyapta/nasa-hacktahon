@@ -1,0 +1,370 @@
+{
+  "context": {
+    "climate": {
+      "period": "2016-01-01/2025-12-31",
+      "monthly": [
+        {
+          "month": 1,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 2,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 3,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 4,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 5,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 6,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 7,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 8,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 9,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 10,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 11,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        },
+        {
+          "month": 12,
+          "rain_median_mm": 220.0,
+          "rain_min_mm": 180.0,
+          "rain_max_mm": 280.0,
+          "class": "basah",
+          "t_mean_c": 26.0,
+          "t_min_c": 21.0,
+          "t_max_c": 32.0,
+          "rad": 4.0,
+          "rh_pct": 80.0,
+          "n_years": 10
+        }
+      ]
+    },
+    "soil": {
+      "status": "unavailable",
+      "depth": "0-30cm",
+      "texture_class": null,
+      "ph": null,
+      "soc_g_per_kg": null,
+      "uncertainty": {}
+    }
+  },
+  "strategies": [
+    {
+      "id": "baseline",
+      "role": "pola_biasa",
+      "label": "Pola biasa Anda",
+      "calendar": [
+        {
+          "crop_id": "padi_sawah",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false
+        },
+        {
+          "crop_id": "bera",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false
+        },
+        {
+          "crop_id": "padi_sawah",
+          "start": "2027-07",
+          "end": "2027-10",
+          "continues_after_horizon": false
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "tinggi",
+          "evidence": "DATA UJI: 8 dari 8 bulan-tahap sesuai."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 8,
+          "years_total": 9
+        },
+        "bare_months": 4,
+        "soil_contribution": {
+          "legume": false,
+          "cover_crop": false,
+          "families": 1
+        },
+        "risks": [
+          "DATA UJI: 1 dari 9 tahun acuan tidak memenuhi kebutuhan air."
+        ]
+      },
+      "reasons": [
+        "DATA UJI: hujan mencukupi pada 8 dari 9 tahun acuan."
+      ],
+      "tradeoffs": [
+        "DATA UJI: terdapat 4 bulan bera dalam horizon 12 bulan."
+      ]
+    },
+    {
+      "id": "fixture-water",
+      "role": "hemat_air",
+      "label": "Hemat air",
+      "calendar": [
+        {
+          "crop_id": "jagung",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false
+        },
+        {
+          "crop_id": "bera",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false
+        },
+        {
+          "crop_id": "padi_sawah",
+          "start": "2027-07",
+          "end": "2027-10",
+          "continues_after_horizon": false
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "tinggi",
+          "evidence": "DATA UJI: 8 dari 8 bulan-tahap sesuai."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 8,
+          "years_total": 9
+        },
+        "bare_months": 4,
+        "soil_contribution": {
+          "legume": false,
+          "cover_crop": false,
+          "families": 1
+        },
+        "risks": [
+          "DATA UJI: 1 dari 9 tahun acuan tidak memenuhi kebutuhan air."
+        ]
+      },
+      "reasons": [
+        "DATA UJI: hujan mencukupi pada 8 dari 9 tahun acuan."
+      ],
+      "tradeoffs": [
+        "DATA UJI: terdapat 4 bulan bera dalam horizon 12 bulan."
+      ]
+    },
+    {
+      "id": "fixture-soil",
+      "role": "jaga_tanah",
+      "label": "Jaga tanah",
+      "calendar": [
+        {
+          "crop_id": "orok_orok",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false
+        },
+        {
+          "crop_id": "bera",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false
+        },
+        {
+          "crop_id": "padi_sawah",
+          "start": "2027-07",
+          "end": "2027-10",
+          "continues_after_horizon": false
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "tinggi",
+          "evidence": "DATA UJI: 8 dari 8 bulan-tahap sesuai."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 8,
+          "years_total": 9
+        },
+        "bare_months": 4,
+        "soil_contribution": {
+          "legume": true,
+          "cover_crop": true,
+          "families": 2
+        },
+        "risks": [
+          "DATA UJI: 1 dari 9 tahun acuan tidak memenuhi kebutuhan air."
+        ]
+      },
+      "reasons": [
+        "DATA UJI: hujan mencukupi pada 8 dari 9 tahun acuan."
+      ],
+      "tradeoffs": [
+        "DATA UJI: terdapat 4 bulan bera dalam horizon 12 bulan."
+      ]
+    }
+  ],
+  "notes": [
+    "DATA UJI SINTETIS untuk pengembangan UI; bukan hasil analisis, pola rekomendasi, atau data agronomi nyata.",
+    "Durasi fixture sintetis; tidak boleh dipakai sebagai tabel agronomi atau pembuktian aturan mesin.",
+    "Data tanah tidak tersedia untuk titik ini. Kesesuaian tanah belum dinilai. Penilaian parsial; K3 dilewati."
+  ],
+  "provenance": {
+    "climate": {
+      "source": "NASA POWER (nama penyedia; nilai fixture sintetis)",
+      "fetched_at": "2026-11-14T06:00:00Z",
+      "resolution": "DATA UJI",
+      "missing_days": 0,
+      "rain_source": "POWER",
+      "rain_validation": {
+        "reference": null,
+        "annual_diff_pct": null,
+        "months_class_differs": null,
+        "status": "unvalidated"
+      }
+    },
+    "soil": {
+      "source": "SoilGrids 2.0 (nama penyedia; nilai fixture sintetis)",
+      "fetched_at": null,
+      "resolution": "250 m"
+    },
+    "crop_table_version": "fixture-only-not-curated",
+    "assumptions": [
+      "DATA UJI: seluruh angka dan kalender sintetis, bukan rekomendasi.",
+      "Estimasi berbasis pola historis, bukan prediksi."
+    ]
+  }
+}

@@ -760,7 +760,7 @@ Topik yang diizinkan: fitur Field Atlas serta tanaman, rotasi, air, tanah, data 
 
 Penolakan adalah respons 200 dengan kalimat Indonesia persis sesuai panduan agronomi terbaru, `sources=[]`, `scenario=null`, dan tambahan opsional `blocked=true`. UI menampilkannya sebagai balasan biasa. Riwayat untuk request berikutnya dimulai setelah penolakan terakhir, sementara percakapan lama tetap terlihat. Flag client tidak dipercaya sebagai izin dan tidak dapat melewati pemeriksa backend. Request ditolak tetap memakai kuota; satu request yang lolos memakai dua panggilan model, yang ditolak satu. Tidak ada retry otomatis atau fallback melewati pemeriksa.
 
-Pengamanan ini mengurangi penyimpangan konteks tetapi bukan jaminan klasifikasi sempurna. Tes memakai provider palsu untuk memeriksa alur dan kegagalan; kualitas klasifikasi DeepSeek asli perlu dievaluasi terpisah. Migrasi FastAPI dan integrasi analisis lahan tetap pekerjaan terpisah.
+Pengamanan ini mengurangi penyimpangan konteks tetapi bukan jaminan klasifikasi sempurna. Tes memakai provider palsu untuk memeriksa alur dan kegagalan; kualitas klasifikasi DeepSeek asli perlu dievaluasi terpisah. Migrasi chat ke FastAPI selesai; integrasi analisis lahan tetap pekerjaan terpisah.
 
 ### Panduan jawaban agronomi terbaru
 

@@ -1,0 +1,47 @@
+{
+  "location": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          110.9,
+          -7.1
+        ],
+        [
+          110.92,
+          -7.1
+        ],
+        [
+          110.92,
+          -7.08
+        ],
+        [
+          110.9,
+          -7.08
+        ],
+        [
+          110.9,
+          -7.1
+        ]
+      ]
+    ]
+  },
+  "rotation": {
+    "has_pattern": true,
+    "stages": [
+      {
+        "crop_id": "padi_sawah"
+      },
+      {
+        "crop_id": "bera",
+        "months": 4
+      }
+    ]
+  },
+  "time": {
+    "start_month": "2026-11",
+    "horizon_months": 12
+  },
+  "water_source": "tadah_hujan",
+  "lang": "id"
+}

@@ -1,0 +1,55 @@
+{
+  "crops": [
+    {
+      "crop_id": "padi_sawah",
+      "nama": "Padi sawah",
+      "peran": [
+        "produksi"
+      ],
+      "slot_bulan": 4
+    },
+    {
+      "crop_id": "jagung",
+      "nama": "Jagung",
+      "peran": [
+        "produksi"
+      ],
+      "slot_bulan": 4
+    },
+    {
+      "crop_id": "kedelai",
+      "nama": "Kedelai",
+      "peran": [
+        "produksi",
+        "penambat nitrogen"
+      ],
+      "slot_bulan": 3
+    },
+    {
+      "crop_id": "kacang_hijau",
+      "nama": "Kacang hijau",
+      "peran": [
+        "produksi",
+        "penambat nitrogen"
+      ],
+      "slot_bulan": 2
+    },
+    {
+      "crop_id": "orok_orok",
+      "nama": "Orok-orok",
+      "peran": [
+        "pupuk hijau",
+        "penutup tanah"
+      ],
+      "slot_bulan": 2
+    },
+    {
+      "crop_id": "bera",
+      "nama": "Bera",
+      "peran": [
+        "lahan terbuka"
+      ],
+      "slot_bulan": null
+    }
+  ]
+}
