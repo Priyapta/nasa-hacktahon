@@ -1,0 +1,7 @@
+raw/
+results/
+probes/
+*.log
+*-status.json
+*.lock
+*.part

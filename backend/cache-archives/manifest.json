@@ -31,6 +31,31 @@
       "required_for": "Offline NASA POWER data for polygon climate analysis within cached coverage",
       "extract_to": "backend/data/power",
       "include_in_git": false
+    },
+    {
+      "id": "soilgrids-grobogan-samples-v1",
+      "filename": "soilgrids-grobogan-samples-v1.zip",
+      "status": "ready",
+      "upload_status": "not_uploaded",
+      "upload_url": null,
+      "bytes": 80605,
+      "sha256": "ba96070113e5c6c6daa15d46f22ac1a99ef558ea1fddb123a27a00ddd4c00c3d",
+      "contents": {
+        "geotiff_files": 45,
+        "metadata_json_files": 45,
+        "depth": "0-30cm",
+        "properties": [
+          "phh2o",
+          "soc",
+          "clay",
+          "sand",
+          "silt"
+        ],
+        "coverage": "Three provisional small Grobogan sample polygons, not Indonesia-wide"
+      },
+      "required_for": "Offline soil sample smoke checks",
+      "extract_to": "backend/data/soilgrids",
+      "include_in_git": false
     }
   ]
 }
