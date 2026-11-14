@@ -188,7 +188,7 @@ function Results() {
 
           {result && strategy && (
             <>
-              <section className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,2.4fr)_minmax(300px,1fr)]">
+              <section className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2.4fr)_minmax(300px,1fr)]">
                 <div className="surface flex flex-col gap-3 px-5 pb-4 pt-[18px]">
                   <div className="flex flex-wrap items-baseline justify-between gap-3">
                     <h2 className="m-0 text-lg font-bold">
@@ -223,16 +223,6 @@ function Results() {
                   t={r}
                 />
               </section>
-
-              {result.notes.length > 0 && (
-                <ul className="m-0 flex list-none flex-col gap-2 p-0">
-                  {result.notes.map((n) => (
-                    <li key={n} className="rounded-xl bg-white px-4 py-2.5 text-sm text-muted">
-                      {n}
-                    </li>
-                  ))}
-                </ul>
-              )}
 
               <StrategyCards strategies={strategies} selected={selected} onSelect={setSelected} startMonth={plan.startMonth} horizon={plan.horizon} t={r} />
 

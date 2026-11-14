@@ -34,10 +34,7 @@ interface CardsProps {
 export function StrategyCards({ strategies, selected, onSelect, startMonth, horizon, t }: CardsProps) {
   return (
     <section aria-labelledby="pick-title" className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="pick-title" className="m-0 text-xl font-bold">{t.pickTitle}</h2>
-        <span className="text-[13px] text-muted">{t.pickHint}</span>
-      </div>
+      <h2 id="pick-title" className="m-0 text-xl font-bold">{t.pickTitle}</h2>
       <div role="radiogroup" aria-labelledby="pick-title" className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
         {strategies.map((s, i) => {
           const on = i === selected;

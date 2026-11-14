@@ -71,7 +71,6 @@ export default function SoilSeasonCard({ ring, hectares, context, calendarMonths
                 <div className="text-[15px] font-bold">{one.format(soil.soc_g_per_kg)} g/kg</div>
               </div>
             </div>
-            <span className="text-[11px] text-muted">{t.soilNote}</span>
           </>
         ) : (
           <p className="m-0 rounded-[10px] bg-tanah-tint px-3 py-2.5 text-[13px] leading-relaxed text-tanah-strong">{t.soilUnavailable}</p>
@@ -121,7 +120,6 @@ export default function SoilSeasonCard({ ring, hectares, context, calendarMonths
               </span>
             </div>
           </div>
-          <span className="text-[11px] text-muted">{t.seasonNote}</span>
         </div>
       </div>
     </div>
