@@ -140,6 +140,8 @@ Build root menyiapkan `packages/shared/dist` sebelum frontend; output tetap `.ne
 
 `frontend/vercel.json` menyimpan framework, install command, dan build command di repo agar tidak bergantung pada override manual dashboard. Root Directory tetap harus `frontend` di pengaturan project. Jika muncul error tidak menemukan `pages`, periksa root tersebut, gunakan commit terbaru, dan redeploy tanpa build cache. Aplikasi ini menggunakan `frontend/app`, sehingga tidak perlu membuat folder `pages` baru.
 
+Pertahankan versi Next.js yang eksplisit di `frontend/package.json`. Rentang `"*"` cocok dengan versi Next 7 dalam deteksi legacy Vercel; builder kemudian mengubah manifest sebelum install sehingga `npm ci` menolak lockfile modern. Saat memperbarui Next/React, sinkronkan lockfile dan uji instalasi bersih/build.
+
 Integrasi Git Vercel otomatis membangun Production saat `main` berubah, dan Preview untuk branch/PR. Tidak perlu GitHub secret `VERCEL_TOKEN` atau deploy hook tambahan. Jalur deployment frontend dan backend berjalan terpisah; Vercel tidak menunggu job checks GitHub secara otomatis. Jadikan job `checks` wajib lewat branch protection/ruleset `main` agar perubahan melalui PR sudah diuji sebelum merge.
 
 ## 6. Operasional setelah deploy pertama
