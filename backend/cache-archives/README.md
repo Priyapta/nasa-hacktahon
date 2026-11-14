@@ -77,3 +77,8 @@ Rebuild paket setelah persiapan sampel lengkap:
 
 Script memverifikasi cache, membuat ZIP, dan memperbarui manifest serta checksum.
 ZIP tetap tidak masuk Git. Tabel README diperbarui saat ukuran paket berubah.
+
+
+Profil iklim bulanan BE-05 adalah cache turunan di `backend/data/power/results/`.
+Tidak perlu paket ZIP atau upload tambahan: hasil dapat dihitung ulang dari
+paket NASA POWER yang sudah ada memakai `scripts/test_climate_sample.py`.

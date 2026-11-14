@@ -200,3 +200,10 @@ dinyatakan siap. Jangan mengklaim 600 file lengkap sebelum status `complete`.
   bukan jaminan latensi semua polygon/periode.
 - Status unduhan nasional tetap diperiksa pada `download-status.json`, bukan
   ditentukan dari hasil tes atau catatan ini.
+
+
+## Pengolahan bulanan BE-05
+
+Pengolahan profil bulanan dan jendela historis kini tersedia terpisah melalui
+`services/climate.py`. Lihat [climate-statistics.md](climate-statistics.md).
+Service POWER pada dokumen ini tetap mengembalikan data harian.

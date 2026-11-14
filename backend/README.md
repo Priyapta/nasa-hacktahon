@@ -106,3 +106,18 @@ kontrak FE, dengan cache, pembatas bersama 1 request/detik, dan galat 400/429/50
 [contracts/geocode.md](contracts/geocode.md) menjelaskan konfigurasi wilayah,
 ketentuan Nominatim, dan integrasi FE yang masih perlu dilakukan: API_URL ke
 port FastAPI serta atribusi OpenStreetMap yang terlihat. Frontend tidak diubah.
+
+
+## Statistik iklim (BE-05)
+
+Profil 12 bulan, kelengkapan data, kelas bulan Oldeman, dan jendela historis
+berurutan tersedia melalui service internal. Memakai arsip harian yang sudah
+ada, dengan cache hasil dan pemeriksaan checksum sumber. Demo tanpa jaringan:
+
+```bash
+.venv/bin/python scripts/test_climate_sample.py
+```
+
+Rincian aturan hitung dan batas tahap ini ada di
+[contracts/climate-statistics.md](contracts/climate-statistics.md).
+Endpoint `/analyze` dan mesin rekomendasi tanaman belum dipasang.
