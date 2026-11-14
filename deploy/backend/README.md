@@ -42,14 +42,14 @@ Batas memori service: `MemoryHigh=900M`, `MemoryMax=1200M`, dan swap maksimal 25
 
 ## 3. Nginx dan domain
 
-Domain proyek memakai subdomain agar `alworkbench.site` tetap bisa dipakai untuk proyek lain:
+Frontend memakai alamat bawaan Vercel. Hanya backend yang memakai subdomain `alworkbench.site`, sehingga domain utama tetap bisa dipakai untuk proyek lain:
 
 | Alamat | Tujuan | Record DNS |
 | --- | --- | --- |
-| `atlas.alworkbench.site` | Frontend Vercel | CNAME `atlas` ke target yang diberikan Vercel |
+| Alamat project `.vercel.app` dari Vercel | Frontend Vercel | Dikelola Vercel, tanpa record DNS domain sendiri |
 | `api-atlas.alworkbench.site` | Backend VPS | A `api-atlas` ke IPv4 VPS |
 
-Tambahkan `atlas.alworkbench.site` di Settings → Domains project Vercel, lalu salin nilai CNAME yang ditampilkan ke penyedia DNS domain. Target CNAME mengikuti project, jangan menebak nilainya. Domain utama dan subdomain proyek lain tidak perlu diubah. Service dapat diuji melalui SSH memakai health lokal sebelum DNS/TLS aktif.
+Tidak perlu menambahkan custom domain atau record CNAME untuk frontend. Gunakan alamat `.vercel.app` yang diberikan setelah deployment. Domain utama dan subdomain proyek lain tidak perlu diubah. Service dapat diuji melalui SSH memakai health lokal sebelum DNS/TLS aktif.
 
 Arahkan DNS A `api-atlas` ke IPv4 VPS. Buat record AAAA hanya jika IPv6 server benar-benar aktif. Konfigurasi Nginx sudah memakai `server_name api-atlas.alworkbench.site`:
 

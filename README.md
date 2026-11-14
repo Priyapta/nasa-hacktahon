@@ -29,7 +29,7 @@ Satellite and Street maps work without a MapTiler key. The optional `NEXT_PUBLIC
 
 ## API connection and deployment
 
-For an Ubuntu 24.04 VPS with 2 cores / 2 GB RAM and a Vercel frontend, use [the backend deployment guide](deploy/backend/README.md). It includes systemd, Nginx, environment configuration, HTTPS setup, and Vercel build settings for `atlas.alworkbench.site` (frontend) and `api-atlas.alworkbench.site` (backend). Configure DNS before activating TLS.
+For an Ubuntu 24.04 VPS with 2 cores / 2 GB RAM and a Vercel frontend, use [the backend deployment guide](deploy/backend/README.md). It includes systemd, Nginx, environment configuration, HTTPS setup, and Vercel build settings. The frontend uses its assigned `.vercel.app` address; the backend uses `api-atlas.alworkbench.site`. Configure the backend DNS before activating TLS.
 
 - `GET /api/v1/health` returns `{"status":"ok"}` without querying external services or PostgreSQL.
 - FastAPI serves health, crop options, Nominatim location search, and AI chat. The analysis endpoint is not implemented yet.
