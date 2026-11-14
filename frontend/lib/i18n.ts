@@ -1,7 +1,7 @@
 import type { Lang } from "./types";
 
 const id = {
-  appName: "Field Shift",
+  appName: "TANI",
   steps: { label: "Langkah", land: "Pilih lahan", plan: "Isi rencana", results: "Lihat hasil" },
   stepOf: (n: number) => `Langkah ${n}/2`,
   language: "Bahasa",
@@ -99,7 +99,7 @@ const id = {
   ai: {
     open: "Tanya AI",
     title: "Tanya AI",
-    subtitle: "Jawaban disusun AI dari data Field Shift",
+    subtitle: "Jawaban disusun AI dari data TANI",
     close: "Tutup Tanya AI",
     notice:
       "Pertanyaan Anda dan ringkasan lahan, tanpa koordinat, dikirim ke penyedia AI. Riwayat hilang saat tab ditutup.",
@@ -231,7 +231,7 @@ const id = {
 export type Dictionary = typeof id;
 
 const en: Dictionary = {
-  appName: "Field Shift",
+  appName: "TANI",
   steps: { label: "Steps", land: "Pick your field", plan: "Fill in the plan", results: "See results" },
   stepOf: (n) => `Step ${n}/2`,
   language: "Language",
@@ -328,7 +328,7 @@ const en: Dictionary = {
   ai: {
     open: "Ask AI",
     title: "Ask AI",
-    subtitle: "Answers written by AI from Field Shift data",
+    subtitle: "Answers written by AI from TANI data",
     close: "Close Ask AI",
     notice:
       "Your question and a field summary, without coordinates, are sent to an AI provider. History is lost when the tab closes.",
