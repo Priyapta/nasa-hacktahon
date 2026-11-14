@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
+import AppShell from "@/components/shell/AppShell";
+import { SessionProvider } from "@/hooks/useSession";
 import { Lexend } from "next/font/google";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
@@ -26,7 +29,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className={lexend.variable}>
-      <body>{children}</body>
+      <body><SessionProvider><Suspense fallback={<div className="h-dvh bg-canvas" />}><AppShell>{children}</AppShell></Suspense></SessionProvider></body>
     </html>
   );
 }

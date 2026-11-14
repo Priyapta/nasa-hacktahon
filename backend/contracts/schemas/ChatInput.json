@@ -209,6 +209,19 @@
       ],
       "title": "Lang",
       "type": "string"
+    },
+    "field_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Field Id"
     }
   },
   "required": [

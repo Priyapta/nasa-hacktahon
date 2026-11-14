@@ -96,8 +96,10 @@ test("serialize and parse round trip", () => {
     horizon: "18",
     air: "irigasi",
     lang: "en",
+    lahan: "existing-field",
   });
   const plan = parsePlan(params, midNovember);
+  assert.equal(plan.fieldId, "existing-field");
   assert.deepEqual(parsePlan(serializePlan(plan), midNovember), plan);
 });
 

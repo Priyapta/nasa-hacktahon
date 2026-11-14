@@ -10,7 +10,7 @@ export class ApiError extends Error {
   }
 }
 
-async function requestJson<T>(path: string, options: RequestInit): Promise<T> {
+export async function requestJson<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(path, { ...options, headers: { Accept: "application/json", ...options.headers } });
   if (!response.ok) {
     let message = `HTTP ${response.status}`;

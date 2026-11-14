@@ -80,11 +80,11 @@ def test_reply_language_history_and_quota(client, monkeypatch, model):
         prompt = body["messages"][0]["content"]
         for instruction in [
             "language of the latest user message: Indonesian or English",
-            "Re-evaluate the language on every turn", "not connected",
+            "Re-evaluate the language on every turn", "read-only tools",
             "Refuse programming", "Simple greetings", "Interpret Indonesian typos",
             "Typos never excuse unsafe intent", "bold sparingly", "never entire sentences",
             "at most 3-4", "U+2014", "U+2013", "only when essential information is missing",
-            "only when supported by available data", "local PPL", "never claim to have fetched",
+            "only when supported by available data", "local PPL", "only after a successful inspection",
             "agricultural economics", "one short sentence", "Do not ask users to copy, summarize",
             "Never claim to have checked external data", "https://cuaca.bmkg.go.id/",
         ]:

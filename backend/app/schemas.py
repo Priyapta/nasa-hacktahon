@@ -9,6 +9,7 @@ import re
 from datetime import datetime
 from typing import Annotated, Literal, Self
 from zoneinfo import ZoneInfo
+from uuid import UUID
 
 from shapely import Polygon, is_valid_reason
 
@@ -290,6 +291,18 @@ class Dimensions(ContractModel):
     risks: list[str]
 
 
+ExplanationPoints = Annotated[
+    list[Annotated[str, Field(min_length=1, max_length=600, pattern=r"\S")]],
+    Field(min_length=1, max_length=6),
+]
+
+
+class StrategyExplanation(ContractModel):
+    assessment: ExplanationPoints
+    basis: ExplanationPoints
+    cautions: ExplanationPoints
+
+
 class Strategy(ContractModel):
     id: Annotated[str, Field(min_length=1)]
     role: StrategyRole
@@ -299,6 +312,7 @@ class Strategy(ContractModel):
     dimensions: Dimensions
     reasons: list[str]
     tradeoffs: list[str]
+    explanation: StrategyExplanation | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class RainValidation(ContractModel):
@@ -420,6 +434,7 @@ class ChatInput(ContractModel):
     history: Annotated[list[ChatMessage], Field(max_length=10)]
     analysis_input: AnalysisContext | None
     lang: Language = "id"
+    field_id: UUID | None = Field(default=None, exclude_if=lambda value: value is None)
 
     @field_validator("message", mode="before")
     @classmethod

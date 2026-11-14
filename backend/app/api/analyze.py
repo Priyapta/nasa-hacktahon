@@ -24,12 +24,14 @@ def get_analysis(request: Request) -> AnalysisService:
 )
 async def analyze(
     body: AnalysisInput,
+    request: Request,
     service: Annotated[AnalysisService, Depends(get_analysis)],
 ):
     """Estimasi berbasis pola historis NASA POWER dan SoilGrids. Tanah yang gagal
     tetap 200 dengan status unavailable. Iklim tanpa cache menghasilkan 502."""
     try:
         # Reading NetCDF and GeoTIFF archives blocks, so keep it off the event loop.
-        return await run_in_threadpool(service.analyze, body)
+        result = await run_in_threadpool(service.analyze, body)
+        return await request.app.state.recommendation.explain(result, body.lang)
     except ClimateUnavailable as exc:
         return JSONResponse(status_code=502, content={"detail": [{"loc": [], "msg": str(exc)}]})

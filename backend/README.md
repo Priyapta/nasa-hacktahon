@@ -3,8 +3,10 @@
 **Status terkini dan panduan penerus:** [HANDOVER.md](HANDOVER.md).
 FastAPI, service POWER/SoilGrids, statistik iklim, geocode, crops, mesin rotasi
 dan `POST /api/v1/analyze` sudah tersedia. Chat umum OpenAI GPT-6 Luna sudah terpasang
-di `/api/v1/agent/chat`; konteks analisis dan tool belum terhubung.
+di `/api/v1/agent/chat`; tool baca lahan tersimpan dan analisis lahan mengikuti sesi login pengguna.
 Isi `AI_API_KEY` dan `AI_MODEL` di `backend/.env`, lalu jalankan `npm run dev:backend` dari root repo. Launcher memuat file ini otomatis; environment shell yang sudah ada tetap diprioritaskan. Restart backend setelah mengubah env. Jika menjalankan Uvicorn langsung, export variabel di shell terlebih dahulu.
+
+`POST /api/v1/analyze` juga memakai konfigurasi AI ini untuk menyusun penjelasan tiap strategi dalam poin: penilaian, dasar data, dan catatan penting. Satu panggilan mencakup semua strategi; hanya hasil analisis yang dikirim, tanpa koordinat atau akun. Perhitungan dan pemilihan strategi tetap dilakukan mesin analisis. Respons menyertakan `strategies[].explanation` bila AI berhasil. Tanpa key, saat kuota lima panggilan per menit per proses tercapai, atau saat AI gagal/lebih dari 25 detik, field ini tidak disertakan dan frontend menampilkan penjelasan dasar. Format JSON mengikuti [dokumentasi OpenAI](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=chat), lalu divalidasi oleh backend.
 Bagian fondasi/rencana awal
 di bawah adalah catatan historis; gunakan handover dan root tasks untuk progres kini.
 
@@ -162,3 +164,31 @@ pemetaan pola lokal) dan dua draft nonaktif. Ini data untuk BE-06, belum
 penilaian/rekomendasi. Periksa dengan `.venv/bin/python scripts/check_catalog.py`.
 Sumber per field, proxy kebutuhan air, dan batas bukti dijelaskan di
 [contracts/crop-data.md](contracts/crop-data.md).
+# Akun dan lahan tersimpan (Neon)
+
+1. Buat project di Neon, lalu salin **pooled connection string** dari menu **Connect** ke `DATABASE_URL` di `backend/.env`. Pertahankan `sslmode=require` dan parameter keamanan yang diberikan Neon. Connection string hanya untuk backend, jangan gunakan variabel `NEXT_PUBLIC_*`.
+2. Install dependensi backend: `uv pip install --python backend/.venv/bin/python -r backend/requirements-dev.lock.txt`.
+3. Dari root repository jalankan `npm run db:migrate`. Alternatif: jalankan isi `backend/migrations/001_accounts_fields.sql` lewat SQL Editor Neon. Migrasi awal ini dapat dijalankan ulang.
+4. Gunakan `COOKIE_SECURE=false` untuk HTTP lokal; pada deployment HTTPS gunakan `COOKIE_SECURE=true` (default). Restart backend setelah mengubah environment.
+5. Buka aplikasi: halaman awal mengarah ke `/login` untuk login/daftar. Setelah masuk, `/akun` (**Lahan saya**) menampilkan lahan tersimpan dan tombol **Buat lahan baru** untuk membuka peta. Pada halaman hasil, isi nama dan pilih **Simpan lahan**. Akun hanya dapat membaca dan menghapus lahannya sendiri. Tautan rencana yang sudah berisi parameter tetap membuka peta atau hasil secara langsung; halaman login awal bukan pembatas akses analisis tamu.
+
+Top navbar bersifat global di semua halaman. Setelah login, sidebar **Lahan saya**, **Tambah lahan**, dan **Keluar** tetap tersedia pada dashboard `/akun`, detail/hasil lahan, serta formulir peta dan rencana; di ponsel gunakan tombol **Menu** di navbar. Logout dari halaman mana pun menghapus sesi dan kembali ke `/login`. Kartu dashboard menampilkan batas asli, luas, koordinat tengah, sumber air dan periode rencana. Setelah menyimpan dari halaman hasil, aplikasi kembali ke dashboard. Membuka lahan tersimpan membawa ID lahan melalui pengeditan batas/rencana/bahasa; **Simpan perubahan** memperbarui lahan tersebut tanpa membuat duplikat. Endpoint `GET /fields/{id}` dan `PUT /fields/{id}` memeriksa pemilik akun, sama seperti penghapusan.
+
+Yang disimpan: batas polygon, nama lahan, pola tanam, sumber air, periode dan bahasa. Hasil analisis tidak disimpan. Membuka lahan memanggil `/analyze` lagi menggunakan layanan analisis dan cache data lingkungan yang sudah ada. Bulan tanam yang sudah lewat digeser ke bulan berjalan (WIB).
+
+Sesi memakai cookie HttpOnly selama 30 hari dengan token acak yang hash-nya disimpan di database. Keluar menghapus sesi. Password memakai scrypt dengan salt acak; username disamakan menjadi huruf kecil, 3–32 huruf/angka/garis bawah; password 8–128 karakter. Belum ada pemulihan password. Endpoint akun dan perubahan lahan memerlukan header `X-Field-Request: 1` untuk mencegah permintaan lintas situs. Akses melalui proxy `/api` di frontend; header ini sengaja tidak diizinkan oleh CORS backend.
+
+Tanpa `DATABASE_URL`, peta dan analisis tetap bekerja; fitur akun/lahan mengembalikan 503. Jika database belum dimigrasikan atau tidak terjangkau, pengguna mendapat pesan penyimpanan tidak tersedia.
+
+Uji integrasi PostgreSQL: set `TEST_DATABASE_URL` ke database pengujian, lalu jalankan `cd backend && .venv/bin/python -m pytest tests/test_accounts.py`. Tes membuat schema terisolasi dan menghapus schema tersebut sesudah selesai. Jangan gunakan Neon production untuk pengujian.
+
+Referensi: [koneksi Neon](https://neon.com/docs/connect/connect-from-any-app), [driver Psycopg](https://www.psycopg.org/psycopg3/docs/basic/install.html).
+
+
+## Ask AI untuk lahan milik pengguna
+
+Chat menyediakan `list_saved_fields` (pencarian nama, 20 lahan per halaman) dan `inspect_saved_field` (rencana tersimpan, tahap menurut kalender asli, luas, sumber air, serta analisis iklim/tanah). Setiap operasi memeriksa cookie sesi dan kepemilikan lahan di PostgreSQL. ID aktif dari `field_id` hanya petunjuk; ID lahan akun lain tetap tidak bisa dibaca. Tidak ada tool mengubah atau menghapus data.
+
+Analisis memakai `AnalysisService` langsung, tanpa memanggil endpoint atau LLM penjelasan kedua. Bulan lama digeser hanya untuk evaluasi baru; kalender asli tetap dipakai menjawab perkembangan menurut rencana. Belum ada pengamatan pertumbuhan nyata, foto, sensor, atau cuaca langsung. Kegagalan iklim tetap menyisakan informasi rencana; kegagalan database dibedakan dari daftar lahan kosong. Maksimal tiga putaran tool dan total 55 detik; frontend menunggu sampai 60 detik. Nama lahan dan hasil tool tidak boleh mengubah aturan asisten.
+
+Tes `tests/test_agent_fields.py` mencakup alur tool ke jawaban, akses antar-akun, sesi kedaluwarsa, pencarian/paginasi, rencana lama, dan kegagalan layanan. Set `TEST_DATABASE_URL` ke PostgreSQL lokal/pengujian untuk menjalankan tes kepemilikan dengan schema sementara terisolasi.

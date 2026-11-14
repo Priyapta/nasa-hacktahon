@@ -1,5 +1,7 @@
 import { meters, periodYears, timeline, type AnalysisResponse, type Strategy } from "@/lib/analysis";
 import type { Dictionary } from "@/lib/i18n";
+import { recommendationExplanation, recommendationSources } from "@/lib/recommendation";
+import type { Lang } from "@/lib/types";
 import { CROP_LOOK } from "./FieldSeason";
 
 type T = Dictionary["results"];
@@ -140,58 +142,47 @@ export function DimensionTable({ strategies, selected, horizon, t }: { strategie
   );
 }
 
-export function WhyCard({ strategy, t }: { strategy: Strategy; t: T }) {
-  const failed = !strategy.feasibility.passed;
+export function WhyCard({ strategy, result, lang, t }: { strategy: Strategy; result: AnalysisResponse; lang: Lang; t: T }) {
+  const explanation = recommendationExplanation(strategy, lang);
+  const notes = [...new Set([
+    ...strategy.reasons.filter((reason) => !explanation.includes(reason)),
+    ...strategy.tradeoffs,
+    ...strategy.dimensions.risks,
+  ])];
   return (
-    <div className="surface flex flex-col gap-3.5 px-5 py-[18px]">
-      <h2 className="m-0 text-lg font-bold">
-        {t.whyTitle} <span className="text-sawah">{strategy.label}</span>
-      </h2>
-      <ul className="m-0 flex list-none flex-col gap-2 p-0">
-        {strategy.reasons.map((r, i) => (
-          <li
-            key={r}
-            className={`rounded-[10px] px-3 py-2 text-[13px] leading-relaxed ${failed && i === 0 ? "bg-tanah-tint font-bold text-tanah-strong" : "bg-sawah-tint"}`}
-          >
-            {r}
-          </li>
-        ))}
-      </ul>
-      {strategy.tradeoffs.length > 0 && (
-        <>
-          <h3 className="m-0 mt-1 text-sm font-bold text-tanah-strong">{t.tradeoffs}</h3>
-          <ul className="m-0 flex list-none flex-col gap-2 p-0">
-            {strategy.tradeoffs.map((x) => (
-              <li key={x} className="rounded-[10px] bg-tanah-tint px-3 py-2 text-[13px] leading-relaxed">
-                {x}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      {strategy.dimensions.risks.length > 0 && (
-        <>
-          <h3 className="m-0 mt-1 text-sm font-bold text-[#3E4A43]">{t.notesTitle}</h3>
-          <ul className="m-0 flex list-none flex-col gap-2 p-0">
-            {strategy.dimensions.risks.map((x) => (
-              <li key={x} className="rounded-[10px] bg-canvas px-3 py-2 text-[13px] leading-relaxed text-muted">
-                {x}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </div>
+    <section className="surface flex flex-col gap-5 px-5 py-[18px]" aria-labelledby="recommendation-title">
+      <div className="flex flex-col gap-2">
+        <h2 id="recommendation-title" className="m-0 text-lg font-bold">{strategy.role === "pola_biasa" ? t.usualWhyTitle : t.whyTitle}</h2>
+        <ul className="m-0 list-disc space-y-2 pl-5 text-sm leading-relaxed">
+          {explanation.map((point) => <li key={point}>{point}</li>)}
+        </ul>
+      </div>
+      <div className="flex flex-col gap-2 border-t-2 border-hairline pt-4">
+        <h3 className="m-0 text-base font-bold">{t.recommendationBasis}</h3>
+        <ul className="m-0 list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted">
+          {(strategy.explanation?.basis ?? recommendationSources(result, lang)).map((source) => <li key={source}>{source}</li>)}
+        </ul>
+      </div>
+      <div className="flex flex-col gap-2 border-t-2 border-hairline pt-4">
+        <h3 className="m-0 text-base font-bold">{t.importantNote}</h3>
+        <ul className="m-0 list-disc space-y-2 pl-5 text-sm leading-relaxed">
+          {(strategy.explanation?.cautions ?? t.disclaimer).map((point) => <li key={point}>{point}</li>)}
+        </ul>
+        {notes.length > 0 && <details className="mt-1 text-sm leading-relaxed">
+          <summary className="min-h-11 cursor-pointer py-3 font-bold text-sawah-lip">{t.notesTitle}</summary>
+          <ul className="m-0 space-y-2 pl-5 text-muted">{notes.map((note) => <li key={note}>{note}</li>)}</ul>
+        </details>}
+      </div>
+    </section>
   );
 }
 
 export function Sources({ result, t }: { result: AnalysisResponse; t: T }) {
   const p = result.provenance;
-  const validated = p.climate.rain_validation.status !== "unvalidated";
   return (
     <details className="surface px-5 py-4">
       <summary className="cursor-pointer text-base font-bold">
-        {t.sourcesTitle} <span className="text-[13px] font-medium text-muted">· {t.sourcesSummary(validated)}</span>
+        {t.sourcesTitle}
       </summary>
       <div className="mt-3 grid grid-cols-1 gap-5 text-[13px] leading-relaxed md:grid-cols-2">
         <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-3.5 gap-y-1.5">
@@ -200,7 +191,7 @@ export function Sources({ result, t }: { result: AnalysisResponse; t: T }) {
             {p.climate.source} {t.yearRange(...periodYears(result.context.climate.period))}, {t.missingDays(p.climate.missing_days)}. {p.climate.resolution}
           </dd>
           <dt className="text-muted">{t.soilLabel}</dt>
-          <dd className="m-0">{p.soil ? `${p.soil.source}, ${p.soil.resolution}` : t.soilUnavailable}</dd>
+          <dd className="m-0">{result.context.soil.status === "ok" && p.soil ? `${p.soil.source}, ${p.soil.resolution}` : t.soilUnavailable}</dd>
           <dt className="text-muted">{t.cropTable}</dt>
           <dd className="m-0">{p.crop_table_version.split(":")[0]}</dd>
         </dl>

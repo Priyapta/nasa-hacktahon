@@ -10,3 +10,4 @@ h5py>=3.10,<4
 pyproj>=3.6,<4
 rasterio>=1.4,<2
 affine>=2.4,<3
+psycopg[binary]>=3.2,<4

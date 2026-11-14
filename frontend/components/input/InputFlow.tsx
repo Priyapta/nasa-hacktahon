@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { LocationResult } from "@field-atlas/shared";
-import AppHeader from "@/components/shell/AppHeader";
 import AgentChat from "@/components/agent/agent-chat";
 import MapPicker, { MIN_DRAW_ZOOM, type MapPickerHandle } from "./MapPicker";
 import LocationSearch from "./LocationSearch";
@@ -26,7 +25,7 @@ import {
   toAnalysisInput,
   type PlanState,
 } from "@/lib/query";
-import type { Crop, Lang, OpenRing } from "@/lib/types";
+import type { Crop, OpenRing } from "@/lib/types";
 
 const URL_SYNC_MS = 300;
 
@@ -219,8 +218,7 @@ export default function InputFlow() {
   const stepOneHint = drawing ? t.land.drawing : canDraw ? t.land.drawReady : t.land.zoomFirst;
 
   return (
-    <div className="flex h-dvh flex-col bg-canvas text-ink">
-      <AppHeader t={t} lang={plan.lang} step={step} onLangChange={(lang: Lang) => replacePlan({ lang })} />
+    <div className="flex h-full flex-col bg-canvas text-ink">
 
       <main className={`relative flex-1 ${step === 2 ? "overflow-y-auto lg:overflow-hidden" : "flex flex-col overflow-hidden lg:block"}`}>
         <div

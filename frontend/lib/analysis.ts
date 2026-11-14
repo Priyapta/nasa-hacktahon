@@ -54,6 +54,11 @@ export interface Strategy {
   };
   reasons: string[];
   tradeoffs: string[];
+  explanation?: {
+    assessment: string[];
+    basis: string[];
+    cautions: string[];
+  } | null;
 }
 
 export interface AnalysisResponse {
@@ -64,7 +69,7 @@ export interface AnalysisResponse {
   strategies: Strategy[];
   notes: string[];
   provenance: {
-    climate: { source: string; resolution: string; missing_days: number; rain_validation: { status: string } };
+    climate: { source: string; resolution: string; missing_days: number; rain_validation: { status: string; reference?: string | null } };
     soil: { source: string; resolution: string } | null;
     crop_table_version: string;
     assumptions: string[];

@@ -79,7 +79,7 @@ test("a climate outage shows a retry instead of an empty page", async ({ page })
     return route.fulfill({ contentType: "application/json", body: analysis });
   });
   await page.goto(`/hasil?${plan}`);
-  await expect(page.getByRole("alert").filter({ hasText: "Analisis belum berhasil" })).toContainText("Data iklim NASA POWER sedang tidak bisa diambil.");
+  await expect(page.getByRole("alert").filter({ hasText: "Analisis belum berhasil" })).toContainText("Data iklim belum selesai diproses atau tidak tersedia untuk lahan ini.");
   outage = false;
   await page.getByRole("button", { name: "Coba lagi" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pola biasa Anda dan dua pilihan lain");
@@ -89,4 +89,52 @@ test("an incomplete plan points back to the form", async ({ page }) => {
   await page.goto("/hasil?mulai=2026-11&horizon=12&lang=id");
   await expect(page.getByText("Rencana belum lengkap.")).toBeVisible();
   await expect(page.getByRole("link", { name: "Ubah rencana" })).toBeVisible();
+});
+
+test("pattern explanations use the requested format and distinguish usual patterns from recommendations", async ({ page }) => {
+  await page.route("**/api/v1/analyze", (route) => route.fulfill({ contentType: "application/json", body: analysis }));
+  await page.goto(`/hasil?${plan}`);
+  const explanation = page.getByRole("region", { name: "Bagaimana pola biasa Anda dinilai?" });
+  await expect(explanation).toContainText("bukan rekomendasi baru");
+  const lists = explanation.locator("ul.list-disc");
+  await expect(lists).toHaveCount(3);
+  await expect(lists.nth(0).getByRole("listitem")).toHaveCount(3);
+  await expect(lists.nth(1).getByRole("listitem")).toHaveCount(3);
+  await expect(lists.nth(2).getByRole("listitem")).toHaveCount(2);
+  await expect(explanation.getByRole("heading", { name: "Dasar rekomendasi", exact: true })).toBeVisible();
+  await expect(explanation.getByRole("heading", { name: "Catatan penting", exact: true })).toBeVisible();
+  await expect(explanation).toContainText("Curah hujan belum divalidasi dengan data pembanding.");
+  await page.getByRole("radio", { name: /Hemat air/ }).click();
+  const recommended = page.getByRole("region", { name: "Mengapa pola ini direkomendasikan?" });
+  await expect(recommended).toContainText("Jagung ditempatkan pada Mar 2027 sampai Jun 2027");
+  await expect(recommended).toContainText("8 dari 9 tahun acuan");
+  await recommended.getByText("Catatan", { exact: true }).click();
+  await expect(recommended).toContainText("Ada 4 bulan lahan terbuka");
+  await recommended.screenshot({ path: "/tmp/tani-recommendation-explanation.png" });
+});
+
+test("unavailable soil is not listed as a source used for the recommendation", async ({ page }) => {
+  const result = JSON.parse(analysis);
+  result.context.soil = { status: "unavailable" };
+  await page.route("**/api/v1/analyze", (route) => route.fulfill({ json: result }));
+  await page.goto(`/hasil?${plan}`);
+  const explanation = page.getByRole("region", { name: "Bagaimana pola biasa Anda dinilai?" });
+  await expect(explanation).toContainText("Data tanah belum tersedia");
+  await expect(explanation).not.toContainText("SoilGrids");
+});
+
+test("result sections display the LLM points supplied by the backend", async ({ page }) => {
+  const result = JSON.parse(analysis);
+  result.strategies[0].explanation = {
+    assessment: ["Penilaian AI untuk tanaman pertama.", "Penilaian AI untuk tanaman kedua."],
+    basis: ["Dasar AI dari data historis."],
+    cautions: ["Catatan AI untuk kondisi lahan."],
+  };
+  await page.route("**/api/v1/analyze", (route) => route.fulfill({ json: result }));
+  await page.goto(`/hasil?${plan}`);
+  const section = page.getByRole("region", { name: "Bagaimana pola biasa Anda dinilai?" });
+  const lists = section.locator("ul.list-disc");
+  await expect(lists.nth(0).getByRole("listitem")).toHaveText(result.strategies[0].explanation.assessment);
+  await expect(lists.nth(1).getByRole("listitem")).toHaveText(result.strategies[0].explanation.basis);
+  await expect(lists.nth(2).getByRole("listitem")).toHaveText(result.strategies[0].explanation.cautions);
 });

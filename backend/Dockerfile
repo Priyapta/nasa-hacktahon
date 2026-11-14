@@ -19,6 +19,7 @@ RUN pip install --no-cache-dir --only-binary=:all: -r requirements.lock.txt \
     && chown atlas:atlas /var/lib/field-shift
 
 COPY app ./app
+COPY migrations ./migrations
 COPY data/catalog ./data/catalog
 USER atlas
 RUN python -c "from app.main import app; assert '/api/v1/health' in app.openapi()['paths']"

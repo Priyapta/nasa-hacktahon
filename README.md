@@ -53,9 +53,9 @@ AI_MODEL=gpt-6-luna
 
 Never put the key in frontend variables. FastAPI uses OpenAI's [Chat Completions API](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create) through the installed `httpx` client, with `reasoning_effort=none` and `max_completion_tokens` limits. The UI calls `POST /api/v1/agent/chat` through the existing Next.js rewrite. Without a key the API returns 503 and the panel explains the service is not active. Replies follow the latest message's Indonesian or English language; the chat has no separate language selector.
 
-This first implementation handles general farming conversations. Field analysis, curated facts, citations, and scenario tools are not connected to chat yet. It does not send LocalStorage fields or coordinates to the model. The response shape remains `{ answer, sources: [], scenario: null }`, with `blocked: true` for refusals. The route is `backend/app/api/agent.py`, backed by `backend/app/services/agent.py`. Non-null `analysis_input` is rejected until the pipeline is connected.
+Chat handles general farming conversations and the signed-in user's saved fields. Read-only tools search owned fields by name (20 per page) and inspect their saved calendars, current planned stages, area, water source, and fresh analysis through the existing analysis service. Ownership is checked against the session for every lookup, including active field IDs supplied by the browser; the model never chooses an account. Field names and tool results are treated as untrusted data. The dashboard also provides Ask AI. When the user asks about “this field” on a saved-field results page, the browser sends its `field_id`; no account ID or client-supplied field data is trusted. Only relevant owned field summaries and analysis go to the model, without raw polygon coordinates or credentials. Saved plans are never modified by chat. Expired start months move to the current month only for the fresh analysis, while progress still uses the original saved calendar. There are no live growth observations or weather tools, so planned progress is not evidence of actual crop growth. The response shape remains `{ answer, sources: [], scenario: null }`, with `blocked: true` for refusals. Non-null `analysis_input` remains unsupported; use saved fields for field-specific chat.
 
-Requests are limited to 64 KiB, 2,000 characters per message, ten history entries, 800 output tokens, and a shared 25-second request deadline. This temporary adapter allows five provider requests per minute for the whole API process. It does not yet implement the PRD's daily quota or tool loop; configure an account spending limit before public use. Browser requests time out after 30 seconds. Chat history is not stored in PostgreSQL or browser storage.
+Requests are limited to 64 KiB, 2,000 characters per message, ten history entries, 800 tokens per completion, three tool rounds, and a shared 55-second request deadline. This temporary adapter allows five chat requests per minute for the whole API process; each accepted request uses two to five provider calls. It does not yet implement the PRD's daily quota; configure an account spending limit before public use. Browser requests time out after 60 seconds. Chat history stays in tab memory and resets on account or language changes.
 
 ## Local PostgreSQL with Docker
 
@@ -75,7 +75,7 @@ Set `DATABASE_URL` in `backend/.env`, matching the database name, user, password
 DATABASE_URL=postgresql://field_shift:YOUR_PASSWORD@127.0.0.1:5432/field_shift
 ```
 
-URL-encode special characters in the password when constructing the connection URL. FastAPI runs locally and connects through the database's published host port. Never place this URL in a `NEXT_PUBLIC_` variable or frontend environment file. The current foundation does not yet query PostgreSQL.
+URL-encode special characters in the password when constructing the connection URL. FastAPI runs locally and connects through the database's published host port. Never place this URL in a `NEXT_PUBLIC_` variable or frontend environment file. Run `npm run db:migrate` to create the account, session, and saved-field tables; set `COOKIE_SECURE=false` for local HTTP.
 
 ```sh
 docker compose logs --tail=50 db
@@ -85,9 +85,9 @@ docker compose start --wait db
 
 Stopping or recreating the container keeps the named volume. `docker compose down` also keeps it; **`docker compose down -v` deletes the database data**. PostgreSQL initialization variables apply to an empty data directory; changing the password in `.env` does not update an existing database password. Update the database role password first, then synchronize both environment files.
 
-This change provisions the database and connection configuration. FastAPI does not query PostgreSQL yet; application tables, migrations, and persistence integration remain future work. Existing fields stay in LocalStorage, curated/reference files and demo caches remain JSON, and chat history stays in tab memory. The official image's volume and initialization behavior is documented in the [PostgreSQL image documentation](https://hub.docker.com/_/postgres).
+Accounts and saved fields use PostgreSQL. Open **Lahan saya** to register or sign in with a username and password, then save a field from the results page. Opening saved land runs analysis again; expired planting months move to the current month. Curated/reference files and environmental caches remain file based, and chat history stays in tab memory. The official image's volume and initialization behavior is documented in the [PostgreSQL image documentation](https://hub.docker.com/_/postgres).
 
-Vercel continues hosting the frontend. This Compose file is for local database development; production needs a separate PostgreSQL instance reachable by the backend and a production `DATABASE_URL`.
+Vercel continues hosting the frontend. This Compose file is for local database development. For production, use a Neon pooled `DATABASE_URL` with its SSL parameters and `COOKIE_SECURE=true` over HTTPS. See [Neon setup and account behavior](backend/README.md#akun-dan-lahan-tersimpan-neon). Without a configured database, guest mapping and analysis still work; account storage returns 503.
 
 ## Satellite, street, and field mapping
 
@@ -145,7 +145,7 @@ Climate charts remain labeled demo data; NASA POWER is not integrated. Soil valu
 
 ### Chat policy gate
 
-The backend classifies each message and history with OpenAI JSON mode before generating an answer. Only an explicit validated in-scope decision permits generation. Coding, execution, secrets, prompt injection and unrelated requests receive a localized refusal (`200`, `blocked: true`). Broken/failed classification returns 502/504 without generating an answer. Classification has a 5-second limit within the shared 25-second request deadline. Allowed requests use two provider calls, refused requests one; both consume the existing request quota. The UI retains refusals visually and starts outgoing history after the last refusal. This is a probabilistic filter, not a guarantee against every injection. Provider tests use mocks; historical DeepSeek checks below do not validate GPT-6 Luna quality.
+The backend classifies each message and history with OpenAI JSON mode before generating an answer. Only an explicit validated in-scope decision permits generation. Coding, execution, secrets, prompt injection and unrelated requests receive a localized refusal (`200`, `blocked: true`). Broken/failed classification returns 502/504 without generating an answer. Classification has a 5-second limit within the shared 55-second request deadline. Allowed requests use two to five provider calls depending on field lookups, refused requests one; both consume the existing request quota. The UI retains refusals visually and starts outgoing history after the last refusal. This is a probabilistic filter, not a guarantee against every injection. Provider tests use mocks; historical DeepSeek checks below do not validate GPT-6 Luna quality.
 
 ### Panduan jawaban agronomi terbaru
 

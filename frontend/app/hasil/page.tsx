@@ -2,9 +2,9 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { CloudRain, PenLine, Waves } from "lucide-react";
-import AppHeader from "@/components/shell/AppHeader";
+import SaveField from "@/components/input/SaveField";
 import AgentChat from "@/components/agent/agent-chat";
 import FieldSeason from "@/components/results/FieldSeason";
 import SoilSeasonCard from "@/components/results/SoilSeasonCard";
@@ -19,7 +19,6 @@ type Load = { status: "loading" } | { status: "error"; climate: boolean } | { st
 
 function Results() {
   const params = useSearchParams();
-  const router = useRouter();
   const [now] = useState(() => new Date());
   const plan = useMemo(() => parsePlan(new URLSearchParams(params.toString()), now), [params, now]);
   const t = dictionary(plan.lang);
@@ -53,19 +52,9 @@ function Results() {
   const hectares = useMemo(() => (plan.area && input ? formatHectares(measure(polygonFromRing(plan.area)).areaHectares, plan.lang) : ""), [plan.area, input, plan.lang]);
   const WaterIcon = plan.water === "irigasi" ? Waves : CloudRain;
 
-  const header = (
-    <AppHeader
-      t={t}
-      lang={plan.lang}
-      step={3}
-      onLangChange={(lang) => router.replace(`/hasil?${serializePlan({ ...plan, lang }, { includeStep: false })}`)}
-    />
-  );
-
   if (!input || !plan.area) {
     return (
-      <div className="flex h-dvh flex-col bg-canvas text-ink">
-        {header}
+      <div className="flex h-full flex-col bg-canvas text-ink">
         <main className="flex-1 overflow-y-auto p-4 lg:p-8">
           <section className="surface mx-auto flex max-w-xl flex-col gap-3 p-6">
             <p className="m-0 text-[15px] leading-relaxed">{r.incomplete}</p>
@@ -88,8 +77,7 @@ function Results() {
   const [from, to] = result ? periodYears(result.context.climate.period) : ["2016", "2025"];
 
   return (
-    <div className="flex h-dvh flex-col bg-canvas text-ink">
-      {header}
+    <div className="flex h-full flex-col bg-canvas text-ink">
       <main className="relative flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-[1320px] flex-col gap-[22px] px-4 pb-28 pt-6 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -122,6 +110,8 @@ function Results() {
               </Link>
             </div>
           </div>
+
+          <SaveField input={input} lang={plan.lang} fieldId={plan.fieldId} />
 
           {load.status === "loading" && (
             <section aria-busy="true" className="surface flex min-h-[420px] flex-col items-center justify-center gap-2 p-8 text-center">
@@ -199,12 +189,11 @@ function Results() {
 
               <section className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
                 <DimensionTable strategies={strategies} selected={selected} horizon={plan.horizon} t={r} />
-                <WhyCard strategy={strategy} t={r} />
+                <WhyCard strategy={strategy} result={result} lang={plan.lang} t={r} />
               </section>
 
               <Sources result={result} t={r} />
 
-              <p className="m-0 rounded-xl bg-sawah-tint px-5 py-3.5 text-center text-[15px] font-bold text-sawah-lip">{r.disclaimer}</p>
             </>
           )}
         </div>
@@ -216,7 +205,7 @@ function Results() {
 
 export default function ResultsPage() {
   return (
-    <Suspense fallback={<div className="h-dvh bg-canvas" />}>
+    <Suspense fallback={<div className="h-full bg-canvas" />}>
       <Results />
     </Suspense>
   );
