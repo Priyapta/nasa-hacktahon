@@ -3,11 +3,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.analyze import router as analyze_router
 from app.api.crops import router as crops_router
 from app.api.geocode import router as geocode_router
 from app.api.routes import router
 from app.catalog import load_catalog
 from app.config import allowed_origins
+from app.services.analysis import AnalysisService
 
 
 def create_app() -> FastAPI:
@@ -15,12 +17,13 @@ def create_app() -> FastAPI:
         title="Field Shift API",
         version="0.1.0",
         description=(
-            "Backend Field Shift: health, katalog tanaman dan pencarian lokasi. Endpoint analisis belum tersedia. "
+            "Backend Field Shift: health, katalog tanaman, pencarian lokasi dan analisis rotasi. "
             "Pencarian: [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL."
         ),
     )
 
     app.state.catalog = load_catalog()
+    app.state.analysis = AnalysisService(catalog=app.state.catalog)
 
     if origins := allowed_origins():
         app.add_middleware(
@@ -49,6 +52,7 @@ def create_app() -> FastAPI:
     app.include_router(router, prefix="/api/v1")
     app.include_router(geocode_router, prefix="/api/v1")
     app.include_router(crops_router, prefix="/api/v1")
+    app.include_router(analyze_router, prefix="/api/v1")
 
     default_openapi = app.openapi
 

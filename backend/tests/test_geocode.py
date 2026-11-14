@@ -71,7 +71,7 @@ def test_http_success_matches_frontend_contract_and_docs(setup):
         assert "openstreetmap.org/copyright" in response.headers["link"]
         docs = client.get("/openapi.json").json()["paths"]["/api/v1/geocode"]["get"]
         assert set(docs["responses"]) == {"200", "400", "429", "502"}
-        assert client.post("/api/v1/analyze", json={}).status_code == 404
+        assert client.post("/api/v1/analyze", json={}).status_code == 400
     request = calls[0]
     assert request.url.params["q"] == "Grobogan"
     assert request.url.params["countrycodes"] == "id"

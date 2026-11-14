@@ -33,8 +33,8 @@ def test_health_and_documentation_without_providers():
         assert client.get("/docs").status_code == 200
         schema = client.get("/openapi.json").json()
         assert "/api/v1/health" in schema["paths"]
-        # An unfinished calculation must not look like working analysis.
-        assert client.post("/api/v1/analyze", json={}).status_code == 404
+        assert "/api/v1/analyze" in schema["paths"]
+        assert client.post("/api/v1/analyze", json={}).status_code == 400
 
 
 def test_polygon_request_and_no_pattern(payload):

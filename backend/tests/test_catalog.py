@@ -88,7 +88,7 @@ def test_crops_http_is_localized_and_offline(monkeypatch):
             "responses"
         ]
         assert "400" in responses and "422" not in responses
-        assert client.post("/api/v1/analyze", json={}).status_code == 404
+        assert client.post("/api/v1/analyze", json={}).status_code == 400
 
 
 @pytest.fixture

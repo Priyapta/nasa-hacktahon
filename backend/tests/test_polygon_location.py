@@ -90,7 +90,7 @@ def test_all_analysis_contexts_share_polygon_and_reject_old_point():
             model.model_validate_json(json.dumps(body))
 
 
-def test_http_polygon_validation_returns_400_without_publishing_analyze():
+def test_http_polygon_validation_returns_400():
     app = create_app()
 
     @app.post("/_test/polygon")
@@ -108,4 +108,4 @@ def test_http_polygon_validation_returns_400_without_publishing_analyze():
         detail = response.json()["detail"][0]
         assert detail["loc"] == ["body", "location", "coordinates"]
         assert set(detail) == {"loc", "msg"}
-        assert client.post("/api/v1/analyze", json=payload).status_code == 404
+        assert client.post("/api/v1/analyze", json=payload).status_code == 400
