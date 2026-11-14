@@ -42,12 +42,12 @@ Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the sam
 Run PostgreSQL 17 from the repository root. If the root `.env` does not exist, copy `.env.example` to `.env`, then replace `POSTGRES_PASSWORD` with your local password. Keep existing environment files; do not overwrite them.
 
 ```sh
-docker compose -f docker.compose.yml up -d --wait db
-docker compose -f docker.compose.yml ps
-docker compose -f docker.compose.yml exec db psql -U field_shift -d field_shift
+docker compose up -d --wait db
+docker compose ps
+docker compose exec db psql -U field_shift -d field_shift
 ```
 
-Use `-f docker.compose.yml` for every Compose command to select this filename explicitly. The database listens on `127.0.0.1:5432` and persists data in the Compose `postgres_data` named volume. `POSTGRES_PORT` in the root `.env` can change the host port. The root `.env` is for Compose; `backend/.env` is for the backend. Both are ignored by Git.
+Docker Compose automatically detects `docker-compose.yml` from the repository root. The database listens on `127.0.0.1:5432` and persists data in the Compose `postgres_data` named volume. `POSTGRES_PORT` in the root `.env` can change the host port. The root `.env` is for Compose; `backend/.env` is for the backend. Both are ignored by Git.
 
 Set `DATABASE_URL` in `backend/.env`, matching the database name, user, password, and host port from the root `.env`:
 
@@ -58,12 +58,12 @@ DATABASE_URL=postgresql://field_shift:YOUR_PASSWORD@127.0.0.1:5432/field_shift
 URL-encode special characters in the password when constructing the connection URL. If the backend later runs in the same Compose network, use host `db` and port `5432` instead. Never place this URL in a `NEXT_PUBLIC_` variable or frontend environment file.
 
 ```sh
-docker compose -f docker.compose.yml logs --tail=50 db
-docker compose -f docker.compose.yml stop db
-docker compose -f docker.compose.yml start --wait db
+docker compose logs --tail=50 db
+docker compose stop db
+docker compose start --wait db
 ```
 
-Stopping or recreating the container keeps the named volume. `docker compose -f docker.compose.yml down` also keeps it; **`docker compose -f docker.compose.yml down -v` deletes the database data**. PostgreSQL initialization variables apply to an empty data directory; changing the password in `.env` does not update an existing database password. Update the database role password first, then synchronize both environment files.
+Stopping or recreating the container keeps the named volume. `docker compose down` also keeps it; **`docker compose down -v` deletes the database data**. PostgreSQL initialization variables apply to an empty data directory; changing the password in `.env` does not update an existing database password. Update the database role password first, then synchronize both environment files.
 
 This change provisions the database and connection configuration. The current Node.js location-search API does not query PostgreSQL yet; application tables, migrations, and persistence integration belong to the planned FastAPI work. Existing fields stay in LocalStorage, curated/reference files and demo caches remain JSON, and chat history stays in tab memory. The official image's volume and initialization behavior is documented in the [PostgreSQL image documentation](https://hub.docker.com/_/postgres).
 

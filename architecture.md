@@ -286,7 +286,7 @@ API_URL=http://127.0.0.1:8000
 
 Perintah backend target dari direktori `backend/`: `uvicorn app.main:app --reload --port 8000`. Frontend tetap dijalankan dengan script Next.js pada port 3000.
 
-Database lokal dijalankan terpisah lewat `docker compose -f docker.compose.yml up -d --wait db` dari root repositori. `docker.compose.yml` memakai image `postgres:17`, healthcheck, port `127.0.0.1:5432`, dan named volume persisten. `.env` di root memasok `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, serta `POSTGRES_PORT`. `backend/.env` memasok `DATABASE_URL` yang sesuai. Password wajib diisi; kredensial hanya untuk backend. Lihat langkah operasional di [README](README.md#local-postgresql-with-docker).
+Database lokal dijalankan terpisah lewat `docker compose up -d --wait db` dari root repositori. `docker-compose.yml` memakai image `postgres:17`, healthcheck, port `127.0.0.1:5432`, dan named volume persisten. `.env` di root memasok `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, serta `POSTGRES_PORT`. `backend/.env` memasok `DATABASE_URL` yang sesuai. Password wajib diisi; kredensial hanya untuk backend. Lihat langkah operasional di [README](README.md#local-postgresql-with-docker).
 
 Penyediaan database sudah diimplementasikan; backend Node.js saat ini belum menggunakannya. Orang 2 menentukan tabel/migrasi dan menghubungkan FastAPI ketika kebutuhan data aplikasi diimplementasikan. Penambahan PostgreSQL tidak otomatis memigrasikan field LocalStorage, data kurasi/cache JSON, atau menyimpan chat. Aplikasi tetap tanpa akun dan riwayat chat permanen. Tidak ditambahkan tabel untuk fitur yang belum diminta.
 

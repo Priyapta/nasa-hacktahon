@@ -715,7 +715,7 @@ Cache titik demo ikut di-commit ke repositori. Banyak hosting gratis menghapus d
 
 Server gratis sering tertidur saat tidak dipakai. Panggil `/api/v1/health` beberapa menit sebelum presentasi, dan siapkan rekaman video sebagai cadangan. Kunci AI tidak masuk bundle browser atau repositori.
 
-Jalankan database lokal dengan `docker compose -f docker.compose.yml up -d --wait db`. Port hanya dibuka di localhost dan data disimpan di named volume; kredensial tidak dikirim ke frontend. PostgreSQL tidak menambah akun, penyimpanan percakapan, atau endpoint CRUD secara otomatis. Migrasi data field dari LocalStorage dan pemindahan cache JSON bukan bagian penyediaan Docker ini.
+Jalankan database lokal dengan `docker compose up -d --wait db`. Port hanya dibuka di localhost dan data disimpan di named volume; kredensial tidak dikirim ke frontend. PostgreSQL tidak menambah akun, penyimpanan percakapan, atau endpoint CRUD secara otomatis. Migrasi data field dari LocalStorage dan pemindahan cache JSON bukan bagian penyediaan Docker ini.
 
 ### 12.8 Kebutuhan non-fungsional
 
