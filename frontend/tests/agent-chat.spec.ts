@@ -1,6 +1,38 @@
 import { expect, test } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 test.use({ trace: "on" });
+
+test("saved-field chat is available on the dashboard and sends the active field on details", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-11-15T05:00:00Z"));
+  const fieldId = "af02e2ce-f771-4f8e-aa50-80c6e29a7df1";
+  const requests: Record<string, unknown>[] = [];
+  await page.route("**/api/v1/auth/me", route => route.fulfill({ json: { id: "owner", username: "petani" } }));
+  await page.route("**/api/v1/fields", route => route.fulfill({ json: { fields: [] } }));
+  await page.route("**/api/v1/fields/*", route => route.fulfill({ json: { id: fieldId, name: "test" } }));
+  await page.route("**/api/v1/analyze", route => route.fulfill({ contentType: "application/json", body: readFileSync(join(__dirname, "fixtures/analyze.json"), "utf8") }));
+  await page.route("**/api/v1/agent/chat", route => {
+    requests.push(route.request().postDataJSON());
+    return route.fulfill({ json: { answer: "Lahan test sedang pada tahap padi menurut rencana tanam tersimpan.", sources: [], scenario: null } });
+  });
+  await page.goto("/akun?lang=id");
+  await page.getByRole("button", { name: "Ask AI", exact: true }).click();
+  await page.getByLabel("Pertanyaan Anda", { exact: true }).fill("Lahan test saya sekarang bagaimana?");
+  await page.getByRole("button", { name: "Kirim pertanyaan", exact: true }).click();
+  await expect(page.getByRole("log")).toContainText("menurut rencana tanam");
+  expect(requests[0].field_id).toBeUndefined();
+  expect(requests[0].user_id).toBeUndefined();
+
+  await page.goto(`/hasil?lahan=${fieldId}&area=110.9,-7.1;110.901,-7.1;110.901,-7.099&pola=kosong&mulai=2026-11&horizon=12&air=irigasi&lang=id`);
+  await expect(page.getByRole("navigation", { name: "Navigasi utama" })).toBeVisible();
+  await page.getByRole("button", { name: "Ask AI", exact: true }).click();
+  await page.getByLabel("Pertanyaan Anda", { exact: true }).fill("Bagaimana kebutuhan air lahan ini?");
+  await page.getByRole("button", { name: "Kirim pertanyaan", exact: true }).click();
+  await expect(page.getByRole("log")).toContainText("menurut rencana tanam");
+  expect(requests[1].field_id).toBe(fieldId);
+  expect(requests[1].user_id).toBeUndefined();
+});
 
 test("floating chat supports conversation, failure retry, reset, keyboard and mobile", async ({ page }) => {
   let attempts = 0;
@@ -14,7 +46,7 @@ test("floating chat supports conversation, failure retry, reset, keyboard and mo
     if (attempts === 2) await route.fulfill({ status: 502, json: { detail: "DeepSeek sementara tidak tersedia." } });
     else await route.fulfill({ json: { answer: body.message === "What do cover crops do?" ? "Cover crops help protect the soil." : "Ini jawaban uji tentang rotasi tanaman.", sources: [], scenario: null } });
   });
-  await page.goto("/");
+  await page.goto("/?lang=id");
   const launcher = page.getByRole("button", { name: "Ask AI", exact: true });
   await launcher.click();
   const dialog = page.getByRole("dialog");
@@ -71,7 +103,7 @@ test("floating chat supports conversation, failure retry, reset, keyboard and mo
 
 test("dialog animates from its launcher and returns focus after closing", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
+  await page.goto("/?lang=id");
   const launcher = page.getByRole("button", { name: "Ask AI", exact: true });
   await launcher.click();
   const dialog = page.getByRole("dialog");
@@ -91,7 +123,7 @@ test("clearing a pending request prevents late replies reappearing", async ({ pa
     await gate;
     await route.fulfill({ json: { answer: "Old reply", sources: [], scenario: null } }).catch(() => {});
   });
-  await page.goto("/");
+  await page.goto("/?lang=id");
   await page.getByRole("button", { name: "Ask AI", exact: true }).click();
   await page.getByLabel("Pertanyaan Anda", { exact: true }).fill("Pertanyaan tertunda");
   await page.getByRole("button", { name: "Kirim pertanyaan", exact: true }).click();
@@ -115,7 +147,7 @@ test('policy refusal remains visible but is excluded from subsequent request his
       await route.fulfill({ json: { answer: 'Jawaban pertanian yang sesuai konteks.', sources: [], scenario: null } });
     }
   });
-  await page.goto('/');
+  await page.goto('/?lang=id');
   await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Run Python code');
@@ -134,7 +166,7 @@ test('agronomy answers render compact paragraphs, bold and lists as safe text', 
   await page.route('**/api/v1/agent/chat', route => route.fulfill({ json: {
     answer: 'Saat air mulai terbatas, pertimbangkan tanaman berikut.\n\n- **Pilih palawija**: Contohnya kacang hijau sesudah padi.\n- **Cek tanah**: Cocokkan kondisi lahan bersama PPL.\n\n<script>alert(1)</script>', sources: [], scenario: null,
   } }));
-  await page.goto('/');
+  await page.goto('/?lang=id');
   await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Apa yang bisa ditanam setelah padi?');
@@ -158,7 +190,7 @@ test('waiting dots rotate, respect reduced motion, and disappear after a reply',
     await gate;
     await route.fulfill({ json: { answer: 'Jawaban selesai.', sources: [], scenario: null } });
   });
-  await page.goto('/');
+  await page.goto('/?lang=id');
   await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Apa manfaat rotasi?');

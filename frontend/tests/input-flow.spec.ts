@@ -24,7 +24,7 @@ async function mockNetwork(page: Page) {
 test("draw a field, fill the plan and reach a results link with every input", async ({ page }) => {
   test.setTimeout(60000);
   await mockNetwork(page);
-  await page.goto("/");
+  await page.goto("/?lang=id");
 
   const draw = page.getByRole("button", { name: "Mulai gambar" });
   await expect(draw).toBeDisabled();
@@ -107,7 +107,7 @@ const planUrl = "/?area=110.892,-7.0915;110.8928,-7.0914;110.8928,-7.092;110.892
 test("drawing allows undo and only closes by pressing its first point", async ({ page }) => {
   test.setTimeout(60000);
   await mockNetwork(page);
-  await page.goto("/");
+  await page.goto("/?lang=id");
   await page.getByLabel("Cari desa atau koordinat").fill("-7.0918, 110.8924");
   await page.getByRole("button", { name: "Cari", exact: true }).click();
   const draw = page.getByRole("button", { name: "Mulai gambar", exact: true });

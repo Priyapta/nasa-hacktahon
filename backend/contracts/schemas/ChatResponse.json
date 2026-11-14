@@ -946,6 +946,17 @@
           },
           "title": "Tradeoffs",
           "type": "array"
+        },
+        "explanation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyExplanation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -959,6 +970,54 @@
         "tradeoffs"
       ],
       "title": "Strategy",
+      "type": "object"
+    },
+    "StrategyExplanation": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "items": {
+            "maxLength": 600,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Assessment",
+          "type": "array"
+        },
+        "basis": {
+          "items": {
+            "maxLength": 600,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Basis",
+          "type": "array"
+        },
+        "cautions": {
+          "items": {
+            "maxLength": 600,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Cautions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "assessment",
+        "basis",
+        "cautions"
+      ],
+      "title": "StrategyExplanation",
       "type": "object"
     },
     "TimeInput": {

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 
@@ -24,6 +25,7 @@ from app.services.soil import SoilService
 CLIMATE_TIMEOUT_S = 15
 SOIL_TIMEOUT_S = 8
 _fetchers = ThreadPoolExecutor(max_workers=8, thread_name_prefix="analysis-fetch")
+logger = logging.getLogger(__name__)
 
 
 def soil_unavailable(lang: str) -> dict:
@@ -127,6 +129,7 @@ class AnalysisService:
         try:
             climate = climate_job.result(timeout=CLIMATE_TIMEOUT_S)
         except (ArchiveError, ClimateInputError, OSError, FutureTimeout) as exc:
+            logger.warning("Climate analysis failed: %s", type(exc).__name__, exc_info=True)
             raise ClimateUnavailable(CLIMATE_UNAVAILABLE[lang]) from exc
         try:
             soil = soil_job.result(timeout=SOIL_TIMEOUT_S)

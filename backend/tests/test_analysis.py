@@ -144,11 +144,13 @@ def test_soil_unavailable_is_partial_not_an_error():
     assert any("pH" in risk for risk in baseline.dimensions.risks)
 
 
-def test_climate_without_cache_is_502_with_detail():
+def test_climate_without_cache_is_502_with_detail(caplog):
     service = AnalysisService(climate=FakeClimate(fail=True), soil=FakeSoil(), allow_network=False)
     with client_with(service) as client:
         response = client.post("/api/v1/analyze", json=REQUEST)
     assert response.status_code == 502
+    assert "Climate analysis failed:" in caplog.text
+    assert caplog.records[-1].exc_info is not None
     assert response.json() == {
         "detail": [{"loc": [], "msg": "Data iklim belum bisa diambil. Coba lagi sebentar."}]
     }

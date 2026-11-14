@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from app.schemas import ChatInput
+from app.services.agent_fields import SavedFieldTools
 
 router = APIRouter()
 
@@ -18,4 +19,8 @@ async def chat(request: Request):
         body = ChatInput.model_validate_json(chunks)
     except ValidationError:
         return JSONResponse(status_code=400, content={"detail": "Pesan maksimal 2.000 karakter; riwayat maksimal 10 pesan user/assistant; bahasa id/en."})
-    return await request.app.state.agent.chat(body)
+    response = await request.app.state.agent.chat(
+        body, SavedFieldTools(request, request.app.state.analysis, body.lang),
+    )
+    response.headers["Cache-Control"] = "no-store"
+    return response

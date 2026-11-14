@@ -1,16 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSession } from "./useSession";
 
 export type ChatMessage = { role: "user" | "assistant"; content: string; blocked?: boolean };
 export type ChatLanguage = "id" | "en";
 
 export function useAgentChat(lang: ChatLanguage) {
+  const { user } = useSession();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const controller = useRef<AbortController | null>(null);
-  const last = useRef<{ message: string; history: ChatMessage[] } | null>(null);
+  const last = useRef<{ message: string; history: ChatMessage[]; field_id?: string } | null>(null);
 
   const reset = useCallback(() => {
     controller.current?.abort();
@@ -21,12 +23,16 @@ export function useAgentChat(lang: ChatLanguage) {
     setError("");
   }, []);
 
-  useEffect(() => { reset(); return () => controller.current?.abort(); }, [lang, reset]);
+  useEffect(() => { reset(); return () => controller.current?.abort(); }, [lang, user?.id, reset]);
 
   async function send(message: string, retry = false) {
     if (controller.current || !message.trim() || message.length > 2000) return;
     const boundary = messages.map((item) => item.blocked === true).lastIndexOf(true);
-    const payload = retry ? last.current : { message: message.trim(), history: messages.slice(boundary + 1).slice(-10).map(({ role, content }) => ({ role, content })) };
+    const fieldId = new URLSearchParams(window.location.search).get("lahan");
+    const payload = retry ? last.current : {
+      message: message.trim(), history: messages.slice(boundary + 1).slice(-10).map(({ role, content }) => ({ role, content })),
+      ...(fieldId ? { field_id: fieldId } : {}),
+    };
     if (!payload) return;
     last.current = payload;
     if (!retry) setMessages((items) => [...items, { role: "user", content: payload.message }]);
@@ -34,7 +40,7 @@ export function useAgentChat(lang: ChatLanguage) {
     setError("");
     const active = new AbortController();
     controller.current = active;
-    const timeout = setTimeout(() => active.abort(), 30_000);
+    const timeout = setTimeout(() => active.abort(), 60_000);
     try {
       const response = await fetch("/api/v1/agent/chat", {
         method: "POST",

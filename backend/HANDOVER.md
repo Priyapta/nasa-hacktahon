@@ -48,7 +48,7 @@ Gunakan katalog bersumber dan fungsi/service yang ada sebagai masukan mesin.
 | BE-12 | Versi awal selesai: 6 entri, 8 kandidat bersumber, 2 draft nonaktif; batas bukti di bawah |
 | BE-13 | Belum: validasi POWER terhadap CHIRPS/IMERG/BMKG dan pemilihan dua lokasi demo final |
 | BE-14 | Sebagian: dua agregat bulan dicek raw; cek air satu tahap, review rekan dan narasi belum |
-| BE-15 | Belum: koneksi aplikasi/migrasi database produksi; health tidak menguji PostgreSQL |
+| BE-15 | Akun username/password, sesi dan lahan per pengguna tersedia; migrasi PostgreSQL/Neon siap. Project Neon dan DATABASE_URL produksi belum tersedia. Health tetap liveness tanpa database. |
 
 Checkbox FE/AI pada tasks tidak diperiksa ulang dalam handover ini.
 

@@ -16,6 +16,7 @@ import {
 } from "./types";
 
 export interface PlanState {
+  fieldId?: string;
   step: 1 | 2;
   area: OpenRing | null;
   hasPattern: boolean;
@@ -142,6 +143,7 @@ export function parsePlan(params: URLSearchParams, now: Date): PlanState {
   const horizon = Number(params.get("horizon"));
   const water = params.get("air");
   return {
+    ...(params.get("lahan") ? { fieldId: params.get("lahan")! } : {}),
     step: params.get("langkah") === "2" && area ? 2 : 1,
     area,
     ...parsePattern(params.get("pola")),
@@ -157,6 +159,7 @@ export function serializePlan(
   { includeStep = true } = {},
 ): URLSearchParams {
   const params = new URLSearchParams();
+  if (plan.fieldId) params.set("lahan", plan.fieldId);
   if (includeStep && plan.step === 2) params.set("langkah", "2");
   if (plan.area) params.set("area", serializeArea(plan.area));
   const pattern = serializePattern(plan.hasPattern, plan.stages);

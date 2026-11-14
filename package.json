@@ -10,6 +10,7 @@
     "node": ">=22.9.0"
   },
   "scripts": {
+    "db:migrate": "node scripts/migrate-db.mjs",
     "dev": "npm run build --workspace @field-atlas/shared && node scripts/run-apps.mjs dev",
     "dev:frontend": "npm run build --workspace @field-atlas/shared && npm run dev --workspace @field-atlas/frontend --",
     "dev:backend": "node scripts/run-backend.mjs dev",

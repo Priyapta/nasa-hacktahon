@@ -1,7 +1,12 @@
-import { Check } from "lucide-react";
+"use client";
+
+import { Check, Menu, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { Dictionary } from "@/lib/i18n";
 import type { Lang } from "@/lib/types";
 import styles from "./AppHeader.module.css";
+import { useSession } from "@/hooks/useSession";
 
 export function Logo({ size = 32 }: { size?: number }) {
   return (
@@ -19,18 +24,26 @@ interface AppHeaderProps {
   lang: Lang;
   step: 1 | 2 | 3;
   onLangChange: (lang: Lang) => void;
+  showSteps: boolean;
+  menuOpen: boolean;
+  onMenuToggle?: () => void;
 }
 
-export default function AppHeader({ t, lang, step, onLangChange }: AppHeaderProps) {
+export default function AppHeader({ t, lang, step, onLangChange, showSteps, menuOpen, onMenuToggle }: AppHeaderProps) {
+  const { user } = useSession();
   const steps = [t.steps.land, t.steps.plan, t.steps.results];
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const accountHref = `/login?lang=${lang}&kembali=${encodeURIComponent(`${pathname}?${params}`)}`;
   return (
-    <header className="relative z-20 flex h-[60px] shrink-0 items-center gap-6 border-b-2 border-hairline bg-surface px-3 pl-4 lg:h-[68px] lg:px-6">
+    <header className="relative z-20 flex h-[60px] shrink-0 items-center gap-3 border-b-2 border-hairline bg-surface px-3 lg:h-[68px] lg:gap-6 lg:px-6">
+      {onMenuToggle && <button type="button" className="btn-secondary min-h-11 px-2.5 lg:hidden" aria-label="Menu" aria-expanded={menuOpen} aria-controls="app-navigation" onClick={onMenuToggle}>{menuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}</button>}
       <a href="/" className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-ink-strong no-underline lg:text-xl">
         <Logo size={30} />
         {t.appName}
       </a>
 
-      <ol aria-label={t.steps.label} className="m-0 hidden flex-1 list-none items-center justify-center gap-2.5 p-0 text-[15px] lg:flex">
+      {showSteps && <ol aria-label={t.steps.label} className="m-0 hidden flex-1 list-none items-center justify-center gap-2.5 p-0 text-[15px] lg:flex">
         {steps.map((label, index) => {
           const n = (index + 1) as 1 | 2 | 3;
           const done = n < step;
@@ -55,10 +68,10 @@ export default function AppHeader({ t, lang, step, onLangChange }: AppHeaderProp
             </li>
           );
         })}
-      </ol>
+      </ol>}
 
-      <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
-        <span className="mr-1 text-[13px] text-muted lg:hidden">{step < 3 ? t.stepOf(step) : ""}</span>
+      <div className="ml-auto flex items-center gap-1.5">
+        {!user && <Link href={accountHref} className="inline-flex min-h-11 items-center rounded-sm px-2 py-2 text-sm font-bold text-sawah-lip hover:bg-sawah-tint">{lang === "en" ? "Sign in" : "Masuk"}</Link>}
         <div role="group" aria-label={t.language} className={styles.language}>
           <span aria-hidden="true" className={styles.selection} data-lang={lang} />
           {(["id", "en"] as const).map((code) => (
