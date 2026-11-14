@@ -28,13 +28,32 @@
         "continues_after_horizon": {
           "title": "Continues After Horizon",
           "type": "boolean"
+        },
+        "water": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StageRain"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
         }
       },
       "required": [
         "crop_id",
         "start",
         "end",
-        "continues_after_horizon"
+        "continues_after_horizon",
+        "water",
+        "warnings"
       ],
       "title": "CalendarStage",
       "type": "object"
@@ -633,6 +652,27 @@
         "uncertainty"
       ],
       "title": "SoilUnavailable",
+      "type": "object"
+    },
+    "StageRain": {
+      "additionalProperties": false,
+      "properties": {
+        "years_met": {
+          "minimum": 0,
+          "title": "Years Met",
+          "type": "integer"
+        },
+        "years_total": {
+          "minimum": 0,
+          "title": "Years Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "years_met",
+        "years_total"
+      ],
+      "title": "StageRain",
       "type": "object"
     },
     "Strategy": {

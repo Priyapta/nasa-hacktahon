@@ -180,19 +180,31 @@
           "crop_id": "padi_sawah",
           "start": "2026-11",
           "end": "2027-02",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 8,
+            "years_total": 9
+          },
+          "warnings": []
         },
         {
           "crop_id": "bera",
           "start": "2027-03",
           "end": "2027-06",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
         },
         {
           "crop_id": "padi_sawah",
           "start": "2027-07",
           "end": "2027-10",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 8,
+            "years_total": 9
+          },
+          "warnings": []
         }
       ],
       "feasibility": {
@@ -235,19 +247,31 @@
           "crop_id": "jagung",
           "start": "2026-11",
           "end": "2027-02",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 8,
+            "years_total": 9
+          },
+          "warnings": []
         },
         {
           "crop_id": "bera",
           "start": "2027-03",
           "end": "2027-06",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
         },
         {
           "crop_id": "padi_sawah",
           "start": "2027-07",
           "end": "2027-10",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 8,
+            "years_total": 9
+          },
+          "warnings": []
         }
       ],
       "feasibility": {
@@ -290,19 +314,28 @@
           "crop_id": "orok_orok",
           "start": "2026-11",
           "end": "2027-02",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
         },
         {
           "crop_id": "bera",
           "start": "2027-03",
           "end": "2027-06",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
         },
         {
           "crop_id": "padi_sawah",
           "start": "2027-07",
           "end": "2027-10",
-          "continues_after_horizon": false
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 8,
+            "years_total": 9
+          },
+          "warnings": []
         }
       ],
       "feasibility": {

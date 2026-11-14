@@ -220,11 +220,24 @@ class EnvironmentalContext(ContractModel):
     soil: Annotated[SoilAvailable | SoilUnavailable, Field(discriminator="status")]
 
 
+class StageRain(ContractModel):
+    years_met: Count
+    years_total: Count
+
+    @model_validator(mode="after")
+    def valid_counts(self) -> Self:
+        if self.years_met > self.years_total:
+            raise ValueError("years_met tidak boleh melebihi years_total.")
+        return self
+
+
 class CalendarStage(ContractModel):
     crop_id: CropId
     start: Month
     end: Month
     continues_after_horizon: bool
+    water: StageRain | None
+    warnings: list[str]
 
     @model_validator(mode="after")
     def ordered_months(self) -> Self:

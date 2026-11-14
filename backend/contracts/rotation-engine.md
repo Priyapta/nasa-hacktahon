@@ -38,6 +38,18 @@ memanggil jaringan atau berkas.
 Semua ambang ada sebagai konstanta bernama di `app/core/feasibility.py` agar
 mudah ditinjau dan diubah.
 
+## Data per tahap di `calendar`
+
+Setiap item `calendar` membawa dua field tambahan untuk layar hasil:
+
+| Field | Isi |
+| --- | --- |
+| `water` | `years_met` dan `years_total` hujan tahap itu, sama dengan hitungan K5. `null` untuk bera, orok-orok, dan tahap tanpa jendela sah |
+| `warnings` | Kalimat untuk tahap itu saja: hujan di bawah ambang 60% (hanya tadah hujan) dan padi dengan kurang dari separuh bulan basah. Daftar kosong bila tidak ada |
+
+`dimensions.water_pressure` tetap memakai tahap terlemah. Field per tahap tidak
+mengubah aturan, hanya menunjukkan tahap mana yang menyebabkan hasilnya.
+
 ## Kode risiko
 
 Mesin mengembalikan kode, bukan kalimat. Kalimat dua bahasa dirakit BE-07.

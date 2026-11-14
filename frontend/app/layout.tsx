@@ -12,7 +12,7 @@ const lexend = Lexend({
 });
 
 export const metadata: Metadata = {
-  title: "Field Shift",
+  title: "TANI",
   description:
     "Bandingkan urutan tanam untuk lahan Anda dengan riwayat iklim NASA POWER dan data tanah SoilGrids.",
 };

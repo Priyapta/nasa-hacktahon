@@ -1,0 +1,434 @@
+{
+  "context": {
+    "climate": {
+      "period": "2016-01-01/2025-12-31",
+      "monthly": [
+        {
+          "month": 1,
+          "rain_median_mm": 296.41000232100487,
+          "rain_min_mm": 204.97000142931938,
+          "rain_max_mm": 388.99000111222267,
+          "class": "basah",
+          "t_mean_c": 26.303064469368227,
+          "t_min_c": 24.176774240309193,
+          "t_max_c": 30.516451435704386,
+          "rad": 16.854032258064514,
+          "rh_pct": 85.63177428706999,
+          "n_years": 10
+        },
+        {
+          "month": 2,
+          "rain_median_mm": 363.1649981737137,
+          "rain_min_mm": 276.0900022238493,
+          "rain_max_mm": 721.9300053119659,
+          "class": "basah",
+          "t_mean_c": 26.064285687037877,
+          "t_min_c": 23.998571395874023,
+          "t_max_c": 29.66379297190699,
+          "rad": 16.678214285714287,
+          "rh_pct": 86.94785676683699,
+          "n_years": 10
+        },
+        {
+          "month": 3,
+          "rain_median_mm": 224.00000095367432,
+          "rain_min_mm": 92.38999998569489,
+          "rain_max_mm": 462.79000183939934,
+          "class": "basah",
+          "t_mean_c": 26.58741929454188,
+          "t_min_c": 24.236128899358935,
+          "t_max_c": 30.06258072391633,
+          "rad": 17.448709677419355,
+          "rh_pct": 84.52935471073273,
+          "n_years": 10
+        },
+        {
+          "month": 4,
+          "rain_median_mm": 192.0249998047948,
+          "rain_min_mm": 135.2200008034706,
+          "rain_max_mm": 274.10999923944473,
+          "class": "lembap",
+          "t_mean_c": 26.79033327102661,
+          "t_min_c": 23.97600008646647,
+          "t_max_c": 30.08566640218099,
+          "rad": 17.812333333333335,
+          "rh_pct": 84.47683321634929,
+          "n_years": 10
+        },
+        {
+          "month": 5,
+          "rain_median_mm": 120.73999947495759,
+          "rain_min_mm": 21.70000014640391,
+          "rain_max_mm": 383.7399959564209,
+          "class": "lembap",
+          "t_mean_c": 26.751290229059034,
+          "t_min_c": 23.360967697635775,
+          "t_max_c": 30.99709658468923,
+          "rad": 18.019677419354835,
+          "rh_pct": 85.05338754961568,
+          "n_years": 10
+        },
+        {
+          "month": 6,
+          "rain_median_mm": 108.90500004962087,
+          "rain_min_mm": 0.7899999916553497,
+          "rain_max_mm": 243.51999667286873,
+          "class": "lembap",
+          "t_mean_c": 26.271833388010663,
+          "t_min_c": 22.27700004577637,
+          "t_max_c": 31.11099974314372,
+          "rad": 16.464666666666666,
+          "rh_pct": 84.24249992370605,
+          "n_years": 10
+        },
+        {
+          "month": 7,
+          "rain_median_mm": 31.21499988529831,
+          "rain_min_mm": 0.6300000045448542,
+          "rain_max_mm": 147.42999961040914,
+          "class": "kering",
+          "t_mean_c": 25.927419293311335,
+          "t_min_c": 21.786128936275357,
+          "t_max_c": 33.2848390148532,
+          "rad": 18.163709677419355,
+          "rh_pct": 79.74693519838394,
+          "n_years": 10
+        },
+        {
+          "month": 8,
+          "rain_median_mm": 45.51500036381185,
+          "rain_min_mm": 1.9400000479072332,
+          "rain_max_mm": 122.11999894492328,
+          "class": "kering",
+          "t_mean_c": 27.110645171134703,
+          "t_min_c": 22.280000071371756,
+          "t_max_c": 35.06774213237147,
+          "rad": 20.148870967741935,
+          "rh_pct": 71.37806449397917,
+          "n_years": 10
+        },
+        {
+          "month": 9,
+          "rain_median_mm": 118.40499984100461,
+          "rain_min_mm": 8.00999995879829,
+          "rain_max_mm": 367.4999971687794,
+          "class": "lembap",
+          "t_mean_c": 28.11683333714803,
+          "t_min_c": 23.395666631062827,
+          "t_max_c": 36.3879997253418,
+          "rad": 20.7065,
+          "rh_pct": 70.98033313751222,
+          "n_years": 10
+        },
+        {
+          "month": 10,
+          "rain_median_mm": 155.02499967534095,
+          "rain_min_mm": 9.100000100210309,
+          "rain_max_mm": 316.21000070497394,
+          "class": "lembap",
+          "t_mean_c": 27.756451514459428,
+          "t_min_c": 24.06387101450274,
+          "t_max_c": 37.676451775335494,
+          "rad": 20.261451612903226,
+          "rh_pct": 75.2870964542512,
+          "n_years": 10
+        },
+        {
+          "month": 11,
+          "rain_median_mm": 234.60500111430883,
+          "rain_min_mm": 54.14999940805137,
+          "rain_max_mm": 336.28999650478363,
+          "class": "basah",
+          "t_mean_c": 27.11400003433228,
+          "t_min_c": 24.484666506449383,
+          "t_max_c": 35.795000139872236,
+          "rad": 17.6455,
+          "rh_pct": 81.07766672770182,
+          "n_years": 10
+        },
+        {
+          "month": 12,
+          "rain_median_mm": 293.3450021604076,
+          "rain_min_mm": 181.52999883890152,
+          "rain_max_mm": 444.3600019812584,
+          "class": "basah",
+          "t_mean_c": 26.705322542498187,
+          "t_min_c": 24.249354823943108,
+          "t_max_c": 30.978387155840473,
+          "rad": 17.41048387096774,
+          "rh_pct": 83.27693545433783,
+          "n_years": 10
+        }
+      ]
+    },
+    "soil": {
+      "status": "ok",
+      "depth": "0-30cm",
+      "texture_class": "clay loam",
+      "ph": 5.474112754117975,
+      "soc_g_per_kg": 32.92240604193102,
+      "uncertainty": {
+        "phh2o": {
+          "q05": 4.05,
+          "q95": 7.2835073935308845
+        },
+        "soc": {
+          "q05": 3.0225123225514734,
+          "q95": 115.29254007878424
+        },
+        "clay": {
+          "q05": 1.0574460874513076,
+          "q95": 93.75567159568728
+        },
+        "sand": {
+          "q05": 2.6,
+          "q95": 74.31931145941849
+        },
+        "silt": {
+          "q05": 0.5888308688230388,
+          "q95": 86.80233056214526
+        }
+      }
+    }
+  },
+  "strategies": [
+    {
+      "id": "baseline",
+      "role": "pola_biasa",
+      "label": "Pola biasa Anda",
+      "calendar": [
+        {
+          "crop_id": "padi_sawah",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "padi_sawah",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": [
+            "Padi sawah mulai Mar 2027 hanya punya 1 dari 4 bulan basah."
+          ]
+        },
+        {
+          "crop_id": "bera",
+          "start": "2027-07",
+          "end": "2027-10",
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
+        }
+      ],
+      "feasibility": {
+        "passed": false,
+        "failed_rules": [
+          "K5"
+        ]
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "sedang",
+          "evidence": "5 dari 8 bulan tanam berada pada suhu optimal dan, untuk padi, pada bulan basah."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 9,
+          "years_total": 9
+        },
+        "bare_months": 4,
+        "soil_contribution": {
+          "legume": false,
+          "cover_crop": false,
+          "families": 1
+        },
+        "risks": []
+      },
+      "reasons": [
+        "Padi sawah mulai Mar 2027 hanya punya 1 dari 4 bulan basah.",
+        "Padi sawah ditempatkan pada Nov 2026 sampai Feb 2027 karena hujan selama tahap itu mencukupi di 9 dari 9 tahun acuan."
+      ],
+      "tradeoffs": [
+        "Ada 4 bulan lahan terbuka dalam horizon."
+      ]
+    },
+    {
+      "id": "grobogan-padi-jagung-bera",
+      "role": "hemat_air",
+      "label": "Hemat air",
+      "calendar": [
+        {
+          "crop_id": "padi_sawah",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "jagung",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 8,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "bera",
+          "start": "2027-07",
+          "end": "2027-10",
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "tinggi",
+          "evidence": "8 dari 8 bulan tanam berada pada suhu optimal dan, untuk padi, pada bulan basah."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 8,
+          "years_total": 9
+        },
+        "bare_months": 4,
+        "soil_contribution": {
+          "legume": false,
+          "cover_crop": false,
+          "families": 1
+        },
+        "risks": []
+      },
+      "reasons": [
+        "Padi sawah ditempatkan pada Nov 2026 sampai Feb 2027 karena hujan selama tahap itu mencukupi di 9 dari 9 tahun acuan.",
+        "Jagung ditempatkan pada Mar 2027 sampai Jun 2027 karena hujan selama tahap itu mencukupi di 8 dari 9 tahun acuan."
+      ],
+      "tradeoffs": [
+        "Tahap terlemah lebih bergantung hujan: mencukupi di 8 dari 9 tahun, pola biasa 9 dari 9.",
+        "Ada 4 bulan lahan terbuka dalam horizon."
+      ]
+    },
+    {
+      "id": "grobogan-padi-kacang-hijau-bera",
+      "role": "jaga_tanah",
+      "label": "Jaga tanah",
+      "calendar": [
+        {
+          "crop_id": "padi_sawah",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "kacang_hijau",
+          "start": "2027-03",
+          "end": "2027-04",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "bera",
+          "start": "2027-05",
+          "end": "2027-10",
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "tinggi",
+          "evidence": "6 dari 6 bulan tanam berada pada suhu optimal dan, untuk padi, pada bulan basah."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 9,
+          "years_total": 9
+        },
+        "bare_months": 6,
+        "soil_contribution": {
+          "legume": true,
+          "cover_crop": false,
+          "families": 2
+        },
+        "risks": [
+          "Kebutuhan air Kacang hijau memakai nilai pendekatan dari kacang buncis FAO."
+        ]
+      },
+      "reasons": [
+        "Padi sawah ditempatkan pada Nov 2026 sampai Feb 2027 karena hujan selama tahap itu mencukupi di 9 dari 9 tahun acuan.",
+        "Kacang hijau ditempatkan pada Mar 2027 sampai Apr 2027 karena hujan selama tahap itu mencukupi di 9 dari 9 tahun acuan.",
+        "Memuat tanaman penambat nitrogen atau pupuk hijau, dengan 2 famili tanaman."
+      ],
+      "tradeoffs": [
+        "Lahan terbuka bertambah dari 4 menjadi 6 bulan dibanding pola biasa Anda."
+      ]
+    }
+  ],
+  "notes": [
+    "Hujan belum divalidasi terhadap dataset pembanding."
+  ],
+  "provenance": {
+    "climate": {
+      "source": "NASA POWER",
+      "fetched_at": "2026-11-14T07:53:26.579352+00:00",
+      "resolution": "Sel grid 0,5° x 0,625°, sekitar 50 km. Nilai area, bukan pengukuran di lahan.",
+      "missing_days": 0,
+      "rain_source": "POWER",
+      "rain_validation": {
+        "reference": null,
+        "annual_diff_pct": null,
+        "months_class_differs": null,
+        "status": "unvalidated"
+      }
+    },
+    "soil": {
+      "source": "SoilGrids 2.0",
+      "fetched_at": "2026-11-14T11:32:33.485498+00:00",
+      "resolution": "250 m"
+    },
+    "crop_table_version": "2026-11-14.v1:a61b3ccb0d6b",
+    "assumptions": [
+      "Data area grid adalah estimasi, bukan pengukuran langsung di lahan.",
+      "Estimasi berbasis pola historis, bukan prediksi atau peluang untuk tahun depan.",
+      "Tidak ada ekstrapolasi tren; sepuluh tahun belum mewakili seluruh kejadian ekstrem.",
+      "Hujan bulanan adalah jumlah observasi tanpa koreksi hari hilang; radiasi dan kelembapan adalah rata-rata.",
+      "Hujan dianggap cukup bila mencapai batas bawah kebutuhan air tanaman pada minimal 60% tahun acuan. Penguapan, limpasan, dan simpanan air tanah tidak dihitung.",
+      "Hitungan X dari N tahun adalah frekuensi historis, bukan peluang untuk tahun depan."
+    ]
+  }
+}
