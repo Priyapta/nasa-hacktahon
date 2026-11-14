@@ -367,6 +367,9 @@ export default function InputFlow() {
                     </div>
                     <RotationBuilder
                       t={t}
+                      lang={plan.lang}
+                      startMonth={plan.startMonth}
+                      horizon={plan.horizon}
                       crops={crops}
                       cropsFailed={cropsFailed}
                       onRetry={() => setCropsAttempt((n) => n + 1)}
@@ -385,7 +388,7 @@ export default function InputFlow() {
                     <WaterSourceToggle t={t} value={plan.water} onChange={(water) => replacePlan({ water })} />
                   </div>
                   <div className="sticky bottom-0 flex flex-col gap-2 border-t-2 border-hairline bg-surface px-3 py-3 lg:static lg:px-8 lg:pb-6 lg:pt-4">
-                    {!analysisInput && <p className="m-0 text-[13px] text-muted">{t.plan.missing}</p>}
+                    {!analysisInput && <p className="m-0 text-[13px] text-muted">{!measured ? t.land.invalid : !plan.water ? t.plan.chooseWater : t.plan.missing}</p>}
                     <div className="flex gap-2.5">
                       <Link href={href({ ...plan, step: 1 })} onNavigate={(event) => navigateStep(event, 1)} className="btn-secondary min-h-14 px-5">
                         {t.plan.back}

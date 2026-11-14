@@ -9,7 +9,7 @@ const copy = {
   id: {
     loading: "Sedang menganalisis lahan…", failed: "Analisis belum berhasil. Silakan coba lagi.",
     retry: "Coba lagi", incomplete: "Lengkapi batas lahan, pola tanam, dan sumber air terlebih dahulu.",
-    historical: "Estimasi berbasis pola historis", soil: "Tanah", unavailable: "Data tanah tidak tersedia; kesesuaian pH belum dinilai.",
+    historical: "Estimasi berbasis pola historis", soil: "Tanah", unavailable: "Data tanah tidak tersedia. Kesesuaian pH belum dinilai.",
     passed: "Lolos aturan kelayakan", failedRules: "Aturan yang belum terpenuhi", empty: "Belum ada alternatif yang lolos untuk input ini.",
     calendar: "Kalender tanam", continues: "berlanjut setelah horizon", reasons: "Alasan", tradeoffs: "Kompromi", risks: "Risiko",
     climate: "Kesesuaian iklim", water: "Tekanan air", bare: "Bulan lahan terbuka", soilContribution: "Kontribusi tanah",
@@ -21,7 +21,7 @@ const copy = {
   en: {
     loading: "Analyzing your field…", failed: "Analysis could not be completed. Please try again.",
     retry: "Try again", incomplete: "Complete the field boundary, cropping pattern, and water source first.",
-    historical: "Estimate based on historical patterns", soil: "Soil", unavailable: "Soil data is unavailable; pH suitability has not been assessed.",
+    historical: "Estimate based on historical patterns", soil: "Soil", unavailable: "Soil data is unavailable. pH suitability has not been assessed.",
     passed: "Passed feasibility rules", failedRules: "Rules not met", empty: "No alternatives passed for these inputs.",
     calendar: "Planting calendar", continues: "continues beyond the horizon", reasons: "Reasons", tradeoffs: "Tradeoffs", risks: "Risks",
     climate: "Climate fit", water: "Water pressure", bare: "Bare months", soilContribution: "Soil contribution",
@@ -83,7 +83,7 @@ export default function AnalysisResults({ plan }: { plan: PlanState }) {
             <div><dt className="font-bold">{t.climate}</dt><dd className="m-0">{level(strategy.dimensions.climate_fit.level)} — {strategy.dimensions.climate_fit.evidence}</dd></div>
             <div><dt className="font-bold">{t.water}</dt><dd className="m-0">{level(strategy.dimensions.water_pressure.level)} ({strategy.dimensions.water_pressure.years_met}/{strategy.dimensions.water_pressure.years_total})</dd></div>
             <div><dt className="font-bold">{t.bare}</dt><dd className="m-0">{strategy.dimensions.bare_months}</dd></div>
-            <div><dt className="font-bold">{t.soilContribution}</dt><dd className="m-0">{t.legume}: {strategy.dimensions.soil_contribution.legume ? t.yes : t.no}; {t.cover}: {strategy.dimensions.soil_contribution.cover_crop ? t.yes : t.no}; {t.families}: {strategy.dimensions.soil_contribution.families}</dd></div>
+            <div><dt className="font-bold">{t.soilContribution}</dt><dd className="m-0">{t.legume}: {strategy.dimensions.soil_contribution.legume ? t.yes : t.no} · {t.cover}: {strategy.dimensions.soil_contribution.cover_crop ? t.yes : t.no} · {t.families}: {strategy.dimensions.soil_contribution.families}</dd></div>
           </dl>
           <TextList title={t.reasons} items={strategy.reasons} />
           <TextList title={t.tradeoffs} items={strategy.tradeoffs} />
