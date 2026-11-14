@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal, Mapping, Sequence
 
-from app.core.feasibility import Risk
+from app.core.feasibility import WATER_SHARE_THRESHOLD, Risk
 from app.core.selector import Scored, Selection
 
 Lang = Literal["id", "en"]
@@ -154,6 +154,39 @@ def _stage_reasons(item: Scored, crops, start_month: str, water_source: str, lan
     return lines
 
 
+def _stage_rain(item: Scored, index: int):
+    for water in item.evaluation.stage_water:
+        if water.stage_index == index and water.total:
+            return {"years_met": water.met, "years_total": water.total}
+    return None
+
+
+def _stage_warnings(item: Scored, index: int, crops, start_month: str, water_source: str, lang: Lang):
+    stage = item.plan[index]
+    lines = []
+    for water in item.evaluation.stage_water:
+        if (
+            water.stage_index == index
+            and water_source == "tadah_hujan"
+            and water.share is not None
+            and water.share < WATER_SHARE_THRESHOLD
+        ):
+            name = crop_name(crops, water.crop_id, lang)
+            lines.append(
+                f"Hujan untuk {name} mencukupi hanya di {water.met} dari {water.total} tahun acuan."
+                if lang == "id"
+                else f"Rain for {name} was enough in only {water.met} of {water.total} reference years."
+            )
+    for risk in item.evaluation.risks:
+        if (
+            risk.code == "paddy_outside_wet"
+            and risk.crop_id == stage.crop_id
+            and risk.get("start") == stage.start(start_month)
+        ):
+            lines.append(risk_text(risk, crops, lang))
+    return lines
+
+
 def _failure_reasons(item: Scored, crops, lang: Lang):
     lines = []
     if "K5" in item.evaluation.failed_rules:
@@ -250,8 +283,10 @@ def strategy_payload(
                 "start": stage.start(start_month),
                 "end": stage.end(start_month),
                 "continues_after_horizon": stage.continues_after_horizon,
+                "water": _stage_rain(item, index),
+                "warnings": _stage_warnings(item, index, crops, start_month, water_source, lang),
             }
-            for stage in item.plan
+            for index, stage in enumerate(item.plan)
         ],
         "feasibility": {
             "passed": item.evaluation.passed,

@@ -124,3 +124,33 @@ def test_open_land_and_failure_reasons_are_not_repeated():
     )
     open_land = [t for t in payload["tradeoffs"] if "lahan terbuka" in t.lower()]
     assert len(open_land) == 1
+
+
+def test_calendar_carries_rain_and_warnings_for_each_stage():
+    from tests.test_rotation_engine import profile
+
+    baseline = scored("baseline", ["padi_sawah", "padi_sawah", "bera:4"], prof=profile())
+    payload = strategy_payload(
+        "pola_biasa", baseline, baseline=None, crops=CROPS,
+        start_month=START, water_source="tadah_hujan", lang="id",
+    )
+    first, second, fallow = payload["calendar"]
+    waters = {w.stage_index: w for w in baseline.evaluation.stage_water}
+    assert first["water"] == {"years_met": waters[0].met, "years_total": waters[0].total}
+    assert first["warnings"] == []
+    assert second["warnings"] == ["Padi sawah mulai Mar 2027 hanya punya 1 dari 4 bulan basah."]
+    assert fallow == {**fallow, "water": None, "warnings": []}
+
+
+def test_stage_rain_shortfall_is_a_warning_only_without_irrigation():
+    baseline = scored("baseline", ["padi_sawah", "jagung", "bera:4"], monthly=rain(20))
+    rainfed = strategy_payload(
+        "pola_biasa", baseline, baseline=None, crops=CROPS,
+        start_month=START, water_source="tadah_hujan", lang="id",
+    )
+    assert rainfed["calendar"][0]["warnings"][0] == "Hujan untuk Padi sawah mencukupi hanya di 0 dari 9 tahun acuan."
+    irrigated = strategy_payload(
+        "pola_biasa", baseline, baseline=None, crops=CROPS,
+        start_month=START, water_source="irigasi", lang="en",
+    )
+    assert not any("Rain for" in w for stage in irrigated["calendar"] for w in stage["warnings"])
