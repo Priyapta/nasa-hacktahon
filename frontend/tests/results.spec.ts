@@ -54,6 +54,9 @@ test("the results screen animates the chosen strategy month by month", async ({ 
 
   await expect(page.getByText("Lempung berliat")).toBeVisible();
   await expect(page.getByText("2.183 mm")).toBeVisible();
+  await page.getByText("Dari mana angka ini", { exact: true }).click();
+  await expect(page.getByText("Data area grid adalah estimasi, bukan pengukuran langsung di lahan.")).toBeVisible();
+  await expect(page.getByText(/divalidasi/)).toHaveCount(0);
 });
 
 test("the results screen shows the submitted plan and changes it only through the form", async ({ page }) => {
@@ -96,18 +99,13 @@ test("pattern explanations use the requested format and distinguish usual patter
   await page.goto(`/hasil?${plan}`);
   const explanation = page.getByRole("region", { name: "Bagaimana pola biasa Anda dinilai?" });
   await expect(explanation).toContainText("bukan rekomendasi baru");
-  const lists = explanation.locator("ul.list-disc");
-  await expect(lists).toHaveCount(3);
-  await expect(lists.nth(0).getByRole("listitem")).toHaveCount(3);
-  await expect(lists.nth(1).getByRole("listitem")).toHaveCount(3);
-  await expect(lists.nth(2).getByRole("listitem")).toHaveCount(2);
-  await expect(explanation.getByRole("heading", { name: "Dasar rekomendasi", exact: true })).toBeVisible();
+  await expect(explanation.getByRole("list", { name: "Penilaian per tahap" }).getByRole("listitem")).toHaveCount(3);
+  await expect(explanation.getByRole("heading", { name: "Dasar rekomendasi", exact: true })).toHaveCount(0);
   await expect(explanation.getByRole("heading", { name: "Catatan penting", exact: true })).toBeVisible();
-  await expect(explanation).toContainText("Curah hujan belum divalidasi dengan data pembanding.");
   await page.getByRole("radio", { name: /Hemat air/ }).click();
   const recommended = page.getByRole("region", { name: "Mengapa pola ini direkomendasikan?" });
   await expect(recommended).toContainText("Jagung ditempatkan pada Mar 2027 sampai Jun 2027");
-  await expect(recommended).toContainText("8 dari 9 tahun acuan");
+  await expect(recommended.getByText("8 dari 9 tahun", { exact: true })).toBeVisible();
   await recommended.getByText("Catatan", { exact: true }).click();
   await expect(recommended).toContainText("Ada 4 bulan lahan terbuka");
   await recommended.screenshot({ path: "/tmp/tani-recommendation-explanation.png" });
@@ -119,7 +117,6 @@ test("unavailable soil is not listed as a source used for the recommendation", a
   await page.route("**/api/v1/analyze", (route) => route.fulfill({ json: result }));
   await page.goto(`/hasil?${plan}`);
   const explanation = page.getByRole("region", { name: "Bagaimana pola biasa Anda dinilai?" });
-  await expect(explanation).toContainText("Data tanah belum tersedia");
   await expect(explanation).not.toContainText("SoilGrids");
 });
 
@@ -133,8 +130,27 @@ test("result sections display the LLM points supplied by the backend", async ({ 
   await page.route("**/api/v1/analyze", (route) => route.fulfill({ json: result }));
   await page.goto(`/hasil?${plan}`);
   const section = page.getByRole("region", { name: "Bagaimana pola biasa Anda dinilai?" });
-  const lists = section.locator("ul.list-disc");
-  await expect(lists.nth(0).getByRole("listitem")).toHaveText(result.strategies[0].explanation.assessment);
-  await expect(lists.nth(1).getByRole("listitem")).toHaveText(result.strategies[0].explanation.basis);
-  await expect(lists.nth(2).getByRole("listitem")).toHaveText(result.strategies[0].explanation.cautions);
+  await expect(section.getByRole("list", { name: "Penilaian per tahap" }).getByRole("listitem")).toHaveText(result.strategies[0].explanation.assessment);
+  for (const point of result.strategies[0].explanation.cautions) await expect(section).toContainText(point);
+  await expect(section).not.toContainText(result.strategies[0].explanation.basis[0]);
+});
+
+test("LLM points are split into a highlighted lead, year counts and short notes", async ({ page }) => {
+  const result = JSON.parse(analysis);
+  result.strategies[0].explanation = {
+    assessment: ["Padi sawah, Agu–Nov 2027: hujan memenuhi batas kebutuhan pada 7 dari 9 tahun acuan; pemeriksaan aturan K5 gagal."],
+    basis: ["Sumber iklim: NASA POWER, periode 2016-01-01/2025-12-31; data dari sel grid sekitar 50 km."],
+    cautions: ["Frekuensi historis bukan ramalan; hitungan memakai 60% tahun acuan.", "Hujan adalah estimasi area.", "Sesuaikan dengan penyuluh; ini bukan jaminan hasil."],
+  };
+  await page.route("**/api/v1/analyze", (route) => route.fulfill({ json: result }));
+  await page.goto(`/hasil?${plan}`);
+  const section = page.getByRole("region", { name: "Bagaimana pola biasa Anda dinilai?" });
+  const stage = section.getByRole("list", { name: "Penilaian per tahap" }).getByRole("listitem");
+  await expect(stage.getByText("Padi sawah, Agu–Nov 2027", { exact: true })).toBeVisible();
+  await expect(stage.getByText("7 dari 9 tahun", { exact: true })).toBeVisible();
+  await expect(stage).toContainText("Pemeriksaan aturan K5 gagal.");
+  await expect(section).toContainText("Hitungan memakai 60% tahun acuan.");
+  await section.getByText("Lihat 2 catatan lain", { exact: true }).click();
+  await expect(section).toContainText("Ini bukan jaminan hasil.");
+  await section.screenshot({ path: "/tmp/tani-explanation-tidy.png" });
 });

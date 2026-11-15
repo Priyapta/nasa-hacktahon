@@ -1,7 +1,9 @@
 import { meters, periodYears, timeline, type AnalysisResponse, type Strategy } from "@/lib/analysis";
 import type { Dictionary } from "@/lib/i18n";
-import { recommendationExplanation, recommendationSources } from "@/lib/recommendation";
+import { recommendationExplanation } from "@/lib/recommendation";
 import type { Lang } from "@/lib/types";
+import { CircleCheck, CircleMinus, Info, TriangleAlert } from "lucide-react";
+import { countSegments, isRainValidationNote, pointTone, sentences, splitLead, type Tone } from "@/lib/explanation-format";
 import { CROP_LOOK } from "./FieldSeason";
 
 type T = Dictionary["results"];
@@ -142,32 +144,65 @@ export function DimensionTable({ strategies, selected, horizon, t }: { strategie
   );
 }
 
-export function WhyCard({ strategy, result, lang, t }: { strategy: Strategy; result: AnalysisResponse; lang: Lang; t: T }) {
+const TONE_ICON = { ok: CircleCheck, warn: TriangleAlert, neutral: CircleMinus } as const;
+const TONE_ICON_CLASS = { ok: "text-sawah", warn: "text-[#b4562a]", neutral: "text-muted" } as const;
+
+function cropFromText(text: string, names: Record<string, string>): string | null {
+  const lower = text.toLowerCase();
+  const hit = Object.entries(names).find(([, name]) => lower.startsWith(name.toLowerCase()));
+  return hit ? hit[0] : null;
+}
+
+function Highlighted({ text, tone, lang }: { text: string; tone: Tone; lang: Lang }) {
+  return <>{countSegments(text, lang).map((segment, i) => "label" in segment
+    ? <span key={i} className={`ml-0.5 inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-[13px] font-bold ${tone === "warn" ? "bg-[#f8e9df] text-[#8e4220]" : "bg-sawah-tint text-sawah-lip"}`}>{segment.label}</span>
+    : <span key={i}>{segment.text}</span>)}</>;
+}
+
+export function WhyCard({ strategy, lang, t }: { strategy: Strategy; lang: Lang; t: T }) {
   const explanation = recommendationExplanation(strategy, lang);
   const notes = [...new Set([
     ...strategy.reasons.filter((reason) => !explanation.includes(reason)),
     ...strategy.tradeoffs,
     ...strategy.dimensions.risks,
   ])];
+  const cautions = (strategy.explanation?.cautions ?? t.disclaimer).flatMap(sentences).filter((point) => !isRainValidationNote(point));
+  const shown = cautions.slice(0, 3);
+  const hidden = cautions.slice(3);
   return (
     <section className="surface flex flex-col gap-5 px-5 py-[18px]" aria-labelledby="recommendation-title">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <h2 id="recommendation-title" className="m-0 text-lg font-bold">{strategy.role === "pola_biasa" ? t.usualWhyTitle : t.whyTitle}</h2>
-        <ul className="m-0 list-disc space-y-2 pl-5 text-sm leading-relaxed">
-          {explanation.map((point) => <li key={point}>{point}</li>)}
+        <ul aria-label={t.assessmentList} className="m-0 flex list-none flex-col gap-2 p-0">
+          {explanation.map((point) => {
+            const tone = pointTone(point);
+            const { lead, body } = splitLead(point);
+            const crop = cropFromText(lead ?? point, t.crops);
+            const Icon = TONE_ICON[tone];
+            return (
+              <li key={point} className="flex gap-3 rounded-md bg-canvas px-3.5 py-3 text-sm leading-relaxed">
+                <Icon size={18} className={`mt-0.5 shrink-0 ${TONE_ICON_CLASS[tone]}`} aria-hidden="true" />
+                <span className="min-w-0">
+                  {lead && <span className="flex items-center gap-2 font-bold text-ink-strong">
+                    {crop && <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ background: CROP_LOOK[crop].bg, border: crop === "bera" ? "1.5px dashed #cf9a7b" : undefined }} />}
+                    {lead}
+                  </span>}
+                  {sentences(body).map((sentence) => <span key={sentence} className="block"><Highlighted text={sentence} tone={tone} lang={lang} /></span>)}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </div>
-      <div className="flex flex-col gap-2 border-t-2 border-hairline pt-4">
-        <h3 className="m-0 text-base font-bold">{t.recommendationBasis}</h3>
-        <ul className="m-0 list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted">
-          {(strategy.explanation?.basis ?? recommendationSources(result, lang)).map((source) => <li key={source}>{source}</li>)}
-        </ul>
-      </div>
-      <div className="flex flex-col gap-2 border-t-2 border-hairline pt-4">
+      <div className="flex flex-col gap-2.5 border-t-2 border-hairline pt-4">
         <h3 className="m-0 text-base font-bold">{t.importantNote}</h3>
-        <ul className="m-0 list-disc space-y-2 pl-5 text-sm leading-relaxed">
-          {(strategy.explanation?.cautions ?? t.disclaimer).map((point) => <li key={point}>{point}</li>)}
+        <ul className="m-0 flex list-none flex-col gap-2 p-0 text-sm leading-relaxed">
+          {shown.map((point) => <li key={point} className="flex gap-2.5"><Info size={16} className="mt-0.5 shrink-0 text-muted" aria-hidden="true" />{point}</li>)}
         </ul>
+        {hidden.length > 0 && <details className="text-sm leading-relaxed">
+          <summary className="min-h-11 cursor-pointer py-3 font-bold text-sawah-lip">{t.moreNotes(hidden.length)}</summary>
+          <ul className="m-0 flex list-none flex-col gap-2 p-0">{hidden.map((point) => <li key={point} className="flex gap-2.5"><Info size={16} className="mt-0.5 shrink-0 text-muted" aria-hidden="true" />{point}</li>)}</ul>
+        </details>}
         {notes.length > 0 && <details className="mt-1 text-sm leading-relaxed">
           <summary className="min-h-11 cursor-pointer py-3 font-bold text-sawah-lip">{t.notesTitle}</summary>
           <ul className="m-0 space-y-2 pl-5 text-muted">{notes.map((note) => <li key={note}>{note}</li>)}</ul>
@@ -196,7 +231,7 @@ export function Sources({ result, t }: { result: AnalysisResponse; t: T }) {
           <dd className="m-0">{p.crop_table_version.split(":")[0]}</dd>
         </dl>
         <ul className="m-0 pl-[18px]">
-          {[...result.notes, ...p.assumptions].map((x) => (
+          {[...result.notes, ...p.assumptions].filter((x) => !isRainValidationNote(x)).map((x) => (
             <li key={x}>{x}</li>
           ))}
         </ul>
