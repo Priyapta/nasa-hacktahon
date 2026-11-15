@@ -12,6 +12,7 @@ test("landing shows the product in Indonesian and English and starts the input f
   await page.route("**/api/v1/auth/me", (route) => route.fulfill({ status: 401, json: { detail: "Masuk dulu." } }));
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Sesuaikan pola tanam dengan iklim dan tanah lahan Anda.");
+  await expect(page.getByText("Gambar buatan SI", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Dibuat untuk sawah kecil, dari Sabang sampai Merauke" })).toBeVisible();
   await expect(page.getByText("BPS, Sensus Pertanian 2023").first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Masuk", exact: true })).toHaveAttribute("href", "/login?lang=id");

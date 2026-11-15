@@ -8,6 +8,7 @@ import type { Polygon } from "geojson";
 import { ArrowUp, CalendarDays, Map as MapIcon, Sprout } from "lucide-react";
 import CropyOrb from "@/components/agent/CropyOrb";
 import { Logo } from "@/components/shell/AppHeader";
+import SiImageLabel from "@/components/shell/SiImageLabel";
 import SatelliteThumb from "@/components/account/SatelliteThumb";
 import { CROP_LOOK } from "@/components/results/FieldSeason";
 import { useSession } from "@/hooks/useSession";
@@ -86,6 +87,7 @@ function Hero({ lang }: { lang: Lang }) {
         <h1 id="hero-title" className="m-0 max-w-[9.5em] text-[44px] font-bold leading-none tracking-[-0.03em] [text-shadow:0_2px_24px_rgba(0,0,0,0.3)] md:text-[clamp(48px,5.6vw,76px)]">{t.heroTitle}</h1>
         <Link href={`/lahan?lang=${lang}`} className="btn-primary self-start">{t.start}</Link>
       </div>
+      <SiImageLabel en={lang === "en"} className="bottom-3 left-4 sm:left-8" />
     </section>
   );
 }
