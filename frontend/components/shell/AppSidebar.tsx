@@ -25,7 +25,7 @@ export default function AppSidebar({ username, lang, menuOpen, onClose, onLogout
           className={`flex min-h-12 items-center gap-3 rounded-md px-3 py-3 font-bold text-white no-underline hover:bg-white/20 ${inFields ? "bg-white/15" : ""}`}>
           <LayoutGrid size={20} aria-hidden="true" />{en ? "My fields" : "Lahan saya"}
         </Link>
-        <Link href={`/?lang=${lang}`} aria-current={!inFields ? "page" : undefined} onClick={onClose}
+        <Link href={`/lahan?lang=${lang}`} aria-current={!inFields ? "page" : undefined} onClick={onClose}
           className={`flex min-h-12 items-center gap-3 rounded-md px-3 py-3 font-bold text-white no-underline hover:bg-white/20 ${!inFields ? "bg-white/15" : ""}`}>
           <Plus size={20} aria-hidden="true" />{en ? "Add field" : "Tambah lahan"}
         </Link>

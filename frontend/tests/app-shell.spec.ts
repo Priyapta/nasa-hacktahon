@@ -27,7 +27,7 @@ test("navbar is global and a logged-in sidebar stays on details and the planting
   await expect(page.getByRole("banner")).toHaveCount(1);
   await expect(page.getByLabel("Bahasa")).toHaveCount(1);
   await nav.getByRole("link", { name: "Tambah lahan" }).click();
-  await expect(page).toHaveURL(/\/\?lang=id$/);
+  await expect(page).toHaveURL(/\/lahan\?lang=id$/);
   await expect(nav.getByRole("link", { name: "Tambah lahan" })).toHaveAttribute("aria-current", "page");
   await expect(page.getByRole("list", { name: "Langkah" })).toBeVisible();
   await expect(page.getByRole("banner")).toHaveCount(1);

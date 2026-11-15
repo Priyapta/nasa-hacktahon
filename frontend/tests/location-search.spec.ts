@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("Cinunuk Bandung can be searched and selected through the real backend", async ({ page }) => {
   test.setTimeout(45000);
   await page.route(/https:\/\/(clarity\.maptiles\.arcgis\.com|services\.arcgisonline\.com)\//, (route) => route.abort());
-  await page.goto("/?lang=id");
+  await page.goto("/lahan?lang=id");
   await expect(page.locator(".maplibregl-canvas")).toBeVisible();
   const response = page.waitForResponse((res) => res.url().includes("/api/v1/geocode?q=Cinunuk"));
   await page.getByLabel("Cari desa atau koordinat").fill("Cinunuk");

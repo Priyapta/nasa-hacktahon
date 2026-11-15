@@ -6,7 +6,7 @@ test.use({ trace: "on" });
 
 test("Cropy liquid layers and contour flow continuously, then freeze for reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/?lang=id");
+  await page.goto("/lahan?lang=id");
   const launcher = page.locator('button[aria-controls="field-agent-chat"]');
   const orb = launcher.locator("[data-cropy-orb]");
   const contour = orb.locator("[data-cropy-contour]");
@@ -69,7 +69,7 @@ test("Cropy ripples on click and increases fluid intensity while thinking", asyn
     await gate;
     await route.fulfill({ json: { answer: "Rotasi membantu menjaga kesehatan tanah.", sources: [], scenario: null } });
   });
-  await page.goto("/?lang=id");
+  await page.goto("/lahan?lang=id");
   const launcher = page.locator('button[aria-controls="field-agent-chat"]');
   const orb = launcher.locator("[data-cropy-orb]");
   await launcher.click();
@@ -93,7 +93,7 @@ test("Cropy ripples on click and increases fluid intensity while thinking", asyn
 for (const motion of ["reduce", "no-preference"] as const) {
   test(`Cropy launcher morphs to its logo and back with ${motion} motion`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: motion });
-    await page.goto("/?lang=id");
+    await page.goto("/lahan?lang=id");
     const launcher = page.locator('button[aria-controls="field-agent-chat"]');
     const label = launcher.locator(':scope > span').last();
     await expect(launcher).toHaveAccessibleName("Ask Cropy");
@@ -189,7 +189,7 @@ test("floating chat supports conversation, failure retry, reset, keyboard and mo
     if (attempts === 2) await route.fulfill({ status: 502, json: { detail: "DeepSeek sementara tidak tersedia." } });
     else await route.fulfill({ json: { answer: body.message === "What do cover crops do?" ? "Cover crops help protect the soil." : "Ini jawaban uji tentang rotasi tanaman.", sources: [], scenario: null } });
   });
-  await page.goto("/?lang=id");
+  await page.goto("/lahan?lang=id");
   const launcher = page.getByRole("button", { name: "Ask Cropy", exact: true });
   await launcher.click();
   const dialog = page.getByRole("dialog");
@@ -246,7 +246,7 @@ test("floating chat supports conversation, failure retry, reset, keyboard and mo
 
 test("dialog animates from its launcher and returns focus after closing", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/?lang=id");
+  await page.goto("/lahan?lang=id");
   const launcher = page.getByRole("button", { name: "Ask Cropy", exact: true });
   await launcher.click();
   const dialog = page.getByRole("dialog");
@@ -266,7 +266,7 @@ test("clearing a pending request prevents late replies reappearing", async ({ pa
     await gate;
     await route.fulfill({ json: { answer: "Old reply", sources: [], scenario: null } }).catch(() => {});
   });
-  await page.goto("/?lang=id");
+  await page.goto("/lahan?lang=id");
   await page.getByRole("button", { name: "Ask Cropy", exact: true }).click();
   await page.getByLabel("Pertanyaan Anda", { exact: true }).fill("Pertanyaan tertunda");
   await page.getByRole("button", { name: "Kirim pertanyaan", exact: true }).click();
@@ -290,7 +290,7 @@ test('policy refusal remains visible but is excluded from subsequent request his
       await route.fulfill({ json: { answer: 'Jawaban pertanian yang sesuai konteks.', sources: [], scenario: null } });
     }
   });
-  await page.goto('/?lang=id');
+  await page.goto('/lahan?lang=id');
   await page.getByRole('button', { name: 'Ask Cropy', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Run Python code');
@@ -309,7 +309,7 @@ test('agronomy answers render compact paragraphs, bold and lists as safe text', 
   await page.route('**/api/v1/agent/chat', route => route.fulfill({ json: {
     answer: 'Saat air mulai terbatas, pertimbangkan tanaman berikut.\n\n- **Pilih palawija**: Contohnya kacang hijau sesudah padi.\n- **Cek tanah**: Cocokkan kondisi lahan bersama PPL.\n\n<script>alert(1)</script>', sources: [], scenario: null,
   } }));
-  await page.goto('/?lang=id');
+  await page.goto('/lahan?lang=id');
   await page.getByRole('button', { name: 'Ask Cropy', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Apa yang bisa ditanam setelah padi?');
@@ -333,7 +333,7 @@ test('waiting dots rotate, respect reduced motion, and disappear after a reply',
     await gate;
     await route.fulfill({ json: { answer: 'Jawaban selesai.', sources: [], scenario: null } });
   });
-  await page.goto('/?lang=id');
+  await page.goto('/lahan?lang=id');
   await page.getByRole('button', { name: 'Ask Cropy', exact: true }).click();
   const input = page.getByLabel('Pertanyaan Anda', { exact: true });
   await input.fill('Apa manfaat rotasi?');

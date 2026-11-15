@@ -38,7 +38,7 @@ export default function AppHeader({ t, lang, step, onLangChange, showSteps, menu
   return (
     <header className="relative z-20 flex h-[60px] shrink-0 items-center gap-3 border-b-2 border-hairline bg-surface px-3 lg:h-[68px] lg:gap-6 lg:px-6">
       {onMenuToggle && <button type="button" className="btn-secondary min-h-11 px-2.5 lg:hidden" aria-label="Menu" aria-expanded={menuOpen} aria-controls="app-navigation" onClick={onMenuToggle}>{menuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}</button>}
-      <a href="/" className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-ink-strong no-underline lg:text-xl">
+      <a href={`/?lang=${lang}`} className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-ink-strong no-underline lg:text-xl">
         <Logo size={30} />
         {t.appName}
       </a>

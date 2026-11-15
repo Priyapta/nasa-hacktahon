@@ -14,7 +14,7 @@ test("input form submits real inputs through the FE proxy and renders backend st
   // Only map imagery is stubbed; crops and analysis use the actual backend.
   await page.route(/https:\/\/(clarity\.maptiles\.arcgis\.com|services\.arcgisonline\.com)\//, (route) => route.abort());
   const crops = page.waitForResponse((response) => response.url().includes("/api/v1/crops") && response.status() === 200);
-  await page.goto(`/?${plan}`);
+  await page.goto(`/lahan?${plan}`);
   await crops;
   await expect(page.getByRole("heading", { name: "Apa rencana di lahan ini?" })).toBeVisible();
   const response = page.waitForResponse((res) => res.url().includes("/api/v1/analyze") && res.request().method() === "POST");

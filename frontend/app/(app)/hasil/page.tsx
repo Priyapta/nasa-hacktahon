@@ -10,6 +10,7 @@ import FieldSeason from "@/components/results/FieldSeason";
 import SoilSeasonCard from "@/components/results/SoilSeasonCard";
 import { DimensionTable, Sources, StrategyCards, WhyCard } from "@/components/results/Compare";
 import { ApiError } from "@/lib/api";
+import { isRainValidationNote } from "@/lib/explanation-format";
 import { analyze, periodYears, timeline, type AnalysisResponse } from "@/lib/analysis";
 import { measure } from "@/lib/geo";
 import { dictionary, formatHectares, formatMonth } from "@/lib/i18n";
@@ -47,7 +48,7 @@ function Results() {
     return () => controller.abort();
   }, [request, attempt]);
 
-  const back = `/?${serializePlan({ ...plan, step: plan.area ? 2 : 1 })}`;
+  const back = `/lahan?${serializePlan({ ...plan, step: plan.area ? 2 : 1 })}`;
   // input is null when measure() rejects the boundary, so this call cannot throw.
   const hectares = useMemo(() => (plan.area && input ? formatHectares(measure(polygonFromRing(plan.area)).areaHectares, plan.lang) : ""), [plan.area, input, plan.lang]);
   const WaterIcon = plan.water === "irigasi" ? Waves : CloudRain;
@@ -139,7 +140,7 @@ function Results() {
           {result && !strategy && (
             <section className="surface flex flex-col gap-2 p-6">
               <p className="m-0 text-[15px] font-bold">{r.noStrategies}</p>
-              {result.notes.map((n) => (
+              {result.notes.filter((n) => !isRainValidationNote(n)).map((n) => (
                 <p key={n} className="m-0 text-sm text-muted">
                   {n}
                 </p>
@@ -189,7 +190,7 @@ function Results() {
 
               <section className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
                 <DimensionTable strategies={strategies} selected={selected} horizon={plan.horizon} t={r} />
-                <WhyCard strategy={strategy} result={result} lang={plan.lang} t={r} />
+                <WhyCard strategy={strategy} lang={plan.lang} t={r} />
               </section>
 
               <Sources result={result} t={r} />

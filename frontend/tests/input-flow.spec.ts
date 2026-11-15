@@ -24,7 +24,7 @@ async function mockNetwork(page: Page) {
 test("draw a field, fill the plan and reach a results link with every input", async ({ page }) => {
   test.setTimeout(60000);
   await mockNetwork(page);
-  await page.goto("/?lang=id");
+  await page.goto("/lahan?lang=id");
 
   const draw = page.getByRole("button", { name: "Mulai gambar" });
   await expect(draw).toBeDisabled();
@@ -84,7 +84,7 @@ test("draw a field, fill the plan and reach a results link with every input", as
 test("language toggle and Ask AI panel", async ({ page }) => {
   await mockNetwork(page);
   const area = "110.892,-7.0915;110.8928,-7.0914;110.8928,-7.092;110.892,-7.0921";
-  await page.goto(`/?langkah=2&area=${area}&pola=kosong&air=tadah_hujan`);
+  await page.goto(`/lahan?langkah=2&area=${area}&pola=kosong&air=tadah_hujan`);
   await expect(page.getByRole("link", { name: "Bandingkan strategi" })).toBeVisible();
 
   await page.getByRole("button", { name: "en", exact: true }).click();
@@ -102,12 +102,12 @@ test("language toggle and Ask AI panel", async ({ page }) => {
   await expect(launcher).toBeFocused();
 });
 
-const planUrl = "/?area=110.892,-7.0915;110.8928,-7.0914;110.8928,-7.092;110.892,-7.0921&pola=kosong&air=tadah_hujan";
+const planUrl = "/lahan?area=110.892,-7.0915;110.8928,-7.0914;110.8928,-7.092;110.892,-7.0921&pola=kosong&air=tadah_hujan";
 
 test("drawing allows undo and only closes by pressing its first point", async ({ page }) => {
   test.setTimeout(60000);
   await mockNetwork(page);
-  await page.goto("/?lang=id");
+  await page.goto("/lahan?lang=id");
   await page.getByLabel("Cari desa atau koordinat").fill("-7.0918, 110.8924");
   await page.getByRole("button", { name: "Cari", exact: true }).click();
   const draw = page.getByRole("button", { name: "Mulai gambar", exact: true });
