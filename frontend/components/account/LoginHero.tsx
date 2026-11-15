@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import SiImageLabel from "@/components/shell/SiImageLabel";
 
 const W = 1120;
 const H = 1400;
@@ -33,6 +34,7 @@ export default function LoginHero({ en }: { en: boolean }) {
       <p className="absolute inset-x-5 top-5 m-0 text-2xl font-bold leading-tight tracking-tight text-white [text-shadow:0_1px_14px_rgba(0,0,0,0.4)] lg:inset-x-16 lg:top-16 lg:text-[34px]">
         {en ? "Save your fields." : "Simpan lahan."}<br />{en ? "Plan the next season." : "Rencanakan musim berikutnya."}
       </p>
+      <SiImageLabel en={en} className="right-3 top-3 lg:bottom-3 lg:left-5 lg:right-auto lg:top-auto" />
     </section>
   );
 }

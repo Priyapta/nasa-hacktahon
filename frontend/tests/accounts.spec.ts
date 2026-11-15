@@ -41,6 +41,7 @@ test("register, reopen saved land, analyze again, delete, and logout on mobile",
   await page.goto("/login");
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("heading", { name: "Masuk akun" })).toBeVisible();
+  await expect(page.getByText("Gambar buatan SI", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Belum punya akun? Daftar" }).click();
   await page.getByLabel("Username", { exact: true }).fill("petani");
   await page.getByLabel("Password", { exact: true }).fill("password-test");
