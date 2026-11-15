@@ -1,0 +1,750 @@
+{
+  "context": {
+    "climate": {
+      "period": "2016-01-01/2025-12-31",
+      "monthly": [
+        {
+          "month": 1,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "basah",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 2,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "basah",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 3,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "basah",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 4,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "lembap",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 5,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "lembap",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 6,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "lembap",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 7,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "lembap",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 8,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "lembap",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 9,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "lembap",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 10,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "lembap",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 11,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "basah",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        },
+        {
+          "month": 12,
+          "rain_median_mm": 150.0,
+          "rain_min_mm": 150.0,
+          "rain_max_mm": 150.0,
+          "class": "basah",
+          "t_mean_c": 26.5,
+          "t_min_c": 23.0,
+          "t_max_c": 31.0,
+          "rad": 17.0,
+          "rh_pct": 82.0,
+          "n_years": 10
+        }
+      ]
+    },
+    "soil": {
+      "status": "ok",
+      "depth": "0-30cm",
+      "texture_class": "clay loam",
+      "ph": 6.0,
+      "soc_g_per_kg": 20.0,
+      "uncertainty": {}
+    }
+  },
+  "strategies": [
+    {
+      "id": "baseline",
+      "role": "pola_biasa",
+      "label": "Pola biasa Anda",
+      "calendar": [
+        {
+          "crop_id": "padi_sawah",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "bera",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
+        },
+        {
+          "crop_id": "padi_sawah",
+          "start": "2027-07",
+          "end": "2027-10",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": [
+            "Padi sawah mulai Jul 2027 hanya punya 0 dari 4 bulan basah."
+          ]
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "sedang",
+          "evidence": "4 dari 8 bulan tanam berada pada suhu optimal dan, untuk padi, pada bulan basah."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 9,
+          "years_total": 9
+        },
+        "bare_months": 4,
+        "soil_contribution": {
+          "legume": false,
+          "cover_crop": false,
+          "families": 1
+        },
+        "risks": [
+          "Irigasi dianggap tersedia. Jumlah airnya tidak dihitung.",
+          "Padi sawah mulai Jul 2027 hanya punya 0 dari 4 bulan basah."
+        ]
+      },
+      "reasons": [
+        "Padi sawah (Nov 2026 sampai Feb 2027): hujan saja mencukupi di 9 dari 9 tahun acuan, sisanya bergantung pada irigasi."
+      ],
+      "tradeoffs": [
+        "Ada 4 bulan lahan terbuka dalam horizon."
+      ],
+      "revenue": {
+        "reference_year": 2023,
+        "currency": "IDR",
+        "area_ha": 490.7920758371115,
+        "gross_idr": 35078624684,
+        "gross_per_ha_idr": 71473494,
+        "completed_harvests": 2,
+        "is_highest": false,
+        "stages": [
+          {
+            "stage_index": 0,
+            "crop_id": "padi_sawah",
+            "harvest_month": "2027-02",
+            "reason": "harvest",
+            "quantity_kg": 2593836.1207991345,
+            "gross_idr": 17539312342
+          },
+          {
+            "stage_index": 1,
+            "crop_id": "bera",
+            "harvest_month": "2027-06",
+            "reason": "no_sales",
+            "quantity_kg": 0.0,
+            "gross_idr": 0
+          },
+          {
+            "stage_index": 2,
+            "crop_id": "padi_sawah",
+            "harvest_month": "2027-10",
+            "reason": "harvest",
+            "quantity_kg": 2593836.1207991345,
+            "gross_idr": 17539312342
+          }
+        ]
+      }
+    },
+    {
+      "id": "grobogan-padi-jagung-bera",
+      "role": "hemat_air",
+      "label": "Hemat air",
+      "calendar": [
+        {
+          "crop_id": "padi_sawah",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "jagung",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "bera",
+          "start": "2027-07",
+          "end": "2027-10",
+          "continues_after_horizon": false,
+          "water": null,
+          "warnings": []
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "tinggi",
+          "evidence": "8 dari 8 bulan tanam berada pada suhu optimal dan, untuk padi, pada bulan basah."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 9,
+          "years_total": 9
+        },
+        "bare_months": 4,
+        "soil_contribution": {
+          "legume": false,
+          "cover_crop": false,
+          "families": 1
+        },
+        "risks": [
+          "Irigasi dianggap tersedia. Jumlah airnya tidak dihitung."
+        ]
+      },
+      "reasons": [
+        "Padi sawah (Nov 2026 sampai Feb 2027): hujan saja mencukupi di 9 dari 9 tahun acuan, sisanya bergantung pada irigasi.",
+        "Jagung (Mar 2027 sampai Jun 2027): hujan saja mencukupi di 9 dari 9 tahun acuan, sisanya bergantung pada irigasi."
+      ],
+      "tradeoffs": [
+        "Ada 4 bulan lahan terbuka dalam horizon."
+      ],
+      "revenue": {
+        "reference_year": 2023,
+        "currency": "IDR",
+        "area_ha": 490.7920758371115,
+        "gross_idr": 35524014497,
+        "gross_per_ha_idr": 72380986,
+        "completed_harvests": 2,
+        "is_highest": false,
+        "stages": [
+          {
+            "stage_index": 0,
+            "crop_id": "padi_sawah",
+            "harvest_month": "2027-02",
+            "reason": "harvest",
+            "quantity_kg": 2593836.1207991345,
+            "gross_idr": 17539312342
+          },
+          {
+            "stage_index": 1,
+            "crop_id": "jagung",
+            "harvest_month": "2027-06",
+            "reason": "harvest",
+            "quantity_kg": 3355354.879692418,
+            "gross_idr": 17984702155
+          },
+          {
+            "stage_index": 2,
+            "crop_id": "bera",
+            "harvest_month": "2027-10",
+            "reason": "no_sales",
+            "quantity_kg": 0.0,
+            "gross_idr": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "grobogan-padi-jagung-kedelai",
+      "role": "jaga_tanah",
+      "label": "Jaga tanah",
+      "calendar": [
+        {
+          "crop_id": "padi_sawah",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "jagung",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "kedelai",
+          "start": "2027-07",
+          "end": "2027-09",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "padi_sawah",
+          "start": "2027-10",
+          "end": "2028-01",
+          "continues_after_horizon": true,
+          "water": {
+            "years_met": 8,
+            "years_total": 8
+          },
+          "warnings": []
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "tinggi",
+          "evidence": "14 dari 15 bulan tanam berada pada suhu optimal dan, untuk padi, pada bulan basah."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 9,
+          "years_total": 9
+        },
+        "bare_months": 0,
+        "soil_contribution": {
+          "legume": true,
+          "cover_crop": false,
+          "families": 2
+        },
+        "risks": [
+          "Irigasi dianggap tersedia. Jumlah airnya tidak dihitung.",
+          "Tahap Padi sawah berlanjut setelah horizon sampai Jan 2028."
+        ]
+      },
+      "reasons": [
+        "Padi sawah (Nov 2026 sampai Feb 2027): hujan saja mencukupi di 9 dari 9 tahun acuan, sisanya bergantung pada irigasi.",
+        "Jagung (Mar 2027 sampai Jun 2027): hujan saja mencukupi di 9 dari 9 tahun acuan, sisanya bergantung pada irigasi.",
+        "Kedelai (Jul 2027 sampai Sep 2027): hujan saja mencukupi di 9 dari 9 tahun acuan, sisanya bergantung pada irigasi.",
+        "Strategi ini mengurangi lahan terbuka dari 4 menjadi 0 bulan dibanding pola biasa Anda.",
+        "Memuat tanaman penambat nitrogen atau pupuk hijau, dengan 2 famili tanaman."
+      ],
+      "tradeoffs": [],
+      "revenue": {
+        "reference_year": 2023,
+        "currency": "IDR",
+        "area_ha": 490.7920758371115,
+        "gross_idr": 43563848324,
+        "gross_per_ha_idr": 88762330,
+        "completed_harvests": 3,
+        "is_highest": false,
+        "stages": [
+          {
+            "stage_index": 0,
+            "crop_id": "padi_sawah",
+            "harvest_month": "2027-02",
+            "reason": "harvest",
+            "quantity_kg": 2593836.1207991345,
+            "gross_idr": 17539312342
+          },
+          {
+            "stage_index": 1,
+            "crop_id": "jagung",
+            "harvest_month": "2027-06",
+            "reason": "harvest",
+            "quantity_kg": 3355354.879692418,
+            "gross_idr": 17984702155
+          },
+          {
+            "stage_index": 2,
+            "crop_id": "kedelai",
+            "harvest_month": "2027-09",
+            "reason": "harvest",
+            "quantity_kg": 783304.15303603,
+            "gross_idr": 8039833827
+          },
+          {
+            "stage_index": 3,
+            "crop_id": "padi_sawah",
+            "harvest_month": "2028-01",
+            "reason": "after_horizon",
+            "quantity_kg": 0.0,
+            "gross_idr": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "grobogan-padi-jagung-padi",
+      "role": "omzet_tertinggi",
+      "label": "Estimasi omzet tertinggi",
+      "calendar": [
+        {
+          "crop_id": "padi_sawah",
+          "start": "2026-11",
+          "end": "2027-02",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "jagung",
+          "start": "2027-03",
+          "end": "2027-06",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": []
+        },
+        {
+          "crop_id": "padi_sawah",
+          "start": "2027-07",
+          "end": "2027-10",
+          "continues_after_horizon": false,
+          "water": {
+            "years_met": 9,
+            "years_total": 9
+          },
+          "warnings": [
+            "Padi sawah mulai Jul 2027 hanya punya 0 dari 4 bulan basah."
+          ]
+        }
+      ],
+      "feasibility": {
+        "passed": true,
+        "failed_rules": []
+      },
+      "dimensions": {
+        "climate_fit": {
+          "level": "sedang",
+          "evidence": "8 dari 12 bulan tanam berada pada suhu optimal dan, untuk padi, pada bulan basah."
+        },
+        "water_pressure": {
+          "level": "rendah",
+          "years_met": 9,
+          "years_total": 9
+        },
+        "bare_months": 0,
+        "soil_contribution": {
+          "legume": false,
+          "cover_crop": false,
+          "families": 1
+        },
+        "risks": [
+          "Irigasi dianggap tersedia. Jumlah airnya tidak dihitung.",
+          "Padi sawah mulai Jul 2027 hanya punya 0 dari 4 bulan basah."
+        ]
+      },
+      "reasons": [
+        "Padi sawah (Nov 2026 sampai Feb 2027): hujan saja mencukupi di 9 dari 9 tahun acuan, sisanya bergantung pada irigasi.",
+        "Jagung (Mar 2027 sampai Jun 2027): hujan saja mencukupi di 9 dari 9 tahun acuan, sisanya bergantung pada irigasi.",
+        "Strategi ini mengurangi lahan terbuka dari 4 menjadi 0 bulan dibanding pola biasa Anda.",
+        "Estimasi omzet nasional 2023 tertinggi di antara pola layak yang dinilai: Rp53,063,326,839. Ini penjualan sebelum biaya, bukan keuntungan bersih."
+      ],
+      "tradeoffs": [],
+      "revenue": {
+        "reference_year": 2023,
+        "currency": "IDR",
+        "area_ha": 490.7920758371115,
+        "gross_idr": 53063326839,
+        "gross_per_ha_idr": 108117733,
+        "completed_harvests": 3,
+        "is_highest": true,
+        "stages": [
+          {
+            "stage_index": 0,
+            "crop_id": "padi_sawah",
+            "harvest_month": "2027-02",
+            "reason": "harvest",
+            "quantity_kg": 2593836.1207991345,
+            "gross_idr": 17539312342
+          },
+          {
+            "stage_index": 1,
+            "crop_id": "jagung",
+            "harvest_month": "2027-06",
+            "reason": "harvest",
+            "quantity_kg": 3355354.879692418,
+            "gross_idr": 17984702155
+          },
+          {
+            "stage_index": 2,
+            "crop_id": "padi_sawah",
+            "harvest_month": "2027-10",
+            "reason": "harvest",
+            "quantity_kg": 2593836.1207991345,
+            "gross_idr": 17539312342
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "Hujan belum divalidasi terhadap dataset pembanding.",
+    "Omzet memakai harga dan produktivitas rata-rata nasional 2023. Angka jagung memakai asumsi penyesuaian kadar air. Bukan keuntungan bersih atau prakiraan harga."
+  ],
+  "provenance": {
+    "climate": {
+      "source": "NASA POWER",
+      "fetched_at": "2026-11-14T07:53:12+00:00",
+      "resolution": "Sel grid 0,5° x 0,625°, sekitar 50 km. Nilai area, bukan pengukuran di lahan.",
+      "missing_days": 0,
+      "rain_source": "POWER",
+      "rain_validation": {
+        "reference": null,
+        "annual_diff_pct": null,
+        "months_class_differs": null,
+        "status": "unvalidated"
+      }
+    },
+    "soil": {
+      "source": "SoilGrids 2.0",
+      "fetched_at": "2026-11-14T09:00:00+00:00",
+      "resolution": "250 m"
+    },
+    "crop_table_version": "2026-11-14.v1:a61b3ccb0d6b",
+    "assumptions": [
+      "Estimasi berbasis pola historis, bukan prediksi.",
+      "Hujan dianggap cukup bila mencapai batas bawah kebutuhan air tanaman pada minimal 60% tahun acuan. Penguapan, limpasan, dan simpanan air tanah tidak dihitung.",
+      "Hitungan X dari N tahun adalah frekuensi historis, bukan peluang untuk tahun depan.",
+      "Irigasi dianggap tersedia, jumlah airnya tidak dihitung."
+    ],
+    "economics": {
+      "version": "national-2023-v1:90de515a95d7",
+      "reference_year": 2023,
+      "scope": "Indonesia",
+      "sources": [
+        {
+          "id": "prices",
+          "title": "Kementan, Statistik Harga Komoditas Pertanian 2025",
+          "url": "https://satudata.pertanian.go.id/assets/docs/publikasi/c9c87ec57f8a22249659ace0dc306047.pdf",
+          "locator": "Tabel 1.1 halaman cetak 3 (GKG tingkat petani), Tabel 2.1 halaman cetak 19, kolom 2023",
+          "sha256": "5e40ceee5aa63fb813d2f6c0cda6f8dbf0d04a904c6e3c02c27ec729cdba6efe"
+        },
+        {
+          "id": "yields",
+          "title": "Kementan, Statistik Pertanian 2024",
+          "url": "https://satudata.pertanian.go.id/assets/docs/publikasi/STATISTIK_PERTANIAN_2024_c.pdf",
+          "locator": "Tabel 2.1.17/18/19/21, halaman cetak 123/124/125/127, baris Indonesia, kolom 2023. Padi GKG: Tabel 2.1.1 halaman cetak 107.",
+          "sha256": "eb6e894e4fe711c1b13498b09854c1ad57b2603159a5bc86b986bd0b5a6a5e7b"
+        },
+        {
+          "id": "maize_basis",
+          "title": "Kementan, Outlook Jagung 2024",
+          "url": "https://satudata.pertanian.go.id/assets/docs/publikasi/Outlook_Jagung_2024_Final.pdf",
+          "locator": "Halaman cetak 21 (PDF 39), harga produsen 2023 dan variasi kadar air sekitar 15-20%. Rentang ini bukan kadar air tepat dari harga rata-rata.",
+          "sha256": null
+        }
+      ],
+      "references": [
+        {
+          "crop_id": "padi_sawah",
+          "product": "Gabah kering giling (GKG), bukan beras",
+          "non_market": false,
+          "price_idr_per_kg": 6761.92,
+          "source_yield_kg_per_ha": 5285.0,
+          "model_yield_kg_per_ha": 5285.0,
+          "source_moisture_pct": null,
+          "model_moisture_pct": null
+        },
+        {
+          "crop_id": "jagung",
+          "product": "Jagung pipilan, berat sumber KA28%, asumsi perbandingan KA15%",
+          "non_market": false,
+          "price_idr_per_kg": 5360.0,
+          "source_yield_kg_per_ha": 8071.0,
+          "model_yield_kg_per_ha": 6836.611764705883,
+          "source_moisture_pct": 28.0,
+          "model_moisture_pct": 15.0
+        },
+        {
+          "crop_id": "kedelai",
+          "product": "Biji kedelai kering",
+          "non_market": false,
+          "price_idr_per_kg": 10264.0,
+          "source_yield_kg_per_ha": 1596.0,
+          "model_yield_kg_per_ha": 1596.0,
+          "source_moisture_pct": null,
+          "model_moisture_pct": null
+        },
+        {
+          "crop_id": "kacang_hijau",
+          "product": "Biji kacang hijau kering",
+          "non_market": false,
+          "price_idr_per_kg": 18211.0,
+          "source_yield_kg_per_ha": 1142.0,
+          "model_yield_kg_per_ha": 1142.0,
+          "source_moisture_pct": null,
+          "model_moisture_pct": null
+        },
+        {
+          "crop_id": "orok_orok",
+          "product": "Tidak dijual dalam model",
+          "non_market": true,
+          "price_idr_per_kg": null,
+          "source_yield_kg_per_ha": 0.0,
+          "model_yield_kg_per_ha": 0.0,
+          "source_moisture_pct": null,
+          "model_moisture_pct": null
+        },
+        {
+          "crop_id": "bera",
+          "product": "Tidak dijual dalam model",
+          "non_market": true,
+          "price_idr_per_kg": null,
+          "source_yield_kg_per_ha": 0.0,
+          "model_yield_kg_per_ha": 0.0,
+          "source_moisture_pct": null,
+          "model_moisture_pct": null
+        }
+      ],
+      "assumptions": [
+        "Harga dan produktivitas adalah rata-rata nasional tahun 2023, sama untuk semua lokasi dan bulan. Bukan harga sekarang atau prakiraan harga panen.",
+        "Omzet adalah penjualan sebelum biaya. Produktivitas nasional tidak diprediksi ulang dari suhu, hujan, pH, varietas atau kondisi lahan pengguna.",
+        "Padi memakai harga gabah kering giling tingkat petani dan produktivitas padi nasional, bukan produktivitas spesifik sawah pengguna atau harga beras eceran.",
+        "Jagung memakai penyesuaian berat konservatif dari KA28% ke KA15%: berat x (1-0,28)/(1-0,15). Harga Rp5.360/kg adalah rata-rata produsen 2023 dengan kadar air bervariasi, bukan harga terukur khusus KA15%.",
+        "Penyesuaian kadar air hanya menjaga massa bahan kering. Kehilangan bahan saat pengeringan, mutu dan biaya pengeringan tidak dimodelkan. Angka jagung adalah skenario asumsi, bukan pasangan kadar air yang terverifikasi sama.",
+        "Hanya panen yang selesai dalam rentang analisis dihitung. Tahap yang berakhir setelah rentang tidak diprorata menjadi penjualan.",
+        "Orok-orok dipakai sebagai pupuk hijau dan bera sebagai lahan kosong. Keduanya diasumsikan tanpa penjualan, bukan tanpa biaya atau tanpa manfaat ekonomi.",
+        "Omzet tertinggi dipilih di antara pola layak yang dinilai. Tidak menjamin hasil panen, keuntungan bersih atau optimum seluruh kemungkinan rotasi."
+      ]
+    }
+  }
+}

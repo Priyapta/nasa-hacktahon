@@ -8,6 +8,7 @@ import SaveField from "@/components/input/SaveField";
 import AgentChat from "@/components/agent/agent-chat";
 import FieldSeason from "@/components/results/FieldSeason";
 import SoilSeasonCard from "@/components/results/SoilSeasonCard";
+import RevenuePanel from "@/components/results/RevenuePanel";
 import { DimensionTable, Sources, StrategyCards, WhyCard } from "@/components/results/Compare";
 import { ApiError } from "@/lib/api";
 import { isRainValidationNote } from "@/lib/explanation-format";
@@ -186,7 +187,9 @@ function Results() {
                 />
               </section>
 
-              <StrategyCards strategies={strategies} selected={selected} onSelect={setSelected} startMonth={plan.startMonth} horizon={plan.horizon} t={r} />
+              <StrategyCards strategies={strategies} selected={selected} onSelect={setSelected} startMonth={plan.startMonth} horizon={plan.horizon} t={r} lang={plan.lang} />
+
+              <RevenuePanel strategy={strategy} provenance={result.provenance.economics} lang={plan.lang} />
 
               <section className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
                 <DimensionTable strategies={strategies} selected={selected} horizon={plan.horizon} t={r} />

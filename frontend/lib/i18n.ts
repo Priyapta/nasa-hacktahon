@@ -112,7 +112,7 @@ const id = {
       hasBaseline
         ? others === 0
           ? "Pola biasa Anda"
-          : `Pola biasa Anda dan ${others === 1 ? "satu" : "dua"} pilihan lain`
+          : `Pola biasa Anda dan ${others === 1 ? "satu" : others === 2 ? "dua" : "tiga"} pilihan lain`
         : `${others} pilihan untuk lahan Anda`,
     subtitle: (from: string, to: string) => `Estimasi berbasis pola historis NASA POWER ${from} sampai ${to}.`,
     back: "Ubah rencana",
@@ -200,6 +200,8 @@ const id = {
     cardWater: "Hujan cukup",
     cardBare: "Lahan terbuka",
     cardSoil: "Rawat tanah",
+    cardRevenue: "Estimasi omzet · 2023",
+    highestRevenue: "Tertinggi",
     ofThree: (n: number) => `${n} dari 3`,
     monthsN: (n: number) => `${n} bulan`,
     tableTitle: "Lima dimensi berdampingan",
@@ -232,6 +234,11 @@ const id = {
     tradeoffs: "Yang dikorbankan",
     notesTitle: "Catatan",
     sourcesTitle: "Dari mana angka ini",
+    sourceListTitle: "Sumber yang dipakai",
+    readingTitle: "Cara membaca hasil",
+    readingNote: "Hasil memakai pola iklim historis, bukan ramalan cuaca atau jaminan panen.",
+    methodDetails: "Detail pengolahan data",
+    revenueDetails: "Asumsi harga dan omzet ada di bagian Estimasi omzet.",
     climateLabel: "Iklim",
     soilLabel: "Tanah",
     cropTable: "Tabel tanaman",
@@ -392,7 +399,7 @@ const en: Dictionary = {
       hasBaseline
         ? others === 0
           ? "Your usual pattern"
-          : `Your usual pattern and ${others === 1 ? "one" : "two"} other options`
+          : `Your usual pattern and ${others === 1 ? "one" : others === 2 ? "two" : "three"} other options`
         : `${others} options for your field`,
     subtitle: (from, to) => `Estimates based on NASA POWER historical patterns, ${from} to ${to}.`,
     back: "Change the plan",
@@ -480,6 +487,8 @@ const en: Dictionary = {
     cardWater: "Rain enough",
     cardBare: "Open land",
     cardSoil: "Soil care",
+    cardRevenue: "Estimated revenue · 2023",
+    highestRevenue: "Highest",
     ofThree: (n) => `${n} of 3`,
     monthsN: (n) => `${n} ${n === 1 ? "month" : "months"}`,
     tableTitle: "Five dimensions side by side",
@@ -512,6 +521,11 @@ const en: Dictionary = {
     tradeoffs: "What you give up",
     notesTitle: "Notes",
     sourcesTitle: "Where these numbers come from",
+    sourceListTitle: "Sources used",
+    readingTitle: "How to read the results",
+    readingNote: "Results use historical climate patterns, not a weather forecast or a harvest guarantee.",
+    methodDetails: "Data processing details",
+    revenueDetails: "Price and revenue assumptions are in the Estimated revenue section.",
     climateLabel: "Climate",
     soilLabel: "Soil",
     cropTable: "Crop table",

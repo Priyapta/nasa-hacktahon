@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal, Sequence
+from typing import Literal
 
 from app.core.dimensions import Dimensions
 from app.core.feasibility import Evaluation
+from app.core.revenue import RevenueCalculation
 from app.core.rotation import PlannedStage, signature
 
-Role = Literal["hemat_air", "jaga_tanah", "seimbang"]
+Role = Literal["hemat_air", "jaga_tanah", "seimbang", "omzet_tertinggi"]
 
 
 @dataclass(frozen=True)
@@ -17,6 +19,7 @@ class Scored:
     plan: tuple[PlannedStage, ...]
     evaluation: Evaluation
     dimensions: Dimensions
+    revenue: RevenueCalculation | None = None
 
 
 @dataclass(frozen=True)
@@ -25,6 +28,7 @@ class Selection:
     wanted: int
     feasible: int
     common_failures: tuple[tuple[str, int], ...]
+    highest_revenue_id: str | None = None
 
 
 def _water_saving_key(item: Scored):
@@ -81,12 +85,24 @@ def select(candidates: Sequence[Scored], baseline: Scored | None) -> Selection:
     if baseline is None:
         pick("seimbang", lambda item: True, _balanced_key)
 
+    # Highest is selected over ALL feasible evaluated patterns, not merely the
+    # leftovers after the water/soil roles. Reuse an existing card if identical.
+    economic_pool = pool + ([baseline] if baseline and baseline.evaluation.passed else [])
+    economic_pool = [p for p in economic_pool if p.revenue and p.revenue.harvests and p.revenue.per_ha > 0]
+    highest = min(economic_pool, key=lambda p: (-p.revenue.per_ha, p.id), default=None)
+    added_revenue = False
+    if highest is not None and signature(highest.plan) not in taken:
+        chosen.append(("omzet_tertinggi", highest))
+        taken.add(signature(highest.plan))
+        added_revenue = True
+
     failures = Counter(
         rule for item in candidates if not item.evaluation.passed for rule in item.evaluation.failed_rules
     )
     return Selection(
         alternatives=tuple(chosen),
-        wanted=2 if baseline else 3,
+        wanted=(2 if baseline else 3) + int(added_revenue),
         feasible=len(feasible),
+        highest_revenue_id=highest.id if highest else None,
         common_failures=tuple(sorted(failures.items(), key=lambda kv: (-kv[1], kv[0]))),
     )

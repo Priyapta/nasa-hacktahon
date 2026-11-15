@@ -12,6 +12,13 @@ di bawah adalah catatan historis; gunakan handover dan root tasks untuk progres 
 
 Acuan: PRD bagian 7 dan 12.4, serta `architecture.md`. FastAPI berjalan sebagai satu aplikasi monolit. Kode backend Node/TypeScript lama telah dihapus; integrasi frontend ke endpoint baru belum lengkap.
 
+## Estimasi omzet
+
+Analisis menyertakan omzet sebelum biaya dari harga dan produktivitas nasional 2023.
+Data kecil sudah ada di Git, tanpa unduhan tambahan atau konfigurasi baru.
+Lihat [kontrak dan batas model](contracts/revenue.md), terutama asumsi kadar air
+jagung dan penghitungan hanya panen yang selesai dalam rentang analisis.
+
 ## Menjalankan di WSL/Linux
 
 Dari root repo, sekali untuk menyiapkan Python environment:

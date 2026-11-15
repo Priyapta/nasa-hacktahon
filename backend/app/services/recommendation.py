@@ -24,7 +24,10 @@ Basis: name the climate source exactly as supplied and include its period in one
 Use a separate point for each source; mention SoilGrids as used only when soil status
 is ok. State rain validation status accurately; validated requires a named reference.
 Cautions: historical frequencies are not forecasts; preserve missing-data and irrigation assumptions,
-and relevant tradeoffs. Explain that this compares options and advise adapting to field conditions
+and relevant tradeoffs. If revenue is supplied, describe it only as a 2023 national-reference
+sales scenario before costs, never net profit or a local/future yield or price forecast.
+Preserve the maize moisture-adjustment assumption. is_highest refers only to feasible evaluated
+patterns and must not be inferred for any other strategy. Explain that this compares options and advise adapting to field conditions
 with a local agricultural extension officer. Never invent evidence, yields, prices, or guarantees.
 """
 

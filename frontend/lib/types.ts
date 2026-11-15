@@ -1,3 +1,4 @@
+import type { RevenueEstimate, RevenueProvenance } from "./revenue";
 import type { Polygon, Position } from "geojson";
 
 export type Lang = "id" | "en";
@@ -70,8 +71,9 @@ export interface AnalysisResponse {
   };
   strategies: {
     id: string;
-    role: "pola_biasa" | "seimbang" | "hemat_air" | "jaga_tanah";
+    role: "pola_biasa" | "seimbang" | "hemat_air" | "jaga_tanah" | "omzet_tertinggi";
     label: string;
+    revenue?: RevenueEstimate;
     calendar: { crop_id: CropId; start: string; end: string; continues_after_horizon: boolean }[];
     feasibility: { passed: boolean; failed_rules: string[] };
     dimensions: {
@@ -88,6 +90,7 @@ export interface AnalysisResponse {
   provenance: {
     climate: { source: string; rain_validation: { status: string } };
     soil: { source: string };
+    economics?: RevenueProvenance;
     crop_table_version: string;
     assumptions: string[];
   };
