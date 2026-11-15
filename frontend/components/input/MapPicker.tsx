@@ -119,7 +119,7 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
     let d: TerraDraw | undefined;
     try {
       setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
-      const style = clarityStyle();
+      const style = clarityStyle(true);
       (style.sources.clarity as RasterSourceSpecification).maxzoom = CLARITY_NATIVE_MAX_ZOOM;
       m = new MapLibreMap({
         container: container.current,
@@ -391,6 +391,12 @@ const MapPicker = forwardRef<MapPickerHandle, MapPickerProps>(function MapPicker
   return (
     <div className={`${styles.frame} absolute inset-0 ${props.editable ? styles.cosmos : "bg-[#2e4a22]"}`} data-panel={props.editable ? "left" : undefined} aria-busy={!ready}>
       <div ref={container} className="h-full w-full" />
+      {props.editable && zoom < 8 && (
+        <p className="pointer-events-none absolute bottom-24 right-3 m-0 rounded-lg bg-white/95 px-3 py-2 text-xs font-semibold text-ink-strong shadow-sm lg:right-5">
+          <span aria-hidden="true" className="mr-2 inline-block size-2.5 rounded-sm bg-[#2e8b57]" />
+          {t.map.coverage}
+        </p>
+      )}
       {fatal && (
         <p role="alert" className="absolute inset-x-4 top-20 rounded-xl bg-white p-4 text-sm">
           {t.map.webglError}

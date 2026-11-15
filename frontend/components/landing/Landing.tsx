@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Polygon } from "geojson";
@@ -10,6 +10,7 @@ import { CROP_LOOK } from "@/components/results/FieldSeason";
 import { useSession } from "@/hooks/useSession";
 import { dictionary, formatHectares } from "@/lib/i18n";
 import type { Lang } from "@/lib/types";
+import styles from "./landing.module.css";
 
 const PHOTO_W = 1120;
 const PHOTO_H = 1400;
@@ -35,8 +36,15 @@ function Header({ lang }: { lang: Lang }) {
   const t = dictionary(lang).landing;
   const router = useRouter();
   const { user } = useSession();
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const update = () => setCompact(window.scrollY > 48);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
   return (
-    <header className="relative z-10 mx-auto flex min-h-[76px] w-full max-w-[1200px] items-center gap-6 px-4 sm:px-8">
+    <header className={`${styles.header} ${compact ? styles.compact : ""} flex items-center gap-3 px-4 sm:gap-6 sm:px-8`}>
       <Link href={`/?lang=${lang}`} className="flex items-center gap-2.5 text-xl font-bold text-white no-underline"><Logo size={30} />TANI</Link>
       <nav aria-label={lang === "en" ? "Page sections" : "Bagian halaman"} className="hidden flex-1 justify-center gap-7 md:flex">
         <a href="#indonesia" className="text-[15px] text-[#e3ede6] no-underline hover:text-white">{t.navIndonesia}</a>
@@ -69,7 +77,7 @@ function Hero({ lang }: { lang: Lang }) {
           {formatHectares(0.59, lang)} ha
         </span>
       </div>
-      <Header lang={lang} />
+      <div aria-hidden="true" className="h-[76px]" />
       <div className="relative mx-auto flex max-w-[1200px] flex-col gap-5 px-4 pt-20 sm:px-8 md:pt-[clamp(96px,11vw,168px)]">
         <h1 id="hero-title" className="m-0 max-w-[9.5em] text-[44px] font-bold leading-none tracking-[-0.03em] [text-shadow:0_2px_24px_rgba(0,0,0,0.3)] md:text-[clamp(48px,5.6vw,76px)]">{t.heroTitle}</h1>
         <Link href={`/lahan?lang=${lang}`} className="btn-primary self-start">{t.start}</Link>
@@ -82,7 +90,7 @@ function Indonesia({ lang }: { lang: Lang }) {
   const t = dictionary(lang).landing;
   const columns = <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden md:block"><div className="mx-auto grid h-full max-w-[1200px] grid-cols-4 px-8">{[0, 1, 2, 3].map((i) => <span key={i} className="border-l-[1.5px] border-dashed border-[#e6e7e0] last:border-r-[1.5px]" />)}</div></div>;
   return (
-    <section id="indonesia" aria-labelledby="indo-title" className="relative border-t-2 border-hairline bg-white pt-16 md:pt-24">
+    <section id="indonesia" aria-labelledby="indo-title" className="relative scroll-mt-24 border-t-2 border-hairline bg-white pt-16 md:pt-24">
       {columns}
       <div className="relative mx-auto max-w-[1200px] px-4 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-5">
@@ -152,7 +160,7 @@ function Steps({ lang }: { lang: Lang }) {
     </div>,
   ];
   return (
-    <section id="cara-kerja" aria-labelledby="steps-title" className="py-16 md:py-24">
+    <section id="cara-kerja" aria-labelledby="steps-title" className="scroll-mt-24 py-16 md:py-24">
       <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 sm:px-8">
         <h2 id="steps-title" className="m-0 text-[30px] font-bold leading-tight tracking-tight text-ink-strong md:text-[42px]">{t.stepsTitle}</h2>
         <ol className="m-0 grid list-none grid-cols-1 gap-4 p-0 md:grid-cols-3">
@@ -203,6 +211,7 @@ export default function Landing() {
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
   return (
     <div className="min-h-dvh bg-canvas text-ink">
+      <Header lang={lang} />
       <Hero lang={lang} />
       <main>
         <Indonesia lang={lang} />
