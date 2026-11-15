@@ -6,6 +6,7 @@ import { expect, test } from "@playwright/test";
 const analysis = JSON.parse(readFileSync(join(__dirname, "fixtures/revenue.json"), "utf8"));
 const tile = readFileSync(join(__dirname, "fixtures/flat-dem.png"));
 const plan = "area=110.9,-7.1;110.92,-7.1;110.92,-7.08;110.9,-7.08&pola=padi_sawah,bera:4&mulai=2026-11&horizon=12&air=irigasi";
+const rupiah = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-11-14T05:00:00Z"));
@@ -19,49 +20,42 @@ test("four strategies retain agronomy and show the selected revenue with its ass
   await expect(page.getByRole("radio")).toHaveCount(4);
   const panel = page.getByRole("region", { name: /^Estimasi omzet/ });
   await expect(panel).toContainText("rata-rata nasional 2023");
+
   await page.getByRole("radio", { name: /Estimasi omzet tertinggi/ }).click();
   const winner = analysis.strategies.find((s: { revenue: { is_highest: boolean } }) => s.revenue.is_highest);
-  const money = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(winner.revenue.gross_idr);
-  await expect(panel).toContainText(money);
+  await expect(panel).toContainText(rupiah(winner.revenue.gross_idr));
   await expect(panel).toContainText("Tertinggi di antara pola layak yang dinilai");
+
+  await page.getByRole("radio", { name: /Jaga tanah/ }).click();
+  const soil = analysis.strategies.find((s: { role: string }) => s.role === "jaga_tanah");
+  await expect(panel).toContainText(rupiah(soil.revenue.gross_idr));
+  await expect(panel).toContainText("Peringkat 2 dari 4 pola layak");
+  await expect(panel).toContainText("Dibanding pola biasa Anda");
+  await expect(panel.getByRole("heading", { name: "Kapan uang masuk" })).toBeVisible();
+  await expect(panel.getByRole("heading", { name: "Dibanding pola lain di petak ini" })).not.toBeVisible();
+  await expect(panel.getByRole("table")).toHaveCount(0);
+  await panel.getByText("Perbandingan pola dan cara hitung", { exact: true }).click();
+  await expect(panel.getByRole("heading", { name: "Dibanding pola lain di petak ini" })).toBeVisible();
+  await expect(panel.getByRole("heading", { name: "Cara hitung" })).toBeVisible();
+  await expect(panel.getByRole("listitem")).toHaveCount(4);
+  await expect(panel.getByRole("listitem").filter({ hasText: "pola ini" })).toHaveCount(1);
+
+  const method = panel.getByRole("table").first();
+  await expect(method).toContainText("Total 3 panen");
+  await expect(method).toContainText("Panen setelah rentang, belum dihitung");
+  await expect(method).toContainText("6.761,92");
   await expect(panel).toContainText("bukan harga terukur khusus KA15%");
-  await panel.getByText("Perhitungan dan asumsi", { exact: true }).click();
-  const chart = panel.getByRole("list", { name: "Omzet per panen" });
-  await expect(chart.getByRole("listitem")).toHaveCount(winner.revenue.stages.length);
-  await expect(panel.getByRole("table")).not.toBeVisible();
-  await chart.locator("summary").first().click();
-  await expect(chart.getByRole("definition").first()).toContainText("kg");
-  await panel.screenshot({ path: "/tmp/tani-revenue-graph.png" });
-  await panel.getByText("Lihat angka acuan", { exact: true }).click();
-  await expect(panel.getByRole("table")).toBeVisible();
-  await panel.getByText("Asumsi lengkap dan sumber", { exact: true }).click();
+  await panel.screenshot({ path: "/tmp/tani-revenue-desktop.png" });
+
+  await expect(panel.getByRole("link")).toHaveCount(0);
+  await panel.getByText("Asumsi, angka acuan dan sumber", { exact: true }).click();
   await expect(panel.getByRole("link")).toHaveCount(3);
-  await expect(panel.getByRole("heading", { name: "Dasar perhitungan", exact: true })).toBeVisible();
-  await expect(panel.getByRole("heading", { name: "Batas estimasi", exact: true })).toBeVisible();
-  await expect(panel.getByText(analysis.provenance.economics.assumptions[3], { exact: true })).not.toBeVisible();
-  const assumptions = panel.locator("details").filter({ has: page.getByText("Asumsi lengkap dan sumber", { exact: true }) });
-  await assumptions.last().screenshot({ path: "/tmp/tani-assumptions-desktop.png" });
-  await panel.getByText("Detail metode dan komoditas", { exact: true }).click();
-  await expect(panel.getByText(analysis.provenance.economics.assumptions[3], { exact: true })).toBeVisible();
-  await panel.getByText("Detail metode dan komoditas", { exact: true }).click();
-  await page.getByText("Dari mana angka ini", { exact: true }).click();
-  const sources = page.locator("details.surface");
-  await expect(sources.getByRole("heading", { name: "Cara membaca hasil" })).toBeVisible();
-  await expect(sources.getByText(/^Omzet memakai/)).toHaveCount(0);
-  await sources.screenshot({ path: "/tmp/tani-sources-desktop.png" });
-  await sources.getByText("Detail pengolahan data", { exact: true }).click();
-  await expect(sources.getByText(analysis.provenance.assumptions[0], { exact: true })).toBeVisible();
-  await sources.getByText("Detail pengolahan data", { exact: true }).click();
-  await expect(panel).toContainText("6.761,92");
-  await expect(page.getByRole("heading", { name: /Lahan Anda sepanjang musim dengan Estimasi omzet tertinggi/ })).toBeVisible();
-  await page.screenshot({ path: "/tmp/tani-revenue-desktop.png", fullPage: true });
-  await panel.getByText("Lihat angka acuan", { exact: true }).click();
-  await panel.getByText("Asumsi lengkap dan sumber", { exact: true }).click();
-  await page.setViewportSize({ width: 390, height: 1800 });
-  await sources.screenshot({ path: "/tmp/tani-sources-mobile.png" });
-  await panel.getByText("Asumsi lengkap dan sumber", { exact: true }).click();
-  await assumptions.last().screenshot({ path: "/tmp/tani-assumptions-mobile.png" });
-  await panel.getByText("Asumsi lengkap dan sumber", { exact: true }).click();
+  for (const name of ["Dasar perhitungan", "Per komoditas", "Batas estimasi", "Angka acuan nasional 2023", "Sumber data"]) {
+    await expect(panel.getByRole("heading", { name, exact: true })).toBeVisible();
+  }
+  await expect(panel).toContainText("berat × (1 − 0,28) / (1 − 0,15)");
+  await panel.screenshot({ path: "/tmp/tani-revenue-desktop-open.png" });
+
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(panel).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
@@ -74,10 +68,10 @@ test("revenue remains usable in English and no-sales stages stay explicit", asyn
   const panel = page.getByRole("region", { name: /^Estimated revenue/ });
   await expect(panel).toContainText("2023 national-average");
   await expect(panel).toContainText("not net profit");
-  await panel.getByText("Calculation and assumptions", { exact: true }).click();
   const baseline = analysis.strategies[0];
   expect(baseline.revenue.stages.some((s: { reason: string }) => s.reason === "no_sales")).toBeTruthy();
   await expect(panel).toContainText("No modeled sales");
-  await panel.getByText("View reference values", { exact: true }).click();
+  await expect(panel).toContainText("When money comes in");
+  await panel.getByText("Assumptions, reference values and sources", { exact: true }).click();
   await expect(panel).toContainText("6,761.92");
 });

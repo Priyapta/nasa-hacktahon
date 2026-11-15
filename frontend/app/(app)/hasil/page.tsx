@@ -189,7 +189,7 @@ function Results() {
 
               <StrategyCards strategies={strategies} selected={selected} onSelect={setSelected} startMonth={plan.startMonth} horizon={plan.horizon} t={r} lang={plan.lang} />
 
-              <RevenuePanel strategy={strategy} provenance={result.provenance.economics} lang={plan.lang} />
+              <RevenuePanel strategy={strategy} strategies={strategies} provenance={result.provenance.economics} startMonth={plan.startMonth} horizon={plan.horizon} lang={plan.lang} />
 
               <section className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
                 <DimensionTable strategies={strategies} selected={selected} horizon={plan.horizon} t={r} />
