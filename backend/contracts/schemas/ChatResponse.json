@@ -49,7 +49,7 @@
           "items": {
             "$ref": "#/$defs/Strategy"
           },
-          "maxItems": 3,
+          "maxItems": 4,
           "title": "Strategies",
           "type": "array"
         },
@@ -566,6 +566,17 @@
           },
           "title": "Assumptions",
           "type": "array"
+        },
+        "economics": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RevenueProvenance"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -647,6 +658,240 @@
         "status"
       ],
       "title": "RainValidation",
+      "type": "object"
+    },
+    "RevenueEstimate": {
+      "additionalProperties": false,
+      "properties": {
+        "reference_year": {
+          "const": 2023,
+          "title": "Reference Year",
+          "type": "integer"
+        },
+        "currency": {
+          "const": "IDR",
+          "title": "Currency",
+          "type": "string"
+        },
+        "area_ha": {
+          "minimum": 0,
+          "title": "Area Ha",
+          "type": "number"
+        },
+        "gross_idr": {
+          "minimum": 0,
+          "title": "Gross Idr",
+          "type": "integer"
+        },
+        "gross_per_ha_idr": {
+          "minimum": 0,
+          "title": "Gross Per Ha Idr",
+          "type": "integer"
+        },
+        "completed_harvests": {
+          "minimum": 0,
+          "title": "Completed Harvests",
+          "type": "integer"
+        },
+        "is_highest": {
+          "title": "Is Highest",
+          "type": "boolean"
+        },
+        "stages": {
+          "items": {
+            "$ref": "#/$defs/StageRevenue"
+          },
+          "title": "Stages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "reference_year",
+        "currency",
+        "area_ha",
+        "gross_idr",
+        "gross_per_ha_idr",
+        "completed_harvests",
+        "is_highest",
+        "stages"
+      ],
+      "title": "RevenueEstimate",
+      "type": "object"
+    },
+    "RevenueProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "reference_year": {
+          "const": 2023,
+          "title": "Reference Year",
+          "type": "integer"
+        },
+        "scope": {
+          "const": "Indonesia",
+          "title": "Scope",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/RevenueSource"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "references": {
+          "items": {
+            "$ref": "#/$defs/RevenueReference"
+          },
+          "title": "References",
+          "type": "array"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "version",
+        "reference_year",
+        "scope",
+        "sources",
+        "references",
+        "assumptions"
+      ],
+      "title": "RevenueProvenance",
+      "type": "object"
+    },
+    "RevenueReference": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "enum": [
+            "padi_sawah",
+            "jagung",
+            "kedelai",
+            "kacang_hijau",
+            "orok_orok",
+            "bera"
+          ],
+          "title": "Crop Id",
+          "type": "string"
+        },
+        "product": {
+          "title": "Product",
+          "type": "string"
+        },
+        "non_market": {
+          "title": "Non Market",
+          "type": "boolean"
+        },
+        "price_idr_per_kg": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Price Idr Per Kg"
+        },
+        "source_yield_kg_per_ha": {
+          "minimum": 0,
+          "title": "Source Yield Kg Per Ha",
+          "type": "number"
+        },
+        "model_yield_kg_per_ha": {
+          "minimum": 0,
+          "title": "Model Yield Kg Per Ha",
+          "type": "number"
+        },
+        "source_moisture_pct": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Moisture Pct"
+        },
+        "model_moisture_pct": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Model Moisture Pct"
+        }
+      },
+      "required": [
+        "crop_id",
+        "product",
+        "non_market",
+        "price_idr_per_kg",
+        "source_yield_kg_per_ha",
+        "model_yield_kg_per_ha",
+        "source_moisture_pct",
+        "model_moisture_pct"
+      ],
+      "title": "RevenueReference",
+      "type": "object"
+    },
+    "RevenueSource": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sha256"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "url",
+        "locator",
+        "sha256"
+      ],
+      "title": "RevenueSource",
       "type": "object"
     },
     "RotationInput": {
@@ -896,6 +1141,62 @@
       "title": "StageRain",
       "type": "object"
     },
+    "StageRevenue": {
+      "additionalProperties": false,
+      "properties": {
+        "stage_index": {
+          "minimum": 0,
+          "title": "Stage Index",
+          "type": "integer"
+        },
+        "crop_id": {
+          "enum": [
+            "padi_sawah",
+            "jagung",
+            "kedelai",
+            "kacang_hijau",
+            "orok_orok",
+            "bera"
+          ],
+          "title": "Crop Id",
+          "type": "string"
+        },
+        "harvest_month": {
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+          "title": "Harvest Month",
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "harvest",
+            "after_horizon",
+            "no_sales"
+          ],
+          "title": "Reason",
+          "type": "string"
+        },
+        "quantity_kg": {
+          "minimum": 0,
+          "title": "Quantity Kg",
+          "type": "number"
+        },
+        "gross_idr": {
+          "minimum": 0,
+          "title": "Gross Idr",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stage_index",
+        "crop_id",
+        "harvest_month",
+        "reason",
+        "quantity_kg",
+        "gross_idr"
+      ],
+      "title": "StageRevenue",
+      "type": "object"
+    },
     "Strategy": {
       "additionalProperties": false,
       "properties": {
@@ -909,7 +1210,8 @@
             "pola_biasa",
             "hemat_air",
             "jaga_tanah",
-            "seimbang"
+            "seimbang",
+            "omzet_tertinggi"
           ],
           "title": "Role",
           "type": "string"
@@ -951,6 +1253,17 @@
           "anyOf": [
             {
               "$ref": "#/$defs/StrategyExplanation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "revenue": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RevenueEstimate"
             },
             {
               "type": "null"

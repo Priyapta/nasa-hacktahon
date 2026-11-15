@@ -12,13 +12,14 @@ from app.core.climate import ClimateInputError
 from app.core.dimensions import measure
 from app.core.explain import selection_notes, strategy_payload
 from app.core.feasibility import WATER_SHARE_THRESHOLD, evaluate
+from app.core.revenue import estimate_revenue
 from app.core.rotation import build_calendar
 from app.core.selector import Scored, select
+from app.economics import field_area_ha, load_revenue_table
 from app.schemas import AnalysisContext, AnalysisInput, AnalysisResponse
 from app.services.climate import ClimateService
 from app.services.power_archive import ArchiveError
 from app.services.soil import SoilService
-
 
 # PRD 12.5: fetch climate and soil together, POWER within 15 s and SoilGrids
 # within 8 s. A late fetch keeps running in the background and fills the cache.
@@ -105,6 +106,7 @@ class AnalysisService:
         self.climate = climate or ClimateService()
         self.soil = soil or SoilService()
         self.catalog = catalog or load_catalog()
+        self.revenue_table = load_revenue_table()
         self.demo_bbox = demo_bbox
         self.allow_network = allow_network
 
@@ -137,6 +139,8 @@ class AnalysisService:
             soil = soil_unavailable(lang)
 
         crops = {crop.crop_id: crop for crop in self.catalog.crops}
+        economic_crops = self.revenue_table.core()
+        area_ha = field_area_ha(request.location.model_dump())
         profile = {
             row["month"]: {"t_mean_c": row["t_mean_c"], "class": row["class"]}
             for row in climate["climate"]["monthly"]
@@ -163,7 +167,8 @@ class AnalysisService:
                 limited_months=limited,
             )
             dims = measure(plan, evaluation, start_month=start, crops=crops, profile=profile)
-            return Scored(identifier, plan, evaluation, dims)
+            revenue = estimate_revenue(plan, economic_crops, area_ha=area_ha, start_month=start)
+            return Scored(identifier, plan, evaluation, dims, revenue)
 
         baseline = (
             score("baseline", request.rotation.stages)
@@ -188,7 +193,31 @@ class AnalysisService:
             strategies.append(strategy_payload("pola_biasa", baseline, **common))
         strategies += [strategy_payload(role, item, **common) for role, item in selection.alternatives]
 
+        scored = {item.id: item for item in candidates}
+        if baseline is not None:
+            scored[baseline.id] = baseline
+        for strategy in strategies:
+            item = scored[strategy["id"]]
+            strategy["revenue"] = item.revenue.payload(strategy["id"] == selection.highest_revenue_id)
+            if strategy["revenue"]["is_highest"]:
+                strategy["reasons"].append(
+                    f"Estimasi omzet nasional 2023 tertinggi di antara pola layak yang dinilai: Rp{strategy['revenue']['gross_idr']:,}. Ini penjualan sebelum biaya, bukan keuntungan bersih."
+                    if lang == "id" else
+                    f"Highest 2023 national-reference revenue among feasible evaluated patterns: IDR{strategy['revenue']['gross_idr']:,}. Sales before costs, not net profit."
+                )
+
         notes = list(climate["notes"])
+        notes.append(
+            "Omzet memakai harga dan produktivitas rata-rata nasional 2023. Angka jagung memakai asumsi penyesuaian kadar air. Bukan keuntungan bersih atau prakiraan harga."
+            if lang == "id" else
+            "Revenue uses 2023 national-average prices and yields. Maize uses an assumed moisture adjustment. These are not net profits or price forecasts."
+        )
+        if not selection.highest_revenue_id:
+            notes.append(
+                "Tidak ada pola layak dengan panen penjualan selesai untuk diberi label omzet tertinggi dalam rentang ini."
+                if lang == "id" else
+                "No feasible pattern has completed sales harvests to receive the highest-revenue label in this period."
+            )
         if soil["soil"]["status"] != "ok":
             notes += soil["notes"]
         if _outside_demo(request.location, self.demo_bbox):
@@ -241,6 +270,7 @@ class AnalysisService:
                 },
                 "soil": soil["provenance"],
                 "crop_table_version": self.catalog.version,
+                "economics": self.revenue_table.provenance(lang),
                 "assumptions": assumptions,
             },
         }

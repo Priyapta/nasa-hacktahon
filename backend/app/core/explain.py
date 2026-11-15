@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Literal, Mapping, Sequence
+from collections.abc import Mapping
+from typing import Literal
 
 from app.core.feasibility import WATER_SHARE_THRESHOLD, Risk
 from app.core.selector import Scored, Selection
@@ -12,6 +13,7 @@ LABELS = {
     "hemat_air": {"id": "Hemat air", "en": "Water-saving"},
     "jaga_tanah": {"id": "Jaga tanah", "en": "Soil-care"},
     "seimbang": {"id": "Seimbang", "en": "Balanced"},
+    "omzet_tertinggi": {"id": "Estimasi omzet tertinggi", "en": "Highest estimated revenue"},
 }
 
 MONTHS = {
@@ -322,9 +324,9 @@ def selection_notes(
     notes: list[str] = []
     if not has_pattern:
         notes.append(
-            "Belum ada pola untuk dibandingkan, jadi kami menampilkan tiga pilihan."
+            "Belum ada pola untuk dibandingkan. Pilihan yang tersedia ditampilkan tanpa pembanding pola biasa."
             if lang == "id"
-            else "There is no usual pattern to compare, so we show three options."
+            else "There is no usual pattern to compare. Available options are shown without a baseline."
         )
     found = len(selection.alternatives)
     if found == 0:

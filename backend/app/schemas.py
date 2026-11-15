@@ -8,10 +8,8 @@ See contracts/location-polygon.md for the backend-only change to PRD location.
 import re
 from datetime import datetime
 from typing import Annotated, Literal, Self
-from zoneinfo import ZoneInfo
 from uuid import UUID
-
-from shapely import Polygon, is_valid_reason
+from zoneinfo import ZoneInfo
 
 from pydantic import (
     BaseModel,
@@ -21,6 +19,7 @@ from pydantic import (
     model_serializer,
     model_validator,
 )
+from shapely import Polygon, is_valid_reason
 
 Language = Literal["id", "en"]
 CropId = Literal[
@@ -148,7 +147,7 @@ Count = Annotated[int, Field(ge=0)]
 Month = Annotated[str, Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")]
 Timestamp = Annotated[str, Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$")]
 Level = Literal["rendah", "sedang", "tinggi"]
-StrategyRole = Literal["pola_biasa", "hemat_air", "jaga_tanah", "seimbang"]
+StrategyRole = Literal["pola_biasa", "hemat_air", "jaga_tanah", "seimbang", "omzet_tertinggi"]
 RuleId = Literal["K1", "K2", "K3", "K4", "K5"]
 
 
@@ -303,6 +302,54 @@ class StrategyExplanation(ContractModel):
     cautions: ExplanationPoints
 
 
+class StageRevenue(ContractModel):
+    stage_index: Count
+    crop_id: CropId
+    harvest_month: Month
+    reason: Literal["harvest", "after_horizon", "no_sales"]
+    quantity_kg: NonNegative
+    gross_idr: Count
+
+
+class RevenueEstimate(ContractModel):
+    reference_year: Literal[2023]
+    currency: Literal["IDR"]
+    area_ha: NonNegative
+    gross_idr: Count
+    gross_per_ha_idr: Count
+    completed_harvests: Count
+    is_highest: bool
+    stages: list[StageRevenue]
+
+
+class RevenueSource(ContractModel):
+    id: str
+    title: str
+    url: str
+    locator: str
+    sha256: str | None
+
+
+class RevenueReference(ContractModel):
+    crop_id: CropId
+    product: str
+    non_market: bool
+    price_idr_per_kg: NonNegative | None
+    source_yield_kg_per_ha: NonNegative
+    model_yield_kg_per_ha: NonNegative
+    source_moisture_pct: Annotated[float, Field(ge=0, lt=100)] | None
+    model_moisture_pct: Annotated[float, Field(ge=0, lt=100)] | None
+
+
+class RevenueProvenance(ContractModel):
+    version: str
+    reference_year: Literal[2023]
+    scope: Literal["Indonesia"]
+    sources: list[RevenueSource]
+    references: list[RevenueReference]
+    assumptions: list[str]
+
+
 class Strategy(ContractModel):
     id: Annotated[str, Field(min_length=1)]
     role: StrategyRole
@@ -313,6 +360,7 @@ class Strategy(ContractModel):
     reasons: list[str]
     tradeoffs: list[str]
     explanation: StrategyExplanation | None = Field(default=None, exclude_if=lambda value: value is None)
+    revenue: RevenueEstimate | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class RainValidation(ContractModel):
@@ -343,11 +391,12 @@ class Provenance(ContractModel):
     soil: SoilProvenance
     crop_table_version: str
     assumptions: list[str]
+    economics: RevenueProvenance | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class AnalysisResponse(ContractModel):
     context: EnvironmentalContext
-    strategies: Annotated[list[Strategy], Field(max_length=3)]
+    strategies: Annotated[list[Strategy], Field(max_length=4)]
     notes: list[str]
     provenance: Provenance
 
@@ -363,6 +412,11 @@ class AnalysisResponse(ContractModel):
             raise ValueError("seimbang hanya untuk hasil tanpa pola biasa.")
         if any(not s.feasibility.passed for s in self.strategies if s.role != "pola_biasa"):
             raise ValueError("Alternatif harus lolos aturan kelayakan.")
+        if any(s.role == "omzet_tertinggi" and (not s.revenue or not s.revenue.is_highest) for s in self.strategies):
+            raise ValueError("Revenue role needs the highest-revenue calculation.")
+        highest = [s for s in self.strategies if s.revenue and s.revenue.is_highest]
+        if len(highest) > 1 or any(not s.feasibility.passed or not s.revenue.completed_harvests for s in highest):
+            raise ValueError("Highest revenue must identify at most one feasible harvested strategy.")
         return self
 
 

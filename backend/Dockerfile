@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir --only-binary=:all: -r requirements.lock.txt \
 COPY app ./app
 COPY migrations ./migrations
 COPY data/catalog ./data/catalog
+COPY data/economics ./data/economics
 USER atlas
 RUN python -c "from app.main import app; assert '/api/v1/health' in app.openapi()['paths']"
 EXPOSE 8000
