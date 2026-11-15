@@ -8,6 +8,7 @@ const plan = {
   time: { start_month: "2026-01", horizon_months: 12 }, water_source: "irigasi", lang: "id",
 };
 const analysis = readFileSync(join(__dirname, "fixtures/analyze.json"), "utf8");
+const tile = readFileSync(join(__dirname, "fixtures/flat-dem.png"));
 const resultUrl = "/hasil?area=110.9,-7.1;110.901,-7.1;110.901,-7.099&pola=kosong&mulai=2026-11&horizon=12&air=irigasi&lang=id";
 
 test("register, reopen saved land, analyze again, delete, and logout on mobile", async ({ page }) => {
@@ -31,6 +32,7 @@ test("register, reopen saved land, analyze again, delete, and logout on mobile",
     if (new URL(route.request().url()).pathname.endsWith("/field-1")) return route.fulfill({ json: fields[0] });
     return route.fulfill({ json: { fields } });
   });
+  await page.route("https://clarity.maptiles.arcgis.com/**", (route) => route.fulfill({ contentType: "image/png", body: tile }));
   await page.route("**/api/v1/analyze", (route) => {
     analyses++;
     expect(route.request().postDataJSON().time.start_month).toBe("2026-11");
@@ -45,10 +47,11 @@ test("register, reopen saved land, analyze again, delete, and logout on mobile",
   await page.getByRole("button", { name: "Buat akun", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Sawah utara" })).toBeVisible();
   await expect(page).toHaveURL(/\/akun$/);
-  await expect(page.getByRole("link", { name: "Buat lahan baru" })).toHaveAttribute("href", "/?lang=id");
+  await expect(page.getByRole("link", { name: "Tambah lahan", exact: true })).toHaveAttribute("href", "/?lang=id");
+  await expect(page.getByText("Jadwal lewat, dihitung dari Nov 2026")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: "/tmp/tani-account-mobile.png", fullPage: true });
-  await page.getByRole("link", { name: "Buka lahan", exact: true }).click();
+  await page.getByRole("link", { name: "Lihat hasil", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("pilihan lain");
   expect(analyses).toBeGreaterThan(0);
   await page.getByRole("button", { name: "Menu", exact: true }).click();
@@ -57,14 +60,15 @@ test("register, reopen saved land, analyze again, delete, and logout on mobile",
   await page.getByRole("button", { name: "Hapus Sawah utara" }).click();
   await expect(page.getByText(/Belum ada lahan tersimpan/)).toBeVisible();
   await page.getByRole("button", { name: "Menu", exact: true }).click();
-  await expect(page.getByRole("link", { name: "Tambah lahan", exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Tambah lahan", exact: true }).press("Escape");
+  const nav = page.getByRole("navigation", { name: "Navigasi utama" });
+  await expect(nav.getByRole("link", { name: "Tambah lahan", exact: true })).toBeVisible();
+  await nav.getByRole("link", { name: "Tambah lahan", exact: true }).press("Escape");
   await expect(page.getByRole("button", { name: "Menu", exact: true })).toBeFocused();
   await page.getByRole("button", { name: "Menu", exact: true }).click();
   await page.getByRole("button", { name: "Keluar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Masuk akun" })).toBeVisible();
   await expect(page).toHaveURL(/\/login(?:\?|$)/);
-  await expect(page.getByRole("link", { name: "Buat lahan baru" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Tambah lahan", exact: true })).toHaveCount(0);
 });
 
 test("save errors, sign-in return link, and successful save preserve the plan", async ({ page }) => {
@@ -164,8 +168,9 @@ test("opening and editing an existing field returns to the dashboard without a d
   });
   await page.route("**/api/v1/analyze", (route) => route.fulfill({ contentType: "application/json", body: analysis }));
   await page.route("**/api/v1/crops**", (route) => route.fulfill({ contentType: "application/json", body: readFileSync(join(__dirname, "fixtures/crops.json"), "utf8") }));
+  await page.route("https://clarity.maptiles.arcgis.com/**", (route) => route.fulfill({ contentType: "image/png", body: tile }));
   await page.goto("/akun");
-  await page.getByRole("link", { name: "Buka lahan", exact: true }).click();
+  await page.getByRole("link", { name: "Lihat hasil", exact: true }).click();
   await expect(page.getByLabel("Nama lahan", { exact: true })).toHaveValue("Sawah timur");
   await expect(page.getByRole("list", { name: "Langkah", exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Perbarui lahan ini" })).toHaveCount(0);
@@ -180,7 +185,8 @@ test("opening and editing an existing field returns to the dashboard without a d
   await page.getByRole("button", { name: "Simpan perubahan", exact: true }).click();
   await expect(page).toHaveURL(/\/akun\?lang=id&tersimpan=field-3$/);
   await expect(page.getByRole("heading", { name: "Sawah timur baru" })).toBeVisible();
-  await expect(page.getByText("1 lahan tersimpan", { exact: true })).toBeVisible();
+  await expect(page.getByRole("term").filter({ hasText: "Lahan tersimpan" })).toBeVisible();
+  await expect(page.getByRole("definition").first()).toHaveText("1");
   expect(updates).toBe(1);
   expect(creates).toBe(0);
   await expect(page.getByRole("navigation", { name: "Navigasi utama" })).toBeVisible();
