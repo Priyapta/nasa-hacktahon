@@ -1,163 +1,276 @@
-# Field Atlas
+<p align="center">
+    <img src="docs/images/tani.svg" width="96" height="96" alt="">
+</p>
 
-Agricultural mapping app in an npm workspaces monorepo. Requires Node.js 22.9+ and npm. Install dependencies from the repository root; there is one lockfile.
+<h1 align="center">TANI</h1>
 
-```text
-frontend/              Next.js frontend: map, farms, insights, planner
-backend/               Python FastAPI monolith (foundation stage)
-packages/
-  shared/              Location types, coordinate parsing, Photon normalization
-scripts/
-  run-apps.mjs         Runs frontend and shared watcher
-  run-backend.mjs      Runs local FastAPI using backend/.venv
-```
+<p align="center"><em>Adapt your planting to your field's climate and soil.</em></p>
 
-The frontend uses TypeScript, MapLibre GL JS, Esri Clarity, Terra Draw, Turf, and LocalStorage. FastAPI runs independently of Next.js. The root Docker Compose file runs local PostgreSQL; production backend Compose lives in `deploy/backend/`. Shared code compiles to ESM and declarations in `packages/shared/dist`.
+<p align="center">
+    A crop rotation decision support tool for small farms in Indonesia. It compares a farmer's usual<br>
+    rotation with alternatives using ten years of NASA POWER climate data, SoilGrids soil data and crop rules.
+</p>
+
+<p align="center">
+    <a href="#how-it-works">How it works</a> ·
+    <a href="#features">Features</a> ·
+    <a href="#method">Method</a> ·
+    <a href="#limitations-and-next-steps">Limitations</a> ·
+    <a href="#running-locally">Running locally</a>
+</p>
+
+<p align="center">
+    <img src="docs/images/landing.webp" width="800" alt="TANI landing page: an aerial photo of rice fields with one plot outlined and labelled 0.59 ha">
+</p>
+
+<p align="center">
+    <img src="https://img.shields.io/badge/NASA%20Space%20Apps-2026-0b3d91?style=flat-square" alt="NASA Space Apps 2026">
+    <img src="https://img.shields.io/badge/challenge-Field%20Shift-1f7a4d?style=flat-square" alt="Challenge: Field Shift">
+    <img src="https://img.shields.io/badge/climate-NASA%20POWER%202016%E2%80%932025-c3e77a?style=flat-square" alt="Climate: NASA POWER 2016 to 2025">
+    <img src="https://img.shields.io/badge/Next.js-16-1d1d1f?style=flat-square" alt="Next.js 16">
+    <img src="https://img.shields.io/badge/FastAPI-Python%203.12-009688?style=flat-square" alt="FastAPI on Python 3.12">
+</p>
+
+## Overview
+
+TANI is the entry of team **Tree Plex** (Jakarta, Indonesia) for the 2026 NASA Space Apps Challenge **Field Shift: Adapting Farms with NASA Data**. The challenge asks for a tool that combines NASA Earth observations with soil information, crop characteristics and farmer priorities, so farmers can explore crop rotations that protect soil and adapt to changing weather and water.
+
+TANI focuses on small rice farms in Indonesia, starting with Grobogan, Central Java. A farmer outlines a field on satellite imagery, enters the usual planting order, the start month, the planning period and the water source. TANI then:
+
+- **Reads the field's climate history** from NASA POWER: daily rain, temperature, humidity and solar radiation for 2016 to 2025, summarised per month.
+- **Reads the field's soil** from SoilGrids 2.0: pH, organic carbon and texture for 0 to 30 cm.
+- **Checks the usual rotation** against five feasibility rules, including how often rain was enough for each stage in the reference years.
+- **Suggests up to three other rotations** from a library of ten candidates, each chosen for one priority: saving water, caring for soil or estimated revenue.
+- **Explains every suggestion** with month by month calendars, five side by side dimensions, risks and the evidence behind them, in Indonesian or English.
+- **Answers follow-up questions** through Cropy, an assistant that can open the farmer's saved fields and rerun the analysis.
+
+Results are historical frequencies, not forecasts. The tool supports the farmer's own judgment and local extension officers and does not replace them.
+
+## How it addresses the challenge
+
+| Challenge objective                                          | What TANI does                                                                                                             |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Use NASA Earth observations                                  | NASA POWER daily data for ten complete years drives every climate rule and chart                                           |
+| Local soil information                                       | SoilGrids 2.0 pH, organic carbon and texture averaged over the field outline                                               |
+| Crop characteristics                                         | A curated table of five crops and fallow with FAO ECOCROP temperature and pH limits, water needs and planting order rules  |
+| Farmer priorities                                            | Water source (rainfed or irrigated) changes the rules, and alternatives are picked for water saving, soil care and revenue |
+| Compare at least three strategies including the existing one | The usual rotation is always shown next to up to three alternatives                                                        |
+| Explain why, evidence, benefits, gaps and risks              | Each strategy lists its reasons, trade offs, risks, years with enough rain and the data sources                            |
+| Bare field periods and vulnerable seasons                    | Bare months are counted per strategy and each month is classed as wet, humid or dry                                        |
+| Supplemental income                                          | An estimated sales value per strategy from 2023 national prices and yields                                                 |
+| Support, not replace, local expertise                        | Every result reminds the user to check with a local extension officer                                                      |
+
+## How it works
+
+1. **Pick the field.** Search a village or type coordinates, then tap the corners of the field on Esri satellite imagery. The area is measured in the browser.
+
+<p align="center">
+    <img src="docs/images/pick-field.webp" width="800" alt="Animation: the map starts on Indonesia, coordinates are typed into the search box, the camera flies to rice fields near Purwodadi, then four corners of one plot are clicked, the field measures 0.27 ha and the plan form opens">
+</p>
+
+2. **Fill in the plan.** Choose the usual order of crops and fallow months, a start month from the current month up to 11 months ahead, a period of 6, 12, 18 or 24 months, and whether the field is rainfed or irrigated.
+3. **Analyse.** The backend reads the cached NASA POWER and SoilGrids data for the field, evaluates the usual rotation and every candidate rotation, and selects the alternatives. The analysis itself is deterministic.
+4. **Explain.** An LLM rewrites the computed evidence into short points per stage. If the LLM is unavailable, the evidence written by the engine is shown instead.
+5. **Compare.** The results page shows the field through the season month by month, the soil, the strategy cards, the five dimensions, the reasons and the estimated revenue.
+
+<p align="center">
+    <img src="docs/images/season.webp" width="800" alt="Animation: the field plays through November to October. Rice is planted in the wet months, maize grows as rain drops, and the fallow field dries out from July, while the rain gauge, the ten year range and the monthly rain classes update each month">
+</p>
+
+Signed in users can save a field and open it again later from their dashboard. Opening a saved field reruns the analysis with the latest data.
+
+## Features
+
+### Choose a rotation strategy
+
+The usual rotation sits next to the alternatives. Each card shows whether the pattern passes the rules, its estimated revenue, how often rain was enough, the bare months and the soil care score. Selecting a card switches the whole page to that strategy.
+
+<p align="center">
+    <img src="docs/images/strategies.webp" width="800" alt="Three strategy cards for the Purwodadi field: the usual pattern fails, water saving passes with the highest estimated revenue and rain enough in 8 of 9 years, soil care passes with 2 of 3 soil care points">
+</p>
+
+### Compare them and see why
+
+Five dimensions are shown side by side without a combined score, so a trade off stays visible. The panel next to it explains each stage with its evidence, such as the number of years with enough rain, and states which rule failed. The screenshot shows the field from the [worked example](#worked-example).
+
+<p align="center">
+    <img src="docs/images/why.webp" width="800" alt="Five dimensions table for three strategies next to the explanation of the usual pattern: the second rice stage from March to June has only 1 of 4 wet months and the pattern fails rule K5">
+</p>
+
+### See the estimated revenue
+
+The revenue card shows the total for the field, the value per hectare, the difference with the usual pattern and the month each harvest brings money in. The comparison with other patterns, the calculation table and the sources open on request.
+
+<p align="center">
+    <img src="docs/images/revenue.webp" width="800" alt="Revenue card for the water saving strategy: Rp26 million for 0.36 ha, the harvest months, a comparison with the other patterns and the calculation table">
+</p>
+
+### Ask Cropy
+
+Cropy answers questions about rotation, water and soil, and can open a signed in user's saved fields to report the current stage and the field's rain history.
+
+<p align="center">
+    <img src="docs/images/cropy.webp" width="800" alt="Cropy section of the landing page with a sample conversation about the current stage of a saved rice field">
+</p>
+
+## Method
+
+This section explains where the numbers come from and how the strategies are chosen.
+
+### Data sources
+
+| Source                                                                                                                                      | What is used                                                                                   | Resolution and period                                                       | Role                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [NASA POWER](https://power.larc.nasa.gov/)                                                                                                  | `T2M`, `T2M_MIN`, `T2M_MAX`, `PRECTOTCORR`, `RH2M`, `ALLSKY_SFC_SW_DWN`, community `AG`, daily | Meteorology about 0.5° x 0.625°, the last ten complete years (2016 to 2025) | Monthly rain, temperature, humidity and radiation for the field. Main input of rules K2 and K5 |
+| [SoilGrids 2.0](https://soilgrids.org/) (ISRIC)                                                                                             | pH in water, soil organic carbon, sand, silt, clay                                             | 250 m, 0 to 30 cm, weighted by the pixels inside the field                  | Soil card, USDA texture and rule K3                                                            |
+| [FAO ECOCROP](https://ecocrop.apps.fao.org/) and FAO water guides                                                                           | Absolute temperature and pH limits, water needs                                                | Per crop                                                                    | Crop table used by rules K2, K3 and K5                                                         |
+| Kementan (Ministry of Agriculture of Indonesia)                                                                                             | 2023 producer prices and yields                                                                | National averages                                                           | Estimated revenue                                                                              |
+| [Esri World Imagery (Clarity)](https://www.esri.com/arcgis-blog/products/imagery/imagery/world-imagery-clarity-a-clearer-view-of-the-world) | Satellite basemap tiles                                                                        | Varies by location                                                          | Drawing and showing the field                                                                  |
+| [Nominatim](https://nominatim.org/) (OpenStreetMap)                                                                                         | Place search                                                                                   |                                                                             | Finding a village by name                                                                      |
+| [Natural Earth](https://www.naturalearthdata.com/)                                                                                          | Country outlines                                                                               | 1:50m                                                                       | Maps on the landing page                                                                       |
+
+NASA POWER is cached for Indonesia in ten regional tiles covering 94° E to 142° E and 12° S to 7° N. SoilGrids rasters are cached for the Grobogan demo area. Outside the soil cache, the analysis runs without soil and rule K3 is skipped. The crop list was assembled for Grobogan and may not fit other regions.
+
+A climate value describes the POWER grid cell, about 50 km across, not the plot itself. Two nearby fields get the same climate profile.
+
+### Rotation engine
+
+The engine lives in [`backend/app/core/`](backend/app/core) and does not train a model. Every strategy, including the usual one, goes through the same five rules:
+
+| Rule | Checks                    | Fails when                                                                                                                                            |
+| ---- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| K1   | Calendar                  | Stages leave gaps or overlap                                                                                                                          |
+| K2   | Temperature               | A month's median mean temperature is outside the crop's absolute limits                                                                               |
+| K3   | Soil pH                   | The field's pH is outside the crop's limits. Skipped when soil data is missing                                                                        |
+| K4   | Planting order            | A crop follows a crop it should not follow                                                                                                            |
+| K5   | Rain, rainfed fields only | Rain over a stage reaches the crop's lower water need in less than 60% of the reference years, or rice has wet months for less than half of its stage |
+
+Months are classed from the median rain of the ten years: wet above 200 mm, humid from 100 to 200 mm and dry below 100 mm. Margins close to a limit are reported as risks instead of failures.
+
+Feasible candidates are compared on five dimensions shown side by side, without a combined score:
+
+| Dimension         | Meaning                                                             |
+| ----------------- | ------------------------------------------------------------------- |
+| Climate fit       | Months where temperature is within the crop's range                 |
+| Water pressure    | How often rain was enough at the weakest stage                      |
+| Bare months       | Months the field is left without a crop                             |
+| Soil contribution | Legumes, cover crops and number of crop families                    |
+| Risks             | Notes such as near limits, missing data or approximated water needs |
+
+The selector picks one alternative per role: water saving and soil care when a usual pattern is given, a balanced option when it is not, and the highest estimated revenue among all feasible patterns. Thresholds and decisions are documented in [rotation-engine.md](backend/contracts/rotation-engine.md).
+
+### Worked example
+
+The usual rotation of a 0.36 ha rainfed field near Purwodadi, Grobogan, is rice, rice, then 4 fallow months, starting November 2026 for 12 months. The engine returns:
+
+| Strategy      | Rotation                | Feasibility |  Rain enough | Bare months | Legume | Estimated revenue |
+| ------------- | ----------------------- | ----------- | -----------: | ----------: | ------ | ----------------: |
+| Usual pattern | Rice, rice, fallow      | Fails K5    | 9 of 9 years |           4 | No     |    Rp25.7 million |
+| Water saving  | Rice, maize, fallow     | Passes      | 8 of 9 years |           4 | No     |    Rp26.0 million |
+| Soil care     | Rice, mung bean, fallow | Passes      | 9 of 9 years |           6 | Yes    |    Rp20.3 million |
+
+Rain over the whole second rice stage is enough in every reference year, but that stage falls from March to June, when less than half of the months are wet. Rainfed rice needs mostly wet months, so the usual pattern fails rule K5. Replacing the second rice with maize or mung bean passes.
+
+### Estimated revenue
+
+For each completed harvest, revenue is field area × reference yield × reference price. Prices and yields are 2023 national averages from Kementan publications, the same for every location and month. The values are sales before costs, not profit and not a price forecast. Maize weight is converted from 28% to 15% moisture. Harvests after the analysis period are not counted. Sunn hemp and fallow have no modelled sales. Details are in [revenue.md](backend/contracts/revenue.md).
+
+### Cropy
+
+Cropy is a chat assistant on the app pages. It answers questions about crop rotation, water and soil in Indonesian or English. For a signed in user it can call two read only tools: one finds saved fields by name and the other reads a saved field's plan, its current planned stage, its area and a fresh climate and soil analysis. Ownership is checked against the session on every call.
+
+Each message is first checked by a classifier, and requests outside farming and land management are refused. Messages are limited to 2,000 characters, and the API process accepts five chat requests per minute. Cropy has no live crop monitoring or weather feed, so planned stages are not evidence of actual crop growth.
+
+## Limitations and next steps
+
+TANI is built to compare rotation options with public data, so each result is a starting point for a conversation with the farmer and a local extension officer. These are the current scope choices and how they can grow:
+
+- **Rain is a modelled estimate.** POWER `PRECTOTCORR` is a satellite and model based product. It has not yet been compared with NASA GPM IMERG or rain gauges in Indonesia, which is the next step for checking the rain rule.
+- **Area scale data.** Climate describes a POWER grid cell about 50 km across and soil a 250 m pixel. This suits comparing seasons and patterns for an area, while plot level detail comes from the farmer's own knowledge of the field.
+- **Built on history.** "Enough in 8 of 9 years" summarises the past ten years. It shows how reliable a season has been, not a forecast for the next one.
+- **Rain based water check.** The water rule compares rain with each crop's need, and irrigated fields skip it. Evapotranspiration and soil moisture, for example from NASA SMAP, are a natural extension.
+- **Revenue as a common reference.** Estimates use 2023 national prices and yields, so every pattern is compared on the same basis. Local prices, costs and the field's own yield can be added later.
+- **Crop list focused on Grobogan.** Five crops and fallow (rice, maize, soybean, mung bean and sunn hemp) cover the main patterns there. Other regions can be added with their own crop table.
+
+## Architecture
+
+| Component   | Technology                                                                                      | Role                                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Frontend    | Next.js 16 App Router, TypeScript, Tailwind CSS 4, MapLibre GL, Terra Draw, Turf, Framer Motion | Landing page, field drawing, plan form, results, dashboard and chat panel. Hosted on Vercel                        |
+| Backend     | FastAPI, Pydantic, rasterio, httpx                                                              | Analysis, geocoding, accounts, saved fields and chat under `/api/v1`. Runs as a Docker image on a VPS behind Nginx |
+| Database    | PostgreSQL (Neon in production)                                                                 | Accounts, sessions and saved fields                                                                                |
+| Data caches | JSON and GeoTIFF files                                                                          | NASA POWER and SoilGrids archives, built by scripts and shared as checksummed ZIP files                            |
+| LLM         | OpenAI Chat Completions                                                                         | Explanation text and the Cropy assistant. Optional for the analysis                                                |
+
+The browser calls the backend through the Next.js origin, which forwards `/api/*`. NASA POWER, SoilGrids, Nominatim and the LLM are reached only from the backend. On every push to `main`, GitHub Actions runs the frontend tests, the build and the backend tests, then builds the backend image, publishes it to GitHub Container Registry and deploys it over SSH. Vercel deploys the frontend from the same branch. See [deploy/backend/README.md](deploy/backend/README.md).
+
+## Running locally
+
+Requires Node.js 22.9 or newer, npm and Python 3.12 or newer (CI uses 3.12).
 
 ```sh
 npm ci
+python3 -m venv backend/.venv
+backend/.venv/bin/python -m pip install -r backend/requirements-dev.lock.txt
 cp frontend/.env.example frontend/.env.local
 cp backend/.env.example backend/.env
+```
+
+Extract the NASA POWER and SoilGrids cache archives as described in [backend/cache-archives/README.md](backend/cache-archives/README.md). Without the climate cache the analysis returns HTTP 502. `AI_API_KEY` in `backend/.env` is optional and enables the explanations and Cropy. `DATABASE_URL` enables accounts and saved fields.
+
+Run the backend and the frontend in two terminals:
+
+```sh
+npm run dev:backend
 npm run dev
 ```
 
-Copy the example environment files only if your local files do not exist. Existing local MapTiler settings have moved to `frontend/.env.local`; API settings belong in `backend/.env`. Local environment files are ignored by Git.
+The app runs at http://localhost:3000 and the API documentation at http://127.0.0.1:8000/docs.
 
-`npm run dev` builds shared code once, then watches shared code and the frontend. Open http://localhost:3000. Run `npm run dev:backend` in another terminal after setting up the Python environment as described in [backend/README.md](backend/README.md). FastAPI listens at http://127.0.0.1:8000, with documentation at `/docs`. Stop each process with Ctrl+C. No API container is required.
-
-Satellite and Street maps work without a MapTiler key. The optional `NEXT_PUBLIC_MAPTILER_KEY` in `frontend/.env.local` enables elevation terrain at zoom >= 11 (exaggeration 1.4), disabled below 11. Without it, the globe and satellite mapping remain interactive with a flat terrain surface. The camera supports zoom 22, pitch 80, and NavigationControl with pitch visualization.
-
-## API connection and deployment
-
-For an Ubuntu 24.04 amd64 VPS with 2 cores / 2 GB RAM and a Vercel frontend, use [the backend deployment guide](deploy/backend/README.md). It includes Docker Compose, Nginx, SSH secrets, GitHub Actions CI/CD, HTTPS setup, and Vercel build settings. Pushes to `main` run checks and publish the backend image to GHCR before SSH deployment; Vercel's Git integration deploys the frontend separately. The frontend uses its assigned `.vercel.app` address; the backend uses `api-atlas.alworkbench.site`. VPS bootstrap, GitHub SSH secrets, Vercel Git connection, and backend DNS/TLS must be configured once before automatic deployments work.
-
-- `GET /api/v1/health` returns `{"status":"ok"}` without querying external services or PostgreSQL.
-- FastAPI serves health, crop options, Nominatim location search, and AI chat. The analysis endpoint is not implemented yet.
-- `npm run dev:backend` and `npm run start:backend` load `backend/.env` automatically; direct Uvicorn commands need exported variables. See the backend README for environment configuration.
-- `API_URL` in `frontend/.env.local` is the backend address reachable by the Next.js server. It defaults to `http://127.0.0.1:8000`. Browser requests keep using `/api/*`, which Next.js proxies to the backend with [external rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites). The browser uses the frontend origin, so this setup needs no cross-origin API configuration.
-
-For deployment, set `API_URL` before building the frontend; changing the proxy address requires rebuilding it. `npm run build` builds shared code and the frontend. `npm start` starts the frontend; `npm run start:backend` runs local Uvicorn separately without reload. Generated `dist`, `.next`, and MapLibre worker assets are built locally and are not committed.
-
-Saved fields remain in browser LocalStorage using `field-atlas-v1`. Keep the same frontend origin to access existing fields; a different host or port has separate browser storage. PostgreSQL setup is described below; field persistence has not been migrated and there are no user accounts.
-
-## Floating AI chat (OpenAI GPT-6 Luna)
-
-The bottom-right **Ask Cropy** button opens a keyboard-accessible chat panel on every page. It supports Indonesian/English, in-memory conversation history, clear/reset, and retry without duplicating the question. Messages are sent to OpenAI only after the user submits. Cropy uses a clipped SVG liquid orb with three translucent lime/mint gradient layers and small static blur filters. Framer Motion drives independent layer transforms, subtle contour deformation, and 0.988–1.012 breathing from a continuous phase, without resetting on hover or thinking changes. Hover/focus eases the flow to about five times idle speed with more visible edge deformation; pending replies also increase flow intensity with a spring; clicking the launcher produces a clipped ripple. The launcher, header, and welcome orb animate while relevant; reply avatars stay still. Frame updates pause in hidden tabs and when reduced motion is enabled. The orb stays inside its existing dimensions and has no surrounding card. The launcher shows only the orb while idle. Hover or keyboard focus smoothly reveals the Ask Cropy label using Anime.js, including while the chat is open; leaving hides it again, with reduced-motion support. The panel stays above the launcher on mobile and remains non-modal so the logo button can close it; Escape also closes it and returns focus. Visible footer notices and the input heading were removed at the product owner’s request; the input retains a screen-reader label.
-
-Set these variables in `backend/.env`, then restart with `npm run dev:backend` in a separate terminal from the frontend. The launcher loads the file automatically; existing shell variables take precedence. Direct Uvicorn commands still need exported variables:
-
-```dotenv
-AI_API_KEY=your-openai-api-key
-AI_MODEL=gpt-6-luna
-```
-
-Never put the key in frontend variables. FastAPI uses OpenAI's [Chat Completions API](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create) through the installed `httpx` client, with `reasoning_effort=none` and `max_completion_tokens` limits. The UI calls `POST /api/v1/agent/chat` through the existing Next.js rewrite. Without a key the API returns 503 and the panel explains the service is not active. Replies follow the latest message's Indonesian or English language; the chat has no separate language selector.
-
-Chat handles general farming conversations and the signed-in user's saved fields. Read-only tools search owned fields by name (20 per page) and inspect their saved calendars, current planned stages, area, water source, and fresh analysis through the existing analysis service. Ownership is checked against the session for every lookup, including active field IDs supplied by the browser; the model never chooses an account. Field names and tool results are treated as untrusted data. The dashboard also provides Ask Cropy. When the user asks about “this field” on a saved-field results page, the browser sends its `field_id`; no account ID or client-supplied field data is trusted. Only relevant owned field summaries and analysis go to the model, without raw polygon coordinates or credentials. Saved plans are never modified by chat. Expired start months move to the current month only for the fresh analysis, while progress still uses the original saved calendar. There are no live growth observations or weather tools, so planned progress is not evidence of actual crop growth. The response shape remains `{ answer, sources: [], scenario: null }`, with `blocked: true` for refusals. Non-null `analysis_input` remains unsupported; use saved fields for field-specific chat.
-
-Requests are limited to 64 KiB, 2,000 characters per message, ten history entries, 800 tokens per completion, three tool rounds, and a shared 55-second request deadline. This temporary adapter allows five chat requests per minute for the whole API process; each accepted request uses two to five provider calls. It does not yet implement the PRD's daily quota; configure an account spending limit before public use. Browser requests time out after 60 seconds. Chat history stays in tab memory and resets on account or language changes.
-
-## Local PostgreSQL with Docker
-
-Run PostgreSQL 17 from the repository root. If the root `.env` does not exist, copy `.env.example` to `.env`, then replace `POSTGRES_PASSWORD` with your local password. Keep existing environment files; do not overwrite them.
+Checks:
 
 ```sh
-docker compose up -d --wait db
-docker compose ps
-docker compose exec db psql -U field_shift -d field_shift
-```
-
-Docker Compose automatically detects `docker-compose.yml` from the repository root. The database listens on `127.0.0.1:5432` and persists data in the Compose `postgres_data` named volume. `POSTGRES_PORT` in the root `.env` can change the host port. The root `.env` is for Compose; `backend/.env` is for the backend. Both are ignored by Git.
-
-Set `DATABASE_URL` in `backend/.env`, matching the database name, user, password, and host port from the root `.env`:
-
-```dotenv
-DATABASE_URL=postgresql://field_shift:YOUR_PASSWORD@127.0.0.1:5432/field_shift
-```
-
-URL-encode special characters in the password when constructing the connection URL. FastAPI runs locally and connects through the database's published host port. Never place this URL in a `NEXT_PUBLIC_` variable or frontend environment file. Run `npm run db:migrate` to create the account, session, and saved-field tables; set `COOKIE_SECURE=false` for local HTTP.
-
-```sh
-docker compose logs --tail=50 db
-docker compose stop db
-docker compose start --wait db
-```
-
-Stopping or recreating the container keeps the named volume. `docker compose down` also keeps it; **`docker compose down -v` deletes the database data**. PostgreSQL initialization variables apply to an empty data directory; changing the password in `.env` does not update an existing database password. Update the database role password first, then synchronize both environment files.
-
-Accounts and saved fields use PostgreSQL. Open **Lahan saya** to register or sign in with a username and password, then save a field from the results page. Opening saved land runs analysis again; expired planting months move to the current month. Curated/reference files and environmental caches remain file based, and chat history stays in tab memory. The official image's volume and initialization behavior is documented in the [PostgreSQL image documentation](https://hub.docker.com/_/postgres).
-
-Vercel continues hosting the frontend. This Compose file is for local database development. For production, use a Neon pooled `DATABASE_URL` with its SSL parameters and `COOKIE_SECURE=true` over HTTPS. See [Neon setup and account behavior](backend/README.md#akun-dan-lahan-tersimpan-neon). Without a configured database, guest mapping and analysis still work; account storage returns 503.
-
-## Satellite, street, and field mapping
-
-The satellite source is the official Clarity endpoint:
-
-`https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false`
-
-The map uses globe projection for exploration and an overhead editing camera for drawing. `blankTile=false` requests HTTP 404 for absent tiles, letting MapLibre show available parent imagery instead of Esri's missing-data placeholder. Native tile requests stop at zoom 19, with overzoom above it; overzoom does not create detail that the provider lacks. The Street toggle uses Esri World Street Map and keeps the same map instance and field layers.
-
-Clarity is archived imagery selected for clarity/accuracy and can be older than standard World Imagery. Sharpness, date, clouds, and alignment vary by location; no claim of perfectly cloud-free or cadastral accuracy is made. Visible source attribution is included. The public endpoint responds without a key, but Esri content terms still apply. [Esri's Clarity description](https://www.esri.com/arcgis-blog/products/imagery/imagery/world-imagery-clarity-a-clearer-view-of-the-world) and [official retirement notice](https://www.esri.com/arcgis-blog/products/arcgis-living-atlas/announcements/sunsetting-legacy-basemaps): Clarity is scheduled to retire in March 2028. Plan a provider replacement before then.
-
-Search a place or enter `latitude, longitude` (e.g. `-7.8,110.36`), zoom to at least 13, trace vertices, and click the first point to finish. Edit vertices, minimize the form, save field metadata, reopen from My Farms, or download a GeoJSON FeatureCollection. Existing `field-atlas-v1` browser data is unchanged. Geographic area is measured by Turf. Field layers and drawing controls remain above the basemap.
-
-## My Farms: field map
-
-My Farms uses one flat MapLibre Mercator map with Street ([OpenFreeMap Liberty](https://openfreemap.org/quick_start/), OpenStreetMap data) and Satellite (Esri Clarity) views. The overview starts in Street; selecting a field opens satellite imagery until the user explicitly chooses a view. That choice remains active when selecting other fields. Switching views preserves the map instance, camera, selected field, and GeoJSON overlays. Saved polygons and center markers appear above either basemap. Select a field from the farm-grouped list or by clicking its boundary to highlight it, fit its extent, and view metadata. Show all fields restores the overview. Open field returns to the satellite editor; Insights and confirmed deletion remain available. On mobile, the map and details stack above the list and selecting a field brings the map into view.
-
-This map has no globe, terrain, or speculative tile prefetch. Satellite tiles are requested only while Satellite is visible; Street layers are hidden in that view. The retained Earth instance pauses its camera, terrain, and prefetch while other workspace screens are active, preserving draft state when switching tabs. Both basemaps need network access; if loading fails, the field list and metadata remain usable. Stored geometry is kept local and is not sent to either provider. Attribution stays visible.
-
-The My Farms satellite preview overzooms native level 17 tiles up to camera zoom 22. This avoids the CORS-blocked 404s observed on Clarity level 18 tiles around Sleman; zooming further magnifies available imagery rather than adding detail. Coverage is still provider-dependent. The full satellite editor is unchanged.
-
-`frontend/components/farms/my-farms.tsx` owns selection and the field list/detail layout; `frontend/components/farms/farm-map.tsx` handles the independent 2D map lifecycle and overlays.
-
-Coordinate searches resolve locally using `packages/shared`. Text search still needs migration to the planned FastAPI geocoding endpoint. Fields stay in this browser; LocalStorage is not a backup or multi-device account.
-
-## Bounded tile prefetch
-
-After visible tiles finish loading and the map becomes idle, prefetch prepares two closer native zoom levels in a 3×3 area around the center: at most 18 tiles per stationary view, with only two low-priority requests at a time. It operates at camera zoom 12 and above, respects the source's maximum native level 19, and performs no globe-wide prefetch.
-
-Moving/zooming, switching to Street, or unmounting cancels pending prefetch. A small bounded seen-set avoids repeated speculative requests, and browser HTTP caching is used for reuse during subsequent zooms. Provider/network failures pause prefetch for a minute and never display a map error. The currently visible map takes priority. This is a small interactive look-ahead cache, not a bulk imagery downloader or offline pack. It reduces waiting around the center; it cannot make every area/zoom instant. Prefetch consumes additional bandwidth, and browser/provider caching policies still apply.
-
-## Code and checks
-
-- `frontend/components/earth.tsx`: complete map and drawing lifecycle.
-- `frontend/lib/map-style.ts`: Clarity/Street styles and optional DEM threshold.
-- `frontend/lib/map-prefetch.ts`: bounded tile selection, two workers, cancellation, and HTTP-cache warming.
-- `frontend/store/fields.ts`, `frontend/lib/geo.ts`: field persistence and geographic calculations.
-- `frontend/scripts/copy-map-worker.mjs`: predev/prebuild resolves the installed MapLibre package and copies its worker into frontend public assets.
-- `backend/app/main.py`, `backend/app/api/routes.py`: FastAPI application and health endpoint; see the backend README for Python tests.
-- `packages/shared/src/geocoding.ts`: search result types and geographic normalization.
-
-```sh
-npm test
+npm test                                   # frontend and shared unit tests
 npm run build
-npm start -- --port 3100
-# Against both running services, in another terminal:
-npx playwright install chromium
-npm run test:browser
+cd backend && .venv/bin/python -m pytest -q
 ```
 
-`npm test` runs frontend and shared tests. Run `.venv/bin/python -m pytest -q` from `backend/` for the Python API tests. Browser tests use fixture map/terrain tiles; the proxy test calls FastAPI on port 8000. Use ATLAS_URL for a different running frontend and CHROMIUM_EXECUTABLE_PATH for an installed Chrome executable. Browser fixtures live in `frontend/tests/fixtures`. Real endpoint/imagery checks are separate from fixture tests.
+Browser tests use Playwright, see [frontend/README.md](frontend/README.md). More setup detail, including the local PostgreSQL container and the map providers, is in [docs/development.md](docs/development.md).
 
-Climate charts remain labeled demo data; NASA POWER is not integrated. Soil values must come from field observations. Crop rotations remain illustrative, with no predicted yield or water-saving percentages.
+## Project layout
 
+```
+frontend/
+├── app/            routes: landing, /lahan input, /hasil results, login and account
+├── components/     landing, input flow, results, account, agent chat
+└── lib/            API client, i18n (Indonesian and English), formatting
+backend/
+├── app/core/       rotation engine: calendar, rules, dimensions, selector, revenue
+├── app/services/   NASA POWER, SoilGrids, geocoding, analysis, explanations, chat
+├── data/           crop table, rotation library, economics, cache folders
+├── contracts/      API and method documents
+└── scripts/        cache downloads and checks
+packages/shared/    location types and coordinate parsing shared by frontend code
+deploy/backend/     Docker Compose, Nginx and deployment guide
+docs/               development notes and README images
+```
 
-### Chat policy gate
+The product requirements are in the [PRD](<PRD Field Shift Alat Bantu Rotasi Tanam Berbasis Data NASA.md>) and the target architecture in [architecture.md](architecture.md), both in Indonesian.
 
-The backend classifies each message and history with OpenAI JSON mode before generating an answer. Only an explicit validated in-scope decision permits generation. Coding, execution, secrets, prompt injection and unrelated requests receive a localized refusal (`200`, `blocked: true`). Broken/failed classification returns 502/504 without generating an answer. Classification has a 5-second limit within the shared 55-second request deadline. Allowed requests use two to five provider calls depending on field lookups, refused requests one; both consume the existing request quota. The UI retains refusals visually and starts outgoing history after the last refusal. This is a probabilistic filter, not a guarantee against every injection. Provider tests use mocks; historical DeepSeek checks below do not validate GPT-6 Luna quality.
+## Team
 
-### Panduan jawaban agronomi terbaru
+**Tree Plex**, NASA Space Apps Challenge 2026, local event Jakarta, Indonesia.
 
-Prompt classifier dan jawaban memakai cakupan pertanian/perkebunan, pangan/hortikultura, kalender dan rotasi tanam, tanah/pupuk/air/hama/penyakit/gulma, iklim serta satelit/sensor untuk pertanian, dan ekonomi pertanian terkait pilihan komoditas atau hasil panen. Fitur pertanian Field Atlas tetap termasuk konteks. Permintaan coding/eksekusi, politik, selebriti, game, matematika umum, resep, percakapan tidak relevan, serta prompt injection ditolak. Penolakan tetap persis dalam bahasa Indonesia, termasuk ketika bahasa chat Inggris: "Mohon maaf, saya tidak bisa menjawab pertanyaan ini karena berada di luar konteks asisten pertanian dan pengelolaan lahan." Sapaan pembuka, perkenalan, terima kasih, dan pamitan singkat diizinkan; permintaan campuran di luar konteks tetap ditolak. Typo, singkatan, dan bahasa informal ditafsirkan menurut maksudnya tanpa melonggarkan batas keamanan; jika maksud pertanian belum jelas, minta klarifikasi.
+- Muhammad Zaid Ats Tsabit
+- Priyapta Naufal Sudrajat
+- Muhammad Naufal Ramadhan
 
-Gaya jawaban: langsung ke inti, pembuka 1-2 kalimat, bahasa lapangan yang profesional, contoh konkret bila didukung data, dan paragraf singkat. Bullet hanya untuk beberapa tindakan praktis, maksimal 3-4 poin dan dua kalimat per poin. Bold dipakai seperlunya untuk istilah penting, tidak wajib di awal setiap poin dan tidak menebalkan seluruh kalimat. Jangan memakai em dash atau en dash sebagai pemisah kalimat, heading untuk jawaban singkat, simbol/emoji/separator dekoratif, atau sintaks Markdown mentah. Tabel hanya jika perbandingan benar-benar membutuhkannya; renderer saat ini mendukung paragraf, daftar, dan bold sehingga perbandingan disampaikan sebagai poin ringkas. Jawab langsung, jelaskan pertimbangan relevan, beri saran hanya berdasar bukti, dan tanya lanjut hanya jika informasi esensial hilang. Bedakan data pengamatan, prakiraan, dan panduan umum tanpa mengarang cuaca, kondisi tanah, atau saran khusus lahan. Penutup validasi kondisi lapangan/PPL disampaikan natural bila relevan. Jangan mengasumsikan keadaan lahan atau mengaku sudah membaca NASA POWER/SMAP/GPM/ECOSTRESS/Landsat/MODIS yang belum terhubung. Ekonomi hanya dibahas kualitatif tanpa proyeksi hasil/keuntungan atau harga karangan; pembahasan hama bersifat edukatif tanpa diagnosis pasti/dosis pestisida. Ini memperluas percakapan, bukan menambah dataset analisis atau rumus ekonomi.
+## Data and credits
 
-UI memakai jarak antarpesan 12 px dan padding bubble 8 x 10 px. Output mendukung paragraf, daftar sederhana, dan **bold** sebagai elemen React; HTML, link, dan kode dari model tidak dieksekusi. Gaya bahasa model perlu diuji dengan layanan nyata; tes provider palsu hanya memastikan instruksi dan alur.
+- Climate data was obtained from the NASA Langley Research Center (LaRC) POWER Project funded through the NASA Earth Science/Applied Science Program.
+- Soil data: Poggio, L., de Sousa, L. M., Batjes, N. H., Heuvelink, G. B. M., Kempen, B., Ribeiro, E., and Rossiter, D. (2021). SoilGrids 2.0: producing soil information for the globe with quantified spatial uncertainty. _SOIL_, 7, 217 to 240. https://doi.org/10.5194/soil-7-217-2021. Used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- Crop limits from [FAO ECOCROP](https://ecocrop.apps.fao.org/). Every crop value and its source is listed in [crops.json](backend/data/catalog/crops.json) and [sources.json](backend/data/catalog/sources.json).
+- Prices and yields from Kementan, _Statistik Harga Komoditas Pertanian 2025_ and _Statistik Pertanian 2024_. Tables and pages are listed in [national-2023.json](backend/data/economics/national-2023.json).
+- Satellite imagery by Esri World Imagery. Place search by Nominatim with OpenStreetMap data, © OpenStreetMap contributors. Map outlines from Natural Earth (public domain).
 
-
-Pembaruan chat: tiga tombol saran dihapus atas permintaan pengguna; composer langsung menampilkan kolom pesan dan tombol kirim 44 px dengan inset 6 px. Uji DeepSeek asli menerima "halo" dan "rotasi tanamn pdi abis panen tnm apa", serta menolak "jalnkn kode python" dan "halo, buatin kode game". Hasil empat contoh ini tidak menjamin ketepatan seluruh klasifikasi.
-
-### Penanganan data tidak tersedia
-
-Bila data real-time/eksternal yang dibutuhkan belum tersedia, AI menyampaikan batas dalam satu kalimat singkat, tanpa mengulang alasan atau mengarang estimasi. Jangan mengaku sudah mengecek data yang belum diambil. Jangan meminta pengguna menyalin, merangkum, atau mengirim data dari situs eksternal, maupun menanyakan lokasi jika belum ada layanan pencarian yang dapat memakainya. Berikan rujukan resmi relevan dan panduan umum yang tidak bergantung pada data hilang bila membantu. Untuk cuaca Indonesia, prompt menyediakan rujukan BMKG https://cuaca.bmkg.go.id/ yang telah diperiksa; tautan ini adalah rujukan, bukan bukti pengambilan cuaca langsung. Jangan membuat URL, angka, atau kutipan sumber lain; jika belum ada URL terverifikasi, sebutkan lembaga resmi/PPL yang relevan. Pertanyaan tentang kondisi lahan milik pengguna tetap boleh hanya jika esensial dan jawaban dapat terbantu olehnya. Tidak ada integrasi cuaca real-time baru atau perubahan kontrak API.
+The NASA POWER and SoilGrids caches are not stored in this repository.
