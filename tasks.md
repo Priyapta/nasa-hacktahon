@@ -115,7 +115,7 @@ Submisi dikerjakan bersama setelah bagian utama terintegrasi: Orang 1 merakit sl
 - [ ] Tes tiap area dan pemeriksaan manual lulus; versi aplikasi untuk presentasi dibekukan.
 - [ ] Aplikasi, repositori, dan slide tujuh halaman dapat dibuka tanpa login; daftar submisi PRD sudah diperiksa.
 
-Beban Orang 2 paling besar karena memegang data dan mesin rule-based; selesaikan dataset minimum bersumber dan satu titik analisis nyata lebih dahulu. Orang 3 fokus agent dari backend sampai UI chat. Bila terlambat, potong F-19–F-21 lebih dahulu dan ikuti aturan potong PRD. Agent tetap termasuk cakupan wajib: jika belum lulus, laporkan sebagai belum selesai dan sepakati penyesuaian jadwal/cakupan. Pemilihan library peta yang belum selaras antara kode dan PRD harus diputuskan pada tahap 0 sebelum Orang 1 membuat ulang komponen.
+Beban Orang 2 paling besar karena memegang data dan mesin rule-based; selesaikan dataset minimum bersumber dan satu titik analisis nyata lebih dahulu. Orang 3 fokus agent dari backend sampai UI chat. Bila terlambat, potong F-19–F-21 lebih dahulu dan ikuti aturan potong PRD. Agent tetap termasuk cakupan wajib: jika belum lulus, laporkan sebagai belum selesai dan sepakati penyesuaian jadwal/cakupan. Pemilihan library peta yang belum selaras antara kode dan PRD harus diputuskan pada tahap 0 sebelum Orang 1 membuat ulang komponen. 
 
 
 Progres keamanan Orang 3: pemeriksa konteks/keamanan kini memakai OpenAI sebelum jawaban; keputusan divalidasi backend, kegagalan menghentikan alur, dan penolakan tidak ikut riwayat request berikutnya. Tes provider palsu dan UI mencakup keputusan/galat. Migrasi FastAPI selesai; evaluasi kualitas classifier dengan model asli dan pipeline analisis tetap belum selesai.
