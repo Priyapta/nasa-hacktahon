@@ -28,6 +28,7 @@ export default function SoilSeasonCard({ ring, hectares, context, calendarMonths
   const one = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const whole = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 });
   const soil = context.soil;
+  const phRange = soil.status === "ok" ? soil.uncertainty.phh2o : undefined;
   const summary = seasonSummary(context.climate.monthly);
   const ordered = calendarMonths.map((m) => context.climate.monthly.find((c) => c.month === m)).filter((m) => m !== undefined);
   const monthName = (m: number, style: "narrow" | "long") =>
@@ -49,15 +50,15 @@ export default function SoilSeasonCard({ ring, hectares, context, calendarMonths
                 </span>
               </div>
               <div className="relative mt-2 h-3.5 rounded-[7px] bg-[linear-gradient(90deg,#E9B9A0_0%,#F3E2B8_40%,#CFE6B8_60%,#A9CDE0_100%)]" aria-hidden="true">
-                <div
+                {phRange && <div
                   className="absolute -bottom-1 -top-1 box-border rounded-[9px] border-2 border-[#3E4A43]"
-                  style={{ left: phAt(soil.uncertainty.phh2o.q05), right: `calc(100% - ${phAt(soil.uncertainty.phh2o.q95)})` }}
-                />
+                  style={{ left: phAt(phRange.q05), right: `calc(100% - ${phAt(phRange.q95)})` }}
+                />}
                 <div className="absolute -top-[7px] h-7 w-1 rounded-[2px] bg-ink-strong" style={{ left: `calc(${phAt(soil.ph)} - 2px)` }} />
               </div>
               <div className="mt-2 flex justify-between text-[11px] text-muted">
                 <span>{t.phLow}</span>
-                <span>{t.phRange(one.format(soil.uncertainty.phh2o.q05), one.format(soil.uncertainty.phh2o.q95))}</span>
+                {phRange && <span>{t.phRange(one.format(phRange.q05), one.format(phRange.q95))}</span>}
                 <span>{t.phHigh}</span>
               </div>
             </div>

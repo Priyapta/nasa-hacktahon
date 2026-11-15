@@ -1,10 +1,11 @@
+import type { RevenueEstimate, RevenueProvenance } from "./revenue";
 import { ApiError } from "./api";
 import { addMonths } from "./query";
 import type { AnalyzeRequest, ApiErrorBody, CropId } from "./types";
 
 export type RainClass = "basah" | "lembap" | "kering";
 export type Level = "rendah" | "sedang" | "tinggi";
-export type Role = "pola_biasa" | "hemat_air" | "jaga_tanah" | "seimbang";
+export type Role = "pola_biasa" | "hemat_air" | "jaga_tanah" | "seimbang" | "omzet_tertinggi";
 export type Phase = "tanam" | "tumbuh" | "panen" | "bera";
 
 export interface MonthlyClimate {
@@ -23,7 +24,7 @@ export interface SoilAvailable {
   texture_class: string;
   ph: number;
   soc_g_per_kg: number;
-  uncertainty: { phh2o: { q05: number; q95: number } };
+  uncertainty: { phh2o?: { q05: number; q95: number } };
 }
 
 export interface SoilUnavailable {
@@ -54,6 +55,7 @@ export interface Strategy {
   };
   reasons: string[];
   tradeoffs: string[];
+  revenue?: RevenueEstimate;
   explanation?: {
     assessment: string[];
     basis: string[];
@@ -71,6 +73,7 @@ export interface AnalysisResponse {
   provenance: {
     climate: { source: string; resolution: string; missing_days: number; rain_validation: { status: string; reference?: string | null } };
     soil: { source: string; resolution: string } | null;
+    economics?: RevenueProvenance;
     crop_table_version: string;
     assumptions: string[];
   };
