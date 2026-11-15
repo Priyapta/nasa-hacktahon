@@ -15,6 +15,12 @@ const copy = {
     chart: "Omzet per panen", chartHint: "Panjang batang menunjukkan omzet tiap panen. Klik untuk melihat rincian.",
     references: "Lihat angka acuan", assumptions: "Asumsi lengkap dan sumber", detail: "Rincian panen",
     brief: "Hanya panen selesai dalam rentang analisis yang dihitung. Orok-orok dan bera tidak menghasilkan penjualan dalam model.",
+    method: "Detail metode dan komoditas",
+    groups: [
+      { title: "Dasar perhitungan", points: ["Harga dan produktivitas memakai rata-rata nasional 2023, sama untuk semua lokasi dan bulan.", "Omzet adalah penjualan sebelum biaya. Biaya produksi dan pengeringan belum dihitung."] },
+      { title: "Panen yang dihitung", points: ["Hanya panen yang selesai dalam rentang analisis yang masuk omzet.", "Orok-orok dan bera tidak menghasilkan penjualan dalam model. Keduanya tetap bisa memiliki biaya dan manfaat lain."] },
+      { title: "Batas estimasi", points: ["Produktivitas nasional menjadi acuan, bukan prediksi hasil lahan Anda.", "Label tertinggi membandingkan pola layak yang dinilai. Hasil panen dan keuntungan tidak dijamin."] },
+    ],
     basis: "Perhitungan dan asumsi", source: "Sumber data", yield: "Hasil acuan kg/ha", price: "Harga acuan/kg",
   },
   en: {
@@ -27,6 +33,12 @@ const copy = {
     chart: "Revenue per harvest", chartHint: "Bar length shows revenue for each harvest. Click to see the details.",
     references: "View reference values", assumptions: "Full assumptions and sources", detail: "Harvest details",
     brief: "Only harvests completed within the analysis period count. Sunn hemp and fallow have no modeled sales.",
+    method: "Method and commodity details",
+    groups: [
+      { title: "Calculation basis", points: ["Prices and yields use 2023 national averages, the same for every location and month.", "Revenue is sales before costs. Production and drying costs are not included."] },
+      { title: "Harvests counted", points: ["Only harvests completed within the analysis period contribute to revenue.", "Sunn hemp and fallow have no modeled sales. They may still have costs and other benefits."] },
+      { title: "Estimate limits", points: ["National yield is a reference, not a forecast for your field.", "The highest label compares feasible evaluated patterns. Harvests and profits are not guaranteed."] },
+    ],
     basis: "Calculation and assumptions", source: "Data sources", yield: "Reference yield kg/ha", price: "Reference price/kg",
   },
 };
@@ -106,9 +118,23 @@ export default function RevenuePanel({ strategy, provenance, lang }: { strategy:
         </details>
         <details className="mt-3 rounded-xl border border-[#DFE3D9] px-4 pb-1">
           <summary className="cursor-pointer py-3 text-sm font-bold text-sawah-lip">{t.assumptions}</summary>
-          <ul className="my-3 list-disc space-y-2 pl-5 text-sm text-muted">{provenance.assumptions.map((text) => <li key={text}>{text}</li>)}</ul>
-          <h3 className="text-sm font-bold">{t.source}</h3>
-          <ul className="list-disc space-y-2 pl-5 text-sm">{provenance.sources.map((source) => <li key={source.id}><a className="underline" href={source.url} target="_blank" rel="noreferrer">{source.title}</a><span className="block text-xs text-muted">{source.locator}</span></li>)}</ul>
+          <div className="flex flex-col gap-4 pb-4 text-sm leading-relaxed">
+            {t.groups.map((group) => <div key={group.title} className="max-w-3xl">
+              <h3 className="m-0 mb-1.5 text-sm font-bold">{group.title}</h3>
+              <ul className="m-0 list-disc space-y-1 pl-5 text-muted">{group.points.map((point) => <li key={point}>{point}</li>)}</ul>
+            </div>)}
+            <details className="border-t border-hairline pt-1">
+              <summary className="min-h-11 cursor-pointer py-3 font-bold text-sawah-lip">{t.method}</summary>
+              <ul className="m-0 max-w-3xl list-disc space-y-2 pb-3 pl-5 text-muted">{provenance.assumptions.map((text) => <li key={text}>{text}</li>)}</ul>
+            </details>
+            <div className="border-t border-hairline pt-4">
+              <h3 className="m-0 mb-3 text-sm font-bold">{t.source}</h3>
+              <ul className="m-0 flex list-none flex-col gap-4 p-0">{provenance.sources.map((source) => <li key={source.id} className="max-w-3xl">
+                <a className="font-bold text-sawah-lip underline underline-offset-2" href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                <p className="mb-0 mt-1 text-xs leading-relaxed text-muted">{source.locator}</p>
+              </li>)}</ul>
+            </div>
+          </div>
         </details>
       </details>
     </section>

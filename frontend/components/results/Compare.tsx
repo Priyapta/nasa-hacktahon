@@ -220,28 +220,48 @@ export function WhyCard({ strategy, lang, t }: { strategy: Strategy; lang: Lang;
 
 export function Sources({ result, t }: { result: AnalysisResponse; t: T }) {
   const p = result.provenance;
+  const notes = [...new Set(result.notes)].filter((note) =>
+    !isRainValidationNote(note) && !(p.economics && /^(Omzet memakai|Revenue uses)/.test(note)),
+  );
+  const assumptions = [...new Set(p.assumptions)].filter((note) => !isRainValidationNote(note));
   return (
     <details className="surface px-5 py-4">
-      <summary className="cursor-pointer text-base font-bold">
-        {t.sourcesTitle}
-      </summary>
-      <div className="mt-3 grid grid-cols-1 gap-5 text-[13px] leading-relaxed md:grid-cols-2">
-        <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-3.5 gap-y-1.5">
-          <dt className="text-muted">{t.climateLabel}</dt>
-          <dd className="m-0">
-            {p.climate.source} {t.yearRange(...periodYears(result.context.climate.period))}, {t.missingDays(p.climate.missing_days)}. {p.climate.resolution}
-          </dd>
-          <dt className="text-muted">{t.soilLabel}</dt>
-          <dd className="m-0">{result.context.soil.status === "ok" && p.soil ? `${p.soil.source}, ${p.soil.resolution}` : t.soilUnavailable}</dd>
-          <dt className="text-muted">{t.cropTable}</dt>
-          <dd className="m-0">{p.crop_table_version.split(":")[0]}</dd>
-        </dl>
-        <ul className="m-0 pl-[18px]">
-          {[...result.notes, ...p.assumptions].filter((x) => !isRainValidationNote(x)).map((x) => (
-            <li key={x}>{x}</li>
-          ))}
-        </ul>
+      <summary className="cursor-pointer text-base font-bold">{t.sourcesTitle}</summary>
+      <div className="mt-4 grid grid-cols-1 items-start gap-6 text-sm leading-relaxed md:grid-cols-2 md:gap-8">
+        <div>
+          <h3 className="m-0 mb-3 text-sm font-bold">{t.sourceListTitle}</h3>
+          <dl className="m-0 flex flex-col gap-4">
+            <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3">
+              <dt className="text-muted">{t.climateLabel}</dt>
+              <dd className="m-0">
+                <span className="block font-bold">{p.climate.source}</span>
+                <span className="block">{t.yearRange(...periodYears(result.context.climate.period))} · {t.missingDays(p.climate.missing_days)}</span>
+                <span className="mt-1 block text-xs text-muted">{p.climate.resolution}</span>
+              </dd>
+            </div>
+            <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3">
+              <dt className="text-muted">{t.soilLabel}</dt>
+              <dd className="m-0">{result.context.soil.status === "ok" && p.soil ? <><span className="font-bold">{p.soil.source}</span><span className="block text-xs text-muted">{p.soil.resolution}</span></> : t.soilUnavailable}</dd>
+            </div>
+            <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3">
+              <dt className="text-muted">{t.cropTable}</dt>
+              <dd className="m-0 break-words">{p.crop_table_version.split(":")[0]}</dd>
+            </div>
+          </dl>
+        </div>
+        <div>
+          <h3 className="m-0 mb-3 text-sm font-bold">{t.readingTitle}</h3>
+          <ul className="m-0 list-disc space-y-2 pl-5 text-muted">
+            <li>{t.readingNote}</li>
+            {notes.map((note) => <li key={note}>{note}</li>)}
+          </ul>
+          {p.economics && <p className="mb-0 mt-3"><a className="text-sawah-lip underline underline-offset-2" href="#revenue-title">{t.revenueDetails}</a></p>}
+        </div>
       </div>
+      {assumptions.length > 0 && <details className="mt-5 border-t border-hairline pt-1 text-sm leading-relaxed">
+        <summary className="min-h-11 cursor-pointer py-3 font-bold text-sawah-lip">{t.methodDetails}</summary>
+        <ul className="m-0 max-w-3xl list-disc space-y-2 pb-2 pl-5 text-muted">{assumptions.map((note) => <li key={note}>{note}</li>)}</ul>
+      </details>}
     </details>
   );
 }
