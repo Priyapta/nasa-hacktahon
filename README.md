@@ -16,7 +16,8 @@
     <a href="#features">Features</a> ·
     <a href="#method">Method</a> ·
     <a href="#limitations-and-next-steps">Limitations</a> ·
-    <a href="#running-locally">Running locally</a>
+    <a href="#running-locally">Running locally</a> ·
+    <a href="#attributions-and-copyright">Attributions and copyright</a>
 </p>
 
 <p align="center">
@@ -265,12 +266,81 @@ The product requirements are in the [PRD](<PRD Field Shift Alat Bantu Rotasi Tan
 - Priyapta Naufal Sudrajat
 - Muhammad Naufal Ramadhan
 
-## Data and credits
+## Attributions and copyright
 
-- Climate data was obtained from the NASA Langley Research Center (LaRC) POWER Project funded through the NASA Earth Science/Applied Science Program.
-- Soil data: Poggio, L., de Sousa, L. M., Batjes, N. H., Heuvelink, G. B. M., Kempen, B., Ribeiro, E., and Rossiter, D. (2021). SoilGrids 2.0: producing soil information for the globe with quantified spatial uncertainty. _SOIL_, 7, 217 to 240. https://doi.org/10.5194/soil-7-217-2021. Used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-- Crop limits from [FAO ECOCROP](https://ecocrop.apps.fao.org/). Every crop value and its source is listed in [crops.json](backend/data/catalog/crops.json) and [sources.json](backend/data/catalog/sources.json).
-- Prices and yields from Kementan, _Statistik Harga Komoditas Pertanian 2025_ and _Statistik Pertanian 2024_. Tables and pages are listed in [national-2023.json](backend/data/economics/national-2023.json).
-- Satellite imagery by Esri World Imagery. Place search by Nominatim with OpenStreetMap data, © OpenStreetMap contributors. Map outlines from Natural Earth (public domain).
+Every source used to build TANI is cited below, including open source software and freely available data. Each item keeps its own license and terms. No NASA logo, flag or mission identifier is used in the app, the README or the demo video.
 
-The NASA POWER and SoilGrids caches are not stored in this repository.
+### Data
+
+| Source | Used for | License or terms |
+| --- | --- | --- |
+| [NASA POWER](https://power.larc.nasa.gov/) | Daily rain, temperature, humidity and solar radiation, 2016 to 2025 | Climate data was obtained from the NASA Langley Research Center (LaRC) POWER Project funded through the NASA Earth Science/Applied Science Program. |
+| [SoilGrids 2.0](https://soilgrids.org/), ISRIC | Soil pH, organic carbon and texture | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Poggio, L., de Sousa, L. M., Batjes, N. H., Heuvelink, G. B. M., Kempen, B., Ribeiro, E., and Rossiter, D. (2021). SoilGrids 2.0: producing soil information for the globe with quantified spatial uncertainty. *SOIL*, 7, 217 to 240. https://doi.org/10.5194/soil-7-217-2021 |
+| [FAO ECOCROP](https://ecocrop.apps.fao.org/ecocrop/srv/en/home) | Crop temperature and pH limits | FAO terms of use. Every value and its page is listed in [sources.json](backend/data/catalog/sources.json) |
+| Kementan (Ministry of Agriculture of Indonesia) | 2023 prices and yields | Public statistics: [Statistik Harga Komoditas Pertanian 2025](https://satudata.pertanian.go.id/assets/docs/publikasi/c9c87ec57f8a22249659ace0dc306047.pdf), [Statistik Pertanian 2024](https://satudata.pertanian.go.id/assets/docs/publikasi/STATISTIK_PERTANIAN_2024_c.pdf), [Outlook Jagung 2024](https://satudata.pertanian.go.id/assets/docs/publikasi/Outlook_Jagung_2024_Final.pdf). Tables and pages are listed in [national-2023.json](backend/data/economics/national-2023.json) |
+| BPS, [Sensus Pertanian 2023](https://sensus.bps.go.id/) | Farm household figures on the landing page | Public statistics |
+| [Natural Earth](https://www.naturalearthdata.com/) | Country outlines for the landing maps | Public domain, see [terms of use](https://www.naturalearthdata.com/about/terms-of-use/) |
+| [Nominatim](https://nominatim.org/) and [OpenStreetMap](https://www.openstreetmap.org/copyright) | Place search | © OpenStreetMap contributors, data available under the Open Database License |
+
+The NASA POWER and SoilGrids caches are not stored in this repository. The curated tables in `backend/data/` hold only the values used by the app, with their sources.
+
+### Maps and imagery
+
+| Source | Used for | Attribution |
+| --- | --- | --- |
+| [Esri World Imagery (Clarity)](https://www.esri.com/arcgis-blog/products/imagery/imagery/world-imagery-clarity-a-clearer-view-of-the-world) | Satellite basemap for drawing and showing fields | Esri, Vantor, Earthstar Geographics, IGN, and the GIS User Community. Esri terms of use apply |
+| Esri World Street Map | Street basemap | Esri, HERE, Garmin, USGS, and the GIS User Community |
+| [MapTiler](https://www.maptiler.com/) terrain, optional | Elevation terrain when a key is configured | MapTiler terms of use |
+
+The attribution of each basemap stays visible on the map in the app.
+
+### Images
+
+| Image | Used on | Source |
+| --- | --- | --- |
+| Aerial photo of rice fields, [`login-sawah.jpg`](frontend/public/images/login-sawah.jpg) | Landing page hero and the sign in page | AI generated. It is an illustration, not a photo of a real field. The outlined plot and its 0.59 ha label are drawn on top by the app |
+
+### Fonts and icons
+
+| Asset | License |
+| --- | --- |
+| [Lexend](https://fonts.google.com/specimen/Lexend) | SIL Open Font License 1.1 |
+| [Lucide](https://lucide.dev/) icons | ISC |
+
+### Software
+
+| Project | License |
+| --- | --- |
+| [Next.js](https://nextjs.org/), [React](https://react.dev/) | MIT |
+| [Tailwind CSS](https://tailwindcss.com/) | MIT |
+| [MapLibre GL JS](https://maplibre.org/) | BSD 3-Clause |
+| [Terra Draw](https://terradraw.io/) | MIT |
+| [Turf.js](https://turfjs.org/) | MIT |
+| [Motion](https://motion.dev/) (framer-motion), [anime.js](https://animejs.com/) | MIT |
+| [TypeScript](https://www.typescriptlang.org/), [Playwright](https://playwright.dev/) | Apache 2.0 |
+| [FastAPI](https://fastapi.tiangolo.com/), [Pydantic](https://docs.pydantic.dev/), [pyproj](https://pyproj4.github.io/pyproj/) | MIT |
+| [httpx](https://www.python-httpx.org/), [Uvicorn](https://github.com/encode/uvicorn), [rasterio](https://rasterio.readthedocs.io/), [Shapely](https://shapely.readthedocs.io/), [NumPy](https://numpy.org/) | BSD |
+| [psycopg](https://www.psycopg.org/) | LGPL 3.0 |
+
+### Services
+
+| Service | Used for | Terms |
+| --- | --- | --- |
+| [OpenAI API](https://platform.openai.com/) | Short explanation of each strategy and the Cropy assistant | OpenAI terms of use |
+| [Vercel](https://vercel.com/), GitHub Actions, GitHub Container Registry | Hosting, tests and deployment | Provider terms |
+
+### Demo video
+
+| Asset | Used for | License or terms |
+| --- | --- | --- |
+| "Ambient Corporate Startup Promo" by alex-morgan, from [Pixabay](https://pixabay.com/id/music/search/technology%20corporate/) | Background music | [Pixabay Content License](https://pixabay.com/service/license-summary/) |
+| Screen recordings of TANI | Every app scene | Recorded by Tree Plex from the running app |
+| Aerial image of rice fields | Opening scenes | AI generated, the same image as the landing page |
+| Voice over | Narration | Recorded by Tree Plex |
+| [Playwright](https://playwright.dev/) | Recording the app scenes | Apache 2.0 |
+| [FFmpeg](https://ffmpeg.org/) | Encoding the video and mixing audio | GPL 3.0 build with x264 |
+| [whisper.cpp](https://github.com/ggml-org/whisper.cpp) | Transcribing the voice over to align it with the scenes | MIT |
+
+### Copyright
+
+The code and documentation in this repository are © 2026 Tree Plex. Third party data, imagery, fonts, icons and software remain the property of their owners and are used under the licenses listed above.
