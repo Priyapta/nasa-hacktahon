@@ -1,0 +1,44 @@
+.header {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1200px;
+  min-height: 76px;
+  border: 1px solid transparent;
+  transition: max-width 240ms ease, width 240ms ease, min-height 240ms ease,
+    top 240ms ease, border-radius 240ms ease, background-color 240ms ease,
+    border-color 240ms ease, box-shadow 240ms ease;
+}
+
+.compact {
+  top: 12px;
+  width: calc(100% - 24px);
+  max-width: 960px;
+  min-height: 64px;
+  border-radius: 20px;
+  border-color: rgb(255 255 255 / 24%);
+  background-color: rgb(15 38 27 / 88%);
+  box-shadow: 0 8px 28px rgb(10 28 18 / 16%), inset 0 1px 0 rgb(255 255 255 / 12%);
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .compact {
+    background-color: rgb(15 38 27 / 76%);
+    backdrop-filter: blur(20px) saturate(140%);
+  }
+}
+
+.header a:focus-visible,
+.header button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition: none;
+  }
+}

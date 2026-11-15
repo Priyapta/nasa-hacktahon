@@ -50,5 +50,19 @@ for (const width of [390, 1440]) {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+    const header = page.getByRole("banner");
+    const expanded = await header.boundingBox();
+    await page.evaluate(() => window.scrollTo(0, 900));
+    await expect(header).toHaveCSS("position", "fixed");
+    await expect(header).toHaveCSS("top", "12px");
+    const compact = await header.boundingBox();
+    expect(compact!.height).toBeLessThan(expanded!.height);
+    expect(compact!.width).toBeLessThan(expanded!.width);
+    await expect(header.getByRole("link", { name: "Masuk", exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(header).toHaveCSS("top", "0px");
   });
 }

@@ -16,6 +16,7 @@ const id = {
   },
   map: {
     tools: "Alat peta",
+    coverage: "Cakupan: Indonesia",
     draw: "Gambar batas lahan",
     satellite: "Satelit",
     street: "Jalan",
@@ -296,6 +297,7 @@ const en: Dictionary = {
   },
   map: {
     tools: "Map tools",
+    coverage: "Coverage: Indonesia",
     draw: "Draw field boundary",
     satellite: "Satellite",
     street: "Street",
