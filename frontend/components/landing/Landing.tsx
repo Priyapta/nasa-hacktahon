@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Polygon } from "geojson";
+import { ArrowUp, CalendarDays, Map as MapIcon, Sprout } from "lucide-react";
+import CropyOrb from "@/components/agent/CropyOrb";
 import { Logo } from "@/components/shell/AppHeader";
 import SatelliteThumb from "@/components/account/SatelliteThumb";
 import { CROP_LOOK } from "@/components/results/FieldSeason";
@@ -49,6 +52,7 @@ function Header({ lang }: { lang: Lang }) {
       <nav aria-label={lang === "en" ? "Page sections" : "Bagian halaman"} className="hidden flex-1 justify-center gap-7 md:flex">
         <a href="#indonesia" className="text-[15px] text-[#e3ede6] no-underline hover:text-white">{t.navIndonesia}</a>
         <a href="#cara-kerja" className="text-[15px] text-[#e3ede6] no-underline hover:text-white">{t.navSteps}</a>
+        <a href="#cropy" className="text-[15px] text-[#e3ede6] no-underline hover:text-white">{t.navCropy}</a>
       </nav>
       <div className="ml-auto flex items-center gap-2">
         <div role="group" aria-label={t.language} className="flex rounded-md bg-black/25 p-1">
@@ -180,6 +184,124 @@ function Steps({ lang }: { lang: Lang }) {
   );
 }
 
+// Splits "**word**" into highlighted spans, the same way the sample answers mark key facts.
+function emphasis(text: string) {
+  return text.split("**").map((part, i) => (i % 2 ? <b key={i} className="font-bold text-[#c3e77a]">{part}</b> : part));
+}
+
+const ABILITY_ICONS = [MapIcon, CalendarDays, Sprout];
+
+function Cropy({ lang }: { lang: Lang }) {
+  const t = dictionary(lang).landing.cropy;
+  return (
+    <section id="cropy" aria-labelledby="cropy-title" className="scroll-mt-24 border-t-2 border-hairline bg-white py-16 md:py-24">
+      <div className="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-10 px-4 sm:px-8 lg:grid-cols-[minmax(0,1fr)_520px] lg:gap-16">
+        <div className="flex flex-col gap-5">
+          <span className="flex items-center gap-3">
+            <span className="size-16"><CropyOrb animated /></span>
+            <span className="text-[26px] font-bold text-sawah-lip">{t.name}</span>
+          </span>
+          <h2 id="cropy-title" className="m-0 text-[30px] font-bold leading-tight tracking-tight text-ink-strong md:text-[42px]">{t.title}</h2>
+          <p className="m-0 max-w-[30em] text-[17px] leading-relaxed text-[#4a5650]">{t.lead}</p>
+          <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
+            {t.abilities.map((ability, i) => {
+              const Icon = ABILITY_ICONS[i];
+              return (
+                <li key={ability.title} className="flex items-start gap-3">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-sawah-tint text-sawah"><Icon aria-hidden="true" size={18} /></span>
+                  <span><b className="text-[15px] text-ink-strong">{ability.title}</b><span className="mt-0.5 block text-sm text-muted">{ability.text}</span></span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="m-0 text-[13px] text-muted">{t.note}</p>
+        </div>
+
+        <ChatDemo lang={lang} />
+      </div>
+    </section>
+  );
+}
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Plays the sample conversation once when it scrolls into view. Every bubble is
+// rendered from the start so the window keeps its final height and the page never jumps.
+function ChatDemo({ lang }: { lang: Lang }) {
+  const t = dictionary(lang).landing.cropy;
+  const box = useRef<HTMLDivElement>(null);
+  const inView = useInView(box, { once: true, amount: 0.5 });
+  const reduced = useReducedMotion();
+  const [shown, setShown] = useState(0);
+  const [typing, setTyping] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!inView) return;
+    if (reduced) { setShown(t.chat.length); return; }
+    let cancelled = false;
+    (async () => {
+      for (let i = 0; i < t.chat.length && !cancelled; i++) {
+        if (t.chat[i].from === "user") {
+          await wait(i === 0 ? 300 : 900);
+        } else {
+          await wait(350);
+          if (cancelled) return;
+          setTyping(i);
+          await wait(1400);
+          if (cancelled) return;
+          setTyping(null);
+        }
+        if (!cancelled) setShown(i + 1);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [inView, reduced, t.chat]);
+
+  const enter = { opacity: 1, y: 0 };
+  const hidden = { opacity: 0, y: 10 };
+  return (
+    <div ref={box} className="overflow-hidden rounded-[22px] bg-[#20242c] text-[#eef2f0] shadow-[0_24px_60px_rgb(22_32_27/28%)]">
+      <div className="flex items-center gap-3 border-b border-[#343c47] px-5 py-4">
+        <span className="size-[34px]"><CropyOrb animated={typing !== null} thinking={typing !== null} /></span>
+        <span><b className="text-base">{t.name}</b><span className="block text-xs text-[#b5beca]">{t.role}</span></span>
+      </div>
+      <ol className="m-0 flex list-none flex-col gap-3.5 p-4 text-sm leading-relaxed sm:p-5">
+        {t.chat.map((message, i) => {
+          const visible = i < shown || typing === i;
+          const transition = { duration: 0.35, ease: [0.2, 0.65, 0.3, 1] as const };
+          if (message.from === "user") {
+            return <motion.li key={i} initial={hidden} animate={visible ? enter : hidden} transition={transition}
+              className="max-w-[85%] self-end rounded-[15px_15px_4px_15px] border border-[#4c5b4e] bg-[#303d35] px-3.5 py-2.5">{message.text}</motion.li>;
+          }
+          const isTyping = typing === i;
+          const answered = i < shown;
+          const bubble = "rounded-[4px_15px_15px_15px] border border-[#566171] bg-[#2b313b] px-3.5 py-2.5";
+          return <motion.li key={i} initial={hidden} animate={visible ? enter : hidden} transition={transition} className="relative flex items-start gap-2">
+            <span className="mt-0.5 size-7 shrink-0"><CropyOrb animated={isTyping} thinking={isTyping} /></span>
+            {/* Invisible copy of the answer keeps its final size reserved. */}
+            <span aria-hidden="true" className={`invisible max-w-[88%] ${bubble}`}>{emphasis(message.text)}</span>
+            <motion.span layout transition={{ layout: { duration: 0.35, ease: [0.2, 0.65, 0.3, 1] } }} style={{ borderRadius: "4px 15px 15px 15px" }}
+              className={`absolute left-9 top-0 max-w-[88%] overflow-hidden ${bubble}`}>
+              {answered
+                ? <motion.span key="text" className="block" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.25 }}>{emphasis(message.text)}</motion.span>
+                : <span key="dots" role={isTyping ? "status" : undefined} aria-label={isTyping ? t.typing : undefined} className="flex h-[1.6em] items-center gap-1">
+                    {[0, 1, 2].map((dot) => <motion.span key={dot} className="size-1.5 rounded-full bg-[#c3e77a]"
+                      animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }} transition={{ duration: 0.9, repeat: Infinity, delay: dot * 0.15 }} />)}
+                  </span>}
+            </motion.span>
+          </motion.li>;
+        })}
+      </ol>
+      <div className="px-4 pb-4">
+        <div className="flex items-center gap-2.5 rounded-2xl border-2 border-[#c3e77a] bg-[#191d24] py-2.5 pl-4 pr-2.5" aria-hidden="true">
+          <span className="flex-1 text-sm text-[#7b8593]">{t.placeholder}</span>
+          <span className="flex size-[38px] items-center justify-center rounded-full bg-[#303d35] text-[#9da79f]"><ArrowUp size={16} /></span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Closing({ lang }: { lang: Lang }) {
   const t = dictionary(lang).landing;
   return (
@@ -216,6 +338,7 @@ export default function Landing() {
       <main>
         <Indonesia lang={lang} />
         <Steps lang={lang} />
+        <Cropy lang={lang} />
       </main>
       <Closing lang={lang} />
     </div>
