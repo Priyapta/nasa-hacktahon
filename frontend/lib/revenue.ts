@@ -23,3 +23,26 @@ export interface RevenueProvenance {
 export function formatRevenue(amount: number, lang: Lang, decimals = 0): string {
   return new Intl.NumberFormat(lang === "id" ? "id-ID" : "en-GB", { style: "currency", currency: "IDR", maximumFractionDigits: decimals }).format(amount);
 }
+
+const SCALES = [
+  { size: 1e12, id: "triliun", en: "trillion" },
+  { size: 1e9, id: "miliar", en: "billion" },
+  { size: 1e6, id: "juta", en: "million" },
+] as const;
+
+// "Rp229,6 juta" reads faster than "Rp 229.606.706". The full figure stays next to it.
+export function formatRevenueShort(amount: number, lang: Lang): string {
+  const scale = SCALES.find((s) => Math.abs(amount) >= s.size);
+  if (!scale) return formatRevenue(amount, lang);
+  const value = new Intl.NumberFormat(lang === "id" ? "id-ID" : "en-GB", { maximumFractionDigits: 1 }).format(amount / scale.size);
+  return lang === "id" ? `Rp${value} ${scale.id}` : `IDR ${value} ${scale.en}`;
+}
+
+type Ranked = { id: string; feasible: boolean; revenue?: Pick<RevenueEstimate, "gross_idr"> };
+
+// Position among feasible patterns by the backend revenue, highest first.
+export function revenueRank(strategies: Ranked[], id: string): { rank: number; total: number } | null {
+  const pool = strategies.filter((s) => s.feasible && s.revenue).sort((a, b) => b.revenue!.gross_idr - a.revenue!.gross_idr);
+  const index = pool.findIndex((s) => s.id === id);
+  return index < 0 ? null : { rank: index + 1, total: pool.length };
+}

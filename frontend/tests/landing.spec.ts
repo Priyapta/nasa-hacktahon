@@ -28,6 +28,25 @@ test("landing shows the product in Indonesian and English and starts the input f
   await expect(page).toHaveURL(/\/lahan\?lang=en$/);
 });
 
+test("landing introduces Cropy with its abilities and a sample conversation", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Cropy", exact: true }).click();
+  const section = page.getByRole("region", { name: "Kenalan dengan Cropy, asisten AI untuk pertanian Anda" });
+  await expect(section).toBeInViewport();
+  for (const ability of ["Membuka lahan tersimpan", "Tahu tahap tanam sekarang", "Fokus ke pertanian"]) {
+    await expect(section.getByText(ability, { exact: true })).toBeVisible();
+  }
+  const chat = section.locator("ol");
+  await expect(chat.getByRole("listitem")).toHaveCount(4);
+  await expect(section.locator("[data-cropy-orb]")).toHaveCount(4);
+  await expect(chat.getByRole("listitem").last()).toHaveCSS("opacity", "1", { timeout: 10_000 });
+  await expect(page.getByRole("status", { name: "Cropy sedang mengetik" })).toHaveCount(0);
+  await expect(section).not.toContainText("Kalau Anda masuk");
+
+  await page.goto("/?lang=en");
+  await expect(page.getByRole("region", { name: "Meet Cropy, the AI assistant for your farm" })).toContainText("rainfed field");
+});
+
 test("a signed-in visitor still sees the landing with a link to saved fields", async ({ page }) => {
   await page.route("**/api/v1/auth/me", (route) => route.fulfill({ json: { id: "user", username: "petani" } }));
   await page.goto("/");

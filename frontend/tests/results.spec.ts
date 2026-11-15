@@ -54,9 +54,7 @@ test("the results screen animates the chosen strategy month by month", async ({ 
 
   await expect(page.getByText("Lempung berliat")).toBeVisible();
   await expect(page.getByText("2.183 mm")).toBeVisible();
-  await page.getByText("Dari mana angka ini", { exact: true }).click();
-  await page.getByText("Detail pengolahan data", { exact: true }).click();
-  await expect(page.getByText("Data area grid adalah estimasi, bukan pengukuran langsung di lahan.")).toBeVisible();
+  await expect(page.getByText("Dari mana angka ini", { exact: true })).toHaveCount(0);
   await expect(page.getByText(/divalidasi/)).toHaveCount(0);
 });
 

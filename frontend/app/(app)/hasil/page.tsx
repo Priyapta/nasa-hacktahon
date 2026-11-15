@@ -9,7 +9,7 @@ import AgentChat from "@/components/agent/agent-chat";
 import FieldSeason from "@/components/results/FieldSeason";
 import SoilSeasonCard from "@/components/results/SoilSeasonCard";
 import RevenuePanel from "@/components/results/RevenuePanel";
-import { DimensionTable, Sources, StrategyCards, WhyCard } from "@/components/results/Compare";
+import { DimensionTable, StrategyCards, WhyCard } from "@/components/results/Compare";
 import { ApiError } from "@/lib/api";
 import { isRainValidationNote } from "@/lib/explanation-format";
 import { analyze, periodYears, timeline, type AnalysisResponse } from "@/lib/analysis";
@@ -189,15 +189,12 @@ function Results() {
 
               <StrategyCards strategies={strategies} selected={selected} onSelect={setSelected} startMonth={plan.startMonth} horizon={plan.horizon} t={r} lang={plan.lang} />
 
-              <RevenuePanel strategy={strategy} provenance={result.provenance.economics} lang={plan.lang} />
+              <RevenuePanel strategy={strategy} strategies={strategies} provenance={result.provenance.economics} startMonth={plan.startMonth} horizon={plan.horizon} lang={plan.lang} />
 
               <section className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
                 <DimensionTable strategies={strategies} selected={selected} horizon={plan.horizon} t={r} />
                 <WhyCard strategy={strategy} lang={plan.lang} t={r} />
               </section>
-
-              <Sources result={result} t={r} />
-
             </>
           )}
         </div>
