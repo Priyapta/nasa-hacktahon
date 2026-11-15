@@ -1,6 +1,10 @@
 # Integrasi halaman input dengan backend
 
-Halaman `/` memakai GET `/api/v1/crops` dan GET `/api/v1/geocode` melalui
+Halaman `/` adalah landing dalam bahasa Indonesia dan Inggris (`?lang=en`).
+Alur input ada di `/lahan`. Link lama dengan parameter alur di `/`, misalnya
+`/?langkah=2&area=…`, dialihkan ke `/lahan` dengan parameter yang sama.
+
+Halaman `/lahan` memakai GET `/api/v1/crops` dan GET `/api/v1/geocode` melalui
 proxy Next.js. Empat input disimpan di URL. Tombol Bandingkan strategi menuju
 `/hasil`, yang mengirim POST `/api/v1/analyze` dengan polygon, rotasi, bulan mulai,
 horizon, sumber air dan bahasa. Tidak ada request analisis saat pengguna baru
