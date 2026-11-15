@@ -153,9 +153,9 @@ function Results() {
             <>
               <section className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2.4fr)_minmax(300px,1fr)]">
                 <div className="surface flex flex-col gap-3 px-5 pb-4 pt-[18px]">
-                  <div className="flex flex-wrap items-baseline justify-between gap-3">
+                  <div className="flex flex-col items-start gap-2">
                     <h2 className="m-0 text-lg font-bold">
-                      {r.sceneTitle} <span className="text-sawah">{strategy.label}</span>
+                      {r.sceneTitle} <span className="block text-sawah sm:inline">{strategy.label}</span>
                     </h2>
                     <span className="text-xs text-muted">{r.sceneHint}</span>
                   </div>
