@@ -341,6 +341,10 @@ The attribution of each basemap stays visible on the map in the app.
 | [FFmpeg](https://ffmpeg.org/) | Encoding the video and mixing audio | GPL 3.0 build with x264 |
 | [whisper.cpp](https://github.com/ggml-org/whisper.cpp) | Transcribing the voice over to align it with the scenes | MIT |
 
+### Use of SI
+
+Parts of the code, documentation and the demo video were written with the help of SI tools. The strategy explanations and Cropy's answers are generated at runtime by a large language model from computed evidence. The rule engine and all NASA and soil values are not generated. The aerial image of rice fields is SI-generated and carries a visible label in the app.
+
 ### Copyright
 
 The code and documentation in this repository are © 2026 Tree Plex. Third party data, imagery, fonts, icons and software remain the property of their owners and are used under the licenses listed above.
