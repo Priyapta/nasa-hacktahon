@@ -1,0 +1,125 @@
+{
+  "version": "national-2023-v1",
+  "reference_year": 2023,
+  "scope": "Indonesia",
+  "sources": [
+    {
+      "id": "prices",
+      "title": "Kementan, Statistik Harga Komoditas Pertanian 2025",
+      "url": "https://satudata.pertanian.go.id/assets/docs/publikasi/c9c87ec57f8a22249659ace0dc306047.pdf",
+      "locator": "Tabel 1.1 halaman cetak 3 (GKG tingkat petani), Tabel 2.1 halaman cetak 19, kolom 2023",
+      "sha256": "5e40ceee5aa63fb813d2f6c0cda6f8dbf0d04a904c6e3c02c27ec729cdba6efe"
+    },
+    {
+      "id": "yields",
+      "title": "Kementan, Statistik Pertanian 2024",
+      "url": "https://satudata.pertanian.go.id/assets/docs/publikasi/STATISTIK_PERTANIAN_2024_c.pdf",
+      "locator": "Tabel 2.1.17/18/19/21, halaman cetak 123/124/125/127, baris Indonesia, kolom 2023. Padi GKG: Tabel 2.1.1 halaman cetak 107.",
+      "sha256": "eb6e894e4fe711c1b13498b09854c1ad57b2603159a5bc86b986bd0b5a6a5e7b"
+    },
+    {
+      "id": "maize_basis",
+      "title": "Kementan, Outlook Jagung 2024",
+      "url": "https://satudata.pertanian.go.id/assets/docs/publikasi/Outlook_Jagung_2024_Final.pdf",
+      "locator": "Halaman cetak 21 (PDF 39), harga produsen 2023 dan variasi kadar air sekitar 15-20%. Rentang ini bukan kadar air tepat dari harga rata-rata.",
+      "sha256": null
+    }
+  ],
+  "crops": [
+    {
+      "crop_id": "padi_sawah",
+      "product": "Gabah kering giling (GKG), bukan beras",
+      "price_idr_per_kg": "6761.92",
+      "yield_quintals_per_ha": "52.85",
+      "non_market": false,
+      "source_moisture_pct": null,
+      "model_moisture_pct": null,
+      "sources": [
+        "prices",
+        "yields"
+      ]
+    },
+    {
+      "crop_id": "jagung",
+      "product": "Jagung pipilan, berat sumber KA28%, asumsi perbandingan KA15%",
+      "price_idr_per_kg": "5360",
+      "yield_quintals_per_ha": "80.71",
+      "non_market": false,
+      "source_moisture_pct": "28",
+      "model_moisture_pct": "15",
+      "sources": [
+        "prices",
+        "yields",
+        "maize_basis"
+      ]
+    },
+    {
+      "crop_id": "kedelai",
+      "product": "Biji kedelai kering",
+      "price_idr_per_kg": "10264",
+      "yield_quintals_per_ha": "15.96",
+      "non_market": false,
+      "source_moisture_pct": null,
+      "model_moisture_pct": null,
+      "sources": [
+        "prices",
+        "yields"
+      ]
+    },
+    {
+      "crop_id": "kacang_hijau",
+      "product": "Biji kacang hijau kering",
+      "price_idr_per_kg": "18211",
+      "yield_quintals_per_ha": "11.42",
+      "non_market": false,
+      "source_moisture_pct": null,
+      "model_moisture_pct": null,
+      "sources": [
+        "prices",
+        "yields"
+      ]
+    },
+    {
+      "crop_id": "orok_orok",
+      "product": "Tidak dijual dalam model",
+      "price_idr_per_kg": null,
+      "yield_quintals_per_ha": "0",
+      "non_market": true,
+      "source_moisture_pct": null,
+      "model_moisture_pct": null,
+      "sources": []
+    },
+    {
+      "crop_id": "bera",
+      "product": "Tidak dijual dalam model",
+      "price_idr_per_kg": null,
+      "yield_quintals_per_ha": "0",
+      "non_market": true,
+      "source_moisture_pct": null,
+      "model_moisture_pct": null,
+      "sources": []
+    }
+  ],
+  "assumptions": {
+    "id": [
+      "Harga dan produktivitas adalah rata-rata nasional tahun 2023, sama untuk semua lokasi dan bulan. Bukan harga sekarang atau prakiraan harga panen.",
+      "Omzet adalah penjualan sebelum biaya. Produktivitas nasional tidak diprediksi ulang dari suhu, hujan, pH, varietas atau kondisi lahan pengguna.",
+      "Padi memakai harga gabah kering giling tingkat petani dan produktivitas padi nasional, bukan produktivitas spesifik sawah pengguna atau harga beras eceran.",
+      "Jagung memakai penyesuaian berat konservatif dari KA28% ke KA15%: berat x (1-0,28)/(1-0,15). Harga Rp5.360/kg adalah rata-rata produsen 2023 dengan kadar air bervariasi, bukan harga terukur khusus KA15%.",
+      "Penyesuaian kadar air hanya menjaga massa bahan kering. Kehilangan bahan saat pengeringan, mutu dan biaya pengeringan tidak dimodelkan. Angka jagung adalah skenario asumsi, bukan pasangan kadar air yang terverifikasi sama.",
+      "Hanya panen yang selesai dalam rentang analisis dihitung. Tahap yang berakhir setelah rentang tidak diprorata menjadi penjualan.",
+      "Orok-orok dipakai sebagai pupuk hijau dan bera sebagai lahan kosong. Keduanya diasumsikan tanpa penjualan, bukan tanpa biaya atau tanpa manfaat ekonomi.",
+      "Omzet tertinggi dipilih di antara pola layak yang dinilai. Tidak menjamin hasil panen, keuntungan bersih atau optimum seluruh kemungkinan rotasi."
+    ],
+    "en": [
+      "Prices and yields are 2023 national averages, identical across locations and months. They are not current prices or harvest-price forecasts.",
+      "Revenue is sales before costs. National yields are not predicted from the field temperature, rainfall, pH, cultivar or management.",
+      "Paddy uses farm-gate dry unhusked grain (GKG) prices and national paddy yields, not field-specific wetland yields or retail rice prices.",
+      "Maize uses a conservative mass adjustment from 28% to 15% moisture: mass x (1-0.28)/(1-0.15). IDR5,360/kg is a 2023 producer average across varying moisture levels, not a measured 15%-moisture price.",
+      "Moisture adjustment preserves dry matter only. Drying losses, quality and drying costs are not modeled. Maize is an assumption scenario, not an exact verified moisture match.",
+      "Only harvests completed within the analysis period count. Stages ending after the period are not prorated into sales.",
+      "Sunn hemp is green manure and fallow is unplanted. Both assume no sales, not zero costs or zero economic benefit.",
+      "Highest revenue is selected among the feasible patterns evaluated. It is not a yield, net-profit or global-rotation-optimum guarantee."
+    ]
+  }
+}
