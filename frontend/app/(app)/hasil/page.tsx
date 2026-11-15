@@ -9,7 +9,7 @@ import AgentChat from "@/components/agent/agent-chat";
 import FieldSeason from "@/components/results/FieldSeason";
 import SoilSeasonCard from "@/components/results/SoilSeasonCard";
 import RevenuePanel from "@/components/results/RevenuePanel";
-import { DimensionTable, Sources, StrategyCards, WhyCard } from "@/components/results/Compare";
+import { DimensionTable, StrategyCards, WhyCard } from "@/components/results/Compare";
 import { ApiError } from "@/lib/api";
 import { isRainValidationNote } from "@/lib/explanation-format";
 import { analyze, periodYears, timeline, type AnalysisResponse } from "@/lib/analysis";
@@ -195,9 +195,6 @@ function Results() {
                 <DimensionTable strategies={strategies} selected={selected} horizon={plan.horizon} t={r} />
                 <WhyCard strategy={strategy} lang={plan.lang} t={r} />
               </section>
-
-              <Sources result={result} t={r} />
-
             </>
           )}
         </div>
