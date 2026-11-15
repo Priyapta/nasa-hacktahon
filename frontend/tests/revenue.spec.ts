@@ -26,15 +26,25 @@ test("four strategies retain agronomy and show the selected revenue with its ass
   await expect(panel).toContainText("Tertinggi di antara pola layak yang dinilai");
   await expect(panel).toContainText("bukan harga terukur khusus KA15%");
   await panel.getByText("Perhitungan dan asumsi", { exact: true }).click();
-  await expect(panel.getByRole("table")).toHaveCount(2);
+  const chart = panel.getByRole("list", { name: "Omzet per panen" });
+  await expect(chart.getByRole("listitem")).toHaveCount(winner.revenue.stages.length);
+  await expect(panel.getByRole("table")).not.toBeVisible();
+  await chart.locator("summary").first().click();
+  await expect(chart.getByRole("definition").first()).toContainText("kg");
+  await panel.screenshot({ path: "/tmp/tani-revenue-graph.png" });
+  await panel.getByText("Lihat angka acuan", { exact: true }).click();
+  await expect(panel.getByRole("table")).toBeVisible();
+  await panel.getByText("Asumsi lengkap dan sumber", { exact: true }).click();
   await expect(panel.getByRole("link")).toHaveCount(3);
   await expect(panel).toContainText("6.761,92");
   await expect(page.getByRole("heading", { name: /Lahan Anda sepanjang musim dengan Estimasi omzet tertinggi/ })).toBeVisible();
   await page.screenshot({ path: "/tmp/tani-revenue-desktop.png", fullPage: true });
+  await panel.getByText("Lihat angka acuan", { exact: true }).click();
+  await panel.getByText("Asumsi lengkap dan sumber", { exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(panel).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
-  await page.screenshot({ path: "/tmp/tani-revenue-mobile.png", fullPage: true });
+  await panel.screenshot({ path: "/tmp/tani-revenue-mobile.png" });
 });
 
 test("revenue remains usable in English and no-sales stages stay explicit", async ({ page }) => {
@@ -47,5 +57,6 @@ test("revenue remains usable in English and no-sales stages stay explicit", asyn
   const baseline = analysis.strategies[0];
   expect(baseline.revenue.stages.some((s: { reason: string }) => s.reason === "no_sales")).toBeTruthy();
   await expect(panel).toContainText("No modeled sales");
+  await panel.getByText("View reference values", { exact: true }).click();
   await expect(panel).toContainText("6,761.92");
 });
