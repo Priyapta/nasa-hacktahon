@@ -104,7 +104,7 @@ function FieldCard({ field, crops, lang, busy, now, onDelete }: { field: SavedFi
 
 export default function Dashboard({ fields, lang, loading, busy, error, savedId, back, onRetry, onDelete }: Props) {
   const en = lang === "en";
-  const newField = `/?lang=${lang}`;
+  const newField = `/lahan?lang=${lang}`;
   const saved = fields.find((field) => field.id === savedId);
   const [now] = useState(() => new Date());
   const [crops, setCrops] = useState<Crop[] | null>(null);

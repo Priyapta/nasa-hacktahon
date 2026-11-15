@@ -47,7 +47,7 @@ function Results() {
     return () => controller.abort();
   }, [request, attempt]);
 
-  const back = `/?${serializePlan({ ...plan, step: plan.area ? 2 : 1 })}`;
+  const back = `/lahan?${serializePlan({ ...plan, step: plan.area ? 2 : 1 })}`;
   // input is null when measure() rejects the boundary, so this call cannot throw.
   const hectares = useMemo(() => (plan.area && input ? formatHectares(measure(polygonFromRing(plan.area)).areaHectares, plan.lang) : ""), [plan.area, input, plan.lang]);
   const WaterIcon = plan.water === "irigasi" ? Waves : CloudRain;

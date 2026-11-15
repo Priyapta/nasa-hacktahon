@@ -38,7 +38,7 @@ test("register, reopen saved land, analyze again, delete, and logout on mobile",
     expect(route.request().postDataJSON().time.start_month).toBe("2026-11");
     return route.fulfill({ contentType: "application/json", body: analysis });
   });
-  await page.goto("/");
+  await page.goto("/login");
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("heading", { name: "Masuk akun" })).toBeVisible();
   await page.getByRole("button", { name: "Belum punya akun? Daftar" }).click();
@@ -47,7 +47,7 @@ test("register, reopen saved land, analyze again, delete, and logout on mobile",
   await page.getByRole("button", { name: "Buat akun", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Sawah utara" })).toBeVisible();
   await expect(page).toHaveURL(/\/akun$/);
-  await expect(page.getByRole("link", { name: "Tambah lahan", exact: true })).toHaveAttribute("href", "/?lang=id");
+  await expect(page.getByRole("link", { name: "Tambah lahan", exact: true })).toHaveAttribute("href", "/lahan?lang=id");
   await expect(page.getByText("Jadwal lewat, dihitung dari Nov 2026")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: "/tmp/tani-account-mobile.png", fullPage: true });

@@ -163,7 +163,7 @@ export default function InputFlow() {
   const analysisInput = patternBlocked ? null : toAnalysisInput(plan);
 
   function href(next: PlanState) {
-    return `/?${serializePlan(next)}`;
+    return `/lahan?${serializePlan(next)}`;
   }
 
   function replacePlan(change: Partial<PlanState>) {
@@ -183,7 +183,7 @@ export default function InputFlow() {
     if (next === written.current) return;
     const timer = setTimeout(() => {
       written.current = next;
-      router.replace(`/?${next}`, { scroll: false });
+      router.replace(`/lahan?${next}`, { scroll: false });
     }, URL_SYNC_MS);
     return () => clearTimeout(timer);
   }, [plan, router]);

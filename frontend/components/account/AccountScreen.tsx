@@ -16,7 +16,7 @@ function Account() {
   const query = params.toString();
   const en = params.get("lang") === "en";
   const back = params.get("kembali");
-  const safeBack = back?.startsWith("/hasil?") || back?.startsWith("/?") ? back : `/?lang=${en ? "en" : "id"}`;
+  const safeBack = back?.startsWith("/hasil?") || back?.startsWith("/lahan?") ? back : `/lahan?lang=${en ? "en" : "id"}`;
   const { user, setUser, loading: sessionLoading, error: sessionError, reload } = useSession();
   const [fields, setFields] = useState<SavedField[]>([]);
   const [loading, setLoading] = useState(true);

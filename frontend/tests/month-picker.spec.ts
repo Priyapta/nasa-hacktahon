@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const url = "/?langkah=2&area=110.892,-7.0915;110.8928,-7.0914;110.8928,-7.092;110.892,-7.0921&pola=kosong&air=tadah_hujan";
+const url = "/lahan?langkah=2&area=110.892,-7.0915;110.8928,-7.0914;110.8928,-7.092;110.892,-7.0921&pola=kosong&air=tadah_hujan";
 
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-11-14T05:00:00Z"));

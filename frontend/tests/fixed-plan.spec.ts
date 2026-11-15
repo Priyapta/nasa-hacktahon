@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 
 const crops = readFileSync(join(__dirname, "../../backend/contracts/fixtures/crops.json"), "utf8");
-const base = "/?langkah=2&area=110.892,-7.0915;110.8928,-7.0914;110.8928,-7.092;110.892,-7.0921&mulai=2027-01&horizon=6&air=irigasi";
+const base = "/lahan?langkah=2&area=110.892,-7.0915;110.8928,-7.0914;110.8928,-7.092;110.892,-7.0921&mulai=2027-01&horizon=6&air=irigasi";
 
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-11-14T05:00:00Z"));

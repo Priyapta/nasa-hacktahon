@@ -17,7 +17,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const isFlow = pathname === "/hasil" || (pathname === "/" && params.size > 0);
+  const isFlow = pathname === "/hasil" || pathname === "/lahan";
   const step = pathname === "/hasil" ? 3 : params.get("langkah") === "2" ? 2 : 1;
 
   useEffect(() => { setMenuOpen(false); setError(""); }, [pathname]);

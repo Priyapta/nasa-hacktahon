@@ -68,7 +68,7 @@ test("the results screen shows the submitted plan and changes it only through th
   await expect(page.getByRole("button", { name: /^(6|18|24|12 bln)$/ })).toHaveCount(0);
 
   const edit = new URL((await page.getByRole("link", { name: "Ubah rencana" }).getAttribute("href"))!, "http://x");
-  expect(edit.pathname).toBe("/");
+  expect(edit.pathname).toBe("/lahan");
   expect(Object.fromEntries(edit.searchParams)).toMatchObject({ langkah: "2", mulai: "2026-11", horizon: "12", air: "tadah_hujan" });
 });
 
